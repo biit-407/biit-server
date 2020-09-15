@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='biit-server',
-    version='420.6.9',
+    version='420.9',
     url='https://biit.com',
     description='The basic blog app built in the Flask tutorial.',
     packages=find_packages(),
