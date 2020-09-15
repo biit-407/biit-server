@@ -1,7 +1,7 @@
 # biit server component
 
-## THIS IS A CLASS PROJECT
-## PLEASE DO NOT CONTRIBUTE
+**THIS IS A CLASS PROJECT**
+**PLEASE DO NOT CONTRIBUTE**
 
 ## How to do PRs
 * Fork the repository
