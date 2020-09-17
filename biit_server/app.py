@@ -35,10 +35,35 @@ def account_route():
         if account.create(data):
             return "Account Created", 200
         return "Failed to create account", 400
-
     elif request.method == "GET":
-        return "OK!"
+        data=""
+        try:
+            data = json.loads(request.get_json())
+        except:        
+            return "Failed to load JSON object", 400
+        if "email" not in data or not data["email"]:
+            return missing_data("email",400)
+        return account.get(data)
     elif request.method == "PUT":
-        return "OK!"
+        data=""
+        try:
+            data = json.loads(request.get_json())
+        except:        
+            return "Failed to load JSON object", 400
+        if "token" not in data or not data["token"]:
+            return missing_data("token",400)    
+        if "email" not in data or not data["email"]:
+            return missing_data("email",400)    
+        account.update(data)
+        return "Account Updated",200
     elif request.method == "DELETE":
-        return "OK!"
+        data=""
+        try:
+            data = json.loads(request.get_json())
+        except:        
+            return "Failed to load JSON object", 400
+        if "token" not in data or not data["token"]:
+            return missing_data("token",400)    
+        if "email" not in data or not data["email"]:
+            return missing_data("email",400)    
+        return "Account Deleted", 200
