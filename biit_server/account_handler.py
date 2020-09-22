@@ -1,25 +1,5 @@
 from .http_responses import http200, http400
-
-
-def validate_body(body, fields):
-    """
-    Validates that the given fields exist in the body
-    """
-    for field in fields:
-        if field not in body:
-            return http400(f"Missing field {field} in request")
-    return http200()
-
-
-def validate_query_params(query_params, fields):
-    """
-    Validates that the given fields exist in the body
-    """
-    for field in fields:
-        if field not in query_params:
-            return http400(f"Missing query parameter {field}")
-    return http200()
-
+from .query_helper import *
 
 def account_post(request):
     """
@@ -82,6 +62,9 @@ def account_put(request):
     if query_validation[1] != 200:
         return query_validation
 
+    if not authenticate_token(args["token"]):
+        return http400("User has wrong credentials.")
+
     # TODO uncomment once db is implemented
     # return account.update(args)
 
@@ -103,6 +86,9 @@ def account_delete(request):
     if query_validation[1] != 200:
         return query_validation
 
+    if not authenticate_token(args["token"]):
+        return http400("User has wrong credentials.")
+        
     # TODO uncomment once db is implemented
     # return account.delete(args)
 
