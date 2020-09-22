@@ -11,7 +11,8 @@ def client():
         yield client
 
 
-def test(client):
-    rv = client.get("/account")
-    print(rv.data)
-    assert b"Failed to load JSON object" == rv.data
+def test_client_fixture(client):
+    """
+    Meta testcase, asserts that the client fixture works
+    """
+    assert client
