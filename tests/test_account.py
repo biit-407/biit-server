@@ -46,7 +46,7 @@ def test_account_put(client):
     """
     rv = client.put(
         "/account",
-        query_string={"email": "test@email.com"},
+        query_string={"email": "test@email.com", "token": "TestToken"},
         follow_redirects=True,
     )
     assert b"OK: Account Updated" == rv.data
@@ -60,7 +60,7 @@ def test_account_delete(client):
     """
     rv = client.delete(
         "/account",
-        query_string={"email": "test@email.com"},
+        query_string={"email": "test@email.com", "token": "TestToken"},
         follow_redirects=True,
     )
     assert b"OK: Account Deleted" == rv.data
