@@ -2,3 +2,5 @@
 env
 *__pycache__*
 .tox
+pythonenv3.8/*
+.vscode/*
