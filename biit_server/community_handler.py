@@ -52,7 +52,7 @@ def community_put(request):
     """
     Handles the community PUT endpoint
     """
-    fields = ["email","token"]
+    fields = ["name","email","token"]
 
     # serializes the quert string to a dict (neeto)
     args = request.args
@@ -76,7 +76,7 @@ def community_delete(request):
     """
     Handles the community DELETE endpoint
     """
-    fields = ["email"]
+    fields = ["email","token","name"]
 
     # serializes the quert string to a dict (neeto)
     args = request.args
