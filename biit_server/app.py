@@ -1,7 +1,12 @@
 from flask import Flask, request
 import json
 from .account_handler import account_post, account_get, account_put, account_delete
-from .community_handler import community_delete, community_get, community_post, community_put
+from .community_handler import (
+    community_delete,
+    community_get,
+    community_post,
+    community_put,
+)
 
 # This runs on Firebase/Cloud Run!
 def create_app():
