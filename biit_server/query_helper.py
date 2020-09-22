@@ -1,5 +1,6 @@
 from .http_responses import http200, http400
 
+
 def validate_body(body, fields):
     """
     Validates that the given fields exist in the body
