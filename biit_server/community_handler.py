@@ -1,11 +1,12 @@
 from .http_responses import http200, http400
 from .query_helper import *
 
+
 def community_post(request):
     """
     Handles the community POST endpoint
     """
-    fields = ["name", "codeofconduct", "Admins","Members","mpm","meettype"]
+    fields = ["name", "codeofconduct", "Admins", "Members", "mpm", "meettype"]
     body = None
 
     try:
@@ -20,7 +21,7 @@ def community_post(request):
 
     # TODO @Ryan Create the DB stuff
     # if community.create(body):
-    return http200("Community Created")
+    return http200("community Created")
 
     # TODO uncomment once the DB is implemented
     # this was commented out for testing purposes
@@ -45,14 +46,14 @@ def community_get(request):
     # return community.get(args)
 
     # TODO remove once db is implemented
-    return http200("Community Returned")
+    return http200("community Returned")
 
 
 def community_put(request):
     """
     Handles the community PUT endpoint
     """
-    fields = ["name","email","token"]
+    fields = ["name", "email", "token"]
 
     # serializes the quert string to a dict (neeto)
     args = request.args
@@ -62,8 +63,7 @@ def community_put(request):
     if query_validation[1] != 200:
         return query_validation
 
-    if not authenticate_community(args["email"],args["token"]):
-        return http400("Invalid Administrative privilege")
+    # TODO Add Authentication
 
     # TODO uncomment once db is implemented
     # return community.update(args)
@@ -76,7 +76,7 @@ def community_delete(request):
     """
     Handles the community DELETE endpoint
     """
-    fields = ["email","token","name"]
+    fields = ["email", "token", "name"]
 
     # serializes the quert string to a dict (neeto)
     args = request.args
@@ -86,8 +86,7 @@ def community_delete(request):
     if query_validation[1] != 200:
         return query_validation
 
-    if not authenticate_community(args["email"],args["token"]):
-        return http400("Invalid Administrative privilege")
+    # TODO Add Authentication
 
     # TODO uncomment once db is implemented
     # return community.delete(args)
