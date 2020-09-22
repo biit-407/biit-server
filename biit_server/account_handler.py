@@ -1,6 +1,7 @@
 from .http_responses import http200, http400
 from .query_helper import *
 
+
 def account_post(request):
     """
     Handles the account POST endpoint
