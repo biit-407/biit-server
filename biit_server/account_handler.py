@@ -1,6 +1,7 @@
 from .http_responses import http200, http400
 from .query_helper import *
 
+
 def account_post(request):
     """
     Handles the account POST endpoint
@@ -62,8 +63,7 @@ def account_put(request):
     if query_validation[1] != 200:
         return query_validation
 
-    if not authenticate_token(args["token"]):
-        return http400("User has wrong credentials.")
+    # TODO Add Authentication
 
     # TODO uncomment once db is implemented
     # return account.update(args)
@@ -86,9 +86,8 @@ def account_delete(request):
     if query_validation[1] != 200:
         return query_validation
 
-    if not authenticate_token(args["token"]):
-        return http400("User has wrong credentials.")
-        
+    # TODO Add Authentication
+
     # TODO uncomment once db is implemented
     # return account.delete(args)
 
