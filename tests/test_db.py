@@ -31,7 +31,7 @@ def test_database_add():
 
 def test_database_get():
     """
-    Tests that database library can accurately add to database.
+    Tests that database library can accurately fetch from database given ID.
     """
     mock_db = MockFirestore()
 
@@ -51,3 +51,41 @@ def test_database_get():
 
     assert doc_json["name"] == test_data["name"]
     assert doc_json["id"] == test_data["id"]
+
+
+def test_database_query():
+    """
+    Tests that database library can accurately query database.
+    """
+    mock_db = MockFirestore()
+
+    test_data_1 = {"name": "Leroy", "id": 1337}
+    test_data_2 = {"name": "Julia", "id": 7}
+    test_data_3 = {"name": "Adrian", "id": 2000}
+
+    test_collection_name = "users"
+
+    mock_db.collection(test_collection_name).document(test_data_1["id"]).set(
+        test_data_1
+    )
+    mock_db.collection(test_collection_name).document(test_data_2["id"]).set(
+        test_data_2
+    )
+    mock_db.collection(test_collection_name).document(test_data_3["id"]).set(
+        test_data_3
+    )
+
+    test_db = Database(test_collection_name, firestore=mock_db)
+
+    query_results = test_db.query("id", "==", test_data_1["id"])
+
+    assert len(query_results) == 1
+
+    doc = query_results[0]
+
+    assert doc.exists
+
+    doc_json = doc.to_dict()
+
+    assert doc_json["name"] == test_data_1["name"]
+    assert doc_json["id"] == test_data_1["id"]
