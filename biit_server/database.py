@@ -19,7 +19,7 @@ class Database:
         self.firestore = firestore if firestore is not None else firestore.client()
         self.collection_ref = self.firestore.collection(self.collection_name)
 
-    def add(self, obj, id=None) -> Boolean:
+    def add(self, obj, id=None) -> bool:
         """Helper function to add object into the database.
 
         Args:
