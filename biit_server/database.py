@@ -4,7 +4,7 @@ from google.cloud import firestore
 
 
 class Database:
-    def __init__(self, collection, firestore=None) -> None:
+    def __init__(self, collection, firestore_client=None) -> None:
         """The constructor for the Database class. Used to instantiate a Database reference object.
 
         Args:
@@ -16,7 +16,7 @@ class Database:
         """
         super().__init__()
         self.collection_name = collection
-        self.firestore = firestore if firestore is not None else firestore.client()
+        self.firestore = firestore_client if firestore is not None else firestore.client()
         self.collection_ref = self.firestore.collection(self.collection_name)
 
     def add(self, obj, id=None) -> bool:
@@ -63,5 +63,22 @@ class Database:
         try:
             results = self.collection_ref.where(field, operation, value).stream()
             return [value for value in results]
+        except Exception:
+            return False
+
+    def update(self, id, update_dict) -> bool:
+        """Helper function to query documents based on parameters.
+
+        Args:
+            id (str, int): The id of the document you want (email for us).
+            update_dict (Dict[str, Any]): A dictionary of the fields you want to update
+        Returns:
+            List[Dict[str, Any]] if there are no errors. Boolean value of False if there is an error.
+        """
+        
+        try:
+            results = self.collection_ref.document(id)
+            results.update(update_dict)
+            return True
         except Exception:
             return False
