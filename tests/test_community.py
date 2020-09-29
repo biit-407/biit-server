@@ -81,3 +81,31 @@ def test_community_delete(client):
         follow_redirects=True,
     )
     assert b"OK: community Deleted" == rv.data
+
+
+def test_community_join_post(client):
+    """
+    Tests that community post works correctly
+
+    TODO this test needs to be modified when the database is connected
+    """
+    rv = client.post(
+        "/community/1/join",
+        json={"name": "Jeffery"},
+        follow_redirects=True,
+    )
+    assert b"OK: Community Joined" == rv.data
+
+
+def test_community_leave_post(client):
+    """
+    Tests that community post works correctly
+
+    TODO this test needs to be modified when the database is connected
+    """
+    rv = client.post(
+        "/community/1/leave",
+        json={"name": "Jeffery"},
+        follow_redirects=True,
+    )
+    assert b"OK: Community Left" == rv.data
