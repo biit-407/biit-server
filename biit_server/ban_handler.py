@@ -4,7 +4,7 @@ from .query_helper import *
 
 def ban_post(request):
     """
-    Handles the community PUT endpoint
+    Handles the ban post endpoint
     """
     fields = ["banner", "bannee", "community", "token"]
     body = None
@@ -30,7 +30,7 @@ def ban_post(request):
 
 def ban_put(request):
     """
-    Handles the community PUT endpoint
+    Handles the ban PUT endpoint
     """
     fields = ["banner", "bannee", "community", "token"]
 

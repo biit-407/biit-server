@@ -97,7 +97,7 @@ def community_delete(request):
 
 def community_join_post(request, community_id):
     """
-    Handles the community POST endpoint
+    Handles the community joining POST endpoint
     """
     fields = ["name"]
     body = None
@@ -123,7 +123,7 @@ def community_join_post(request, community_id):
 
 def community_leave_post(request, community_id):
     """
-    Handles the community POST endpoint
+    Handles the community leaveing POST endpoint
     """
     fields = ["name"]
     body = None
