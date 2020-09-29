@@ -1,5 +1,6 @@
 import pytest
-from biit_server import create_app
+from biit_server import create_app, account_handler
+from unittest.mock import patch
 
 
 @pytest.fixture
@@ -44,12 +45,16 @@ def test_account_put(client):
 
     TODO this test needs to be modified when the database is connected
     """
-    rv = client.put(
-        "/account",
-        query_string={"email": "test@email.com", "token": "TestToken"},
-        follow_redirects=True,
-    )
-    assert b"OK: Account Updated" == rv.data
+    with patch.object(
+        account_handler, "azure_refresh_token"
+    ) as mock_azure_refresh_token:
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
+        rv = client.put(
+            "/account",
+            query_string={"email": "test@email.com", "token": "TestToken"},
+            follow_redirects=True,
+        )
+        assert b"OK: Account Updated" == rv.data
 
 
 def test_account_delete(client):
@@ -58,9 +63,13 @@ def test_account_delete(client):
 
     TODO this test needs to be modified when the database is connected
     """
-    rv = client.delete(
-        "/account",
-        query_string={"email": "test@email.com", "token": "TestToken"},
-        follow_redirects=True,
-    )
-    assert b"OK: Account Deleted" == rv.data
+    with patch.object(
+        account_handler, "azure_refresh_token"
+    ) as mock_azure_refresh_token:
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
+        rv = client.delete(
+            "/account",
+            query_string={"email": "test@email.com", "token": "TestToken"},
+            follow_redirects=True,
+        )
+        assert b"OK: Account Deleted" == rv.data

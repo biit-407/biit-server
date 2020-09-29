@@ -1,5 +1,6 @@
 import pytest
-from biit_server import create_app
+from biit_server import create_app, ban_handler
+from unittest.mock import patch
 
 
 @pytest.fixture
@@ -16,12 +17,19 @@ def test_ban_post(client):
 
     TODO this test needs to be modified when the database is connected
     """
-    rv = client.post(
-        "/ban",
-        json={"banner": "first", "bannee": "last", "community": "com", "token": "test"},
-        follow_redirects=True,
-    )
-    assert b"OK: last has been banned" == rv.data
+    with patch.object(ban_handler, "azure_refresh_token") as mock_azure_refresh_token:
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
+        rv = client.post(
+            "/ban",
+            json={
+                "banner": "first",
+                "bannee": "last",
+                "community": "com",
+                "token": "test",
+            },
+            follow_redirects=True,
+        )
+        assert b"OK: last has been banned" == rv.data
 
 
 def test_ban_put(client):
@@ -30,14 +38,16 @@ def test_ban_put(client):
 
     TODO this test needs to be modified when the database is connected
     """
-    rv = client.put(
-        "/ban",
-        query_string={
-            "banner": "first",
-            "bannee": "last",
-            "community": "com",
-            "token": "test",
-        },
-        follow_redirects=True,
-    )
-    assert b"OK: last has been unbanned" == rv.data
+    with patch.object(ban_handler, "azure_refresh_token") as mock_azure_refresh_token:
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
+        rv = client.put(
+            "/ban",
+            query_string={
+                "banner": "first",
+                "bannee": "last",
+                "community": "com",
+                "token": "test",
+            },
+            follow_redirects=True,
+        )
+        assert b"OK: last has been unbanned" == rv.data
