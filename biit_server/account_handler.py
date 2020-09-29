@@ -4,8 +4,17 @@ from .azure import azure_refresh_token
 
 
 def account_post(request):
-    """
-    Handles the account POST endpoint
+    """Handles the account POST endpoint
+    Validates data sent in a request then calls the database to add an account
+
+    Args:
+        request: A request object that contains a json object with keys: fname, lname, email
+    
+    Returns:
+        Http 200 string response
+
+    Raises:
+        Http 400 when the json is missing a key
     """
     fields = ["fname", "lname", "email"]
     body = None
@@ -30,8 +39,17 @@ def account_post(request):
 
 
 def account_get(request):
-    """
-    Handles the account GET endpoint
+    """Handles the account GET endpoint
+    Validates data sent in a request then calls the database to get the row of the associated account
+
+    Args:
+        request: A request object that contains args with keys: email
+    
+    Returns:
+        Http 200 string response with the associated account information
+
+    Raises:
+        Http 400 when the json is missing a key
     """
     fields = ["email"]
 
@@ -51,8 +69,18 @@ def account_get(request):
 
 
 def account_put(request):
-    """
-    Handles the account PUT endpoint
+    """Handles the account POST endpoint
+    Validates data sent in a request then calls the database to edit the row of the account
+
+    Args:
+        request: A request object that contains args with keys: email, token, and (any account values to be changed)
+    
+    Returns:
+        Http 200 string response
+
+    Raises:
+        Http 400 when the json is missing required keys: email, token
+        or if the token is not valid
     """
     fields = ["email", "token"]
 
@@ -77,8 +105,18 @@ def account_put(request):
 
 
 def account_delete(request):
-    """
-    Handles the account DELETE endpoint
+    """Handles the account DELETE endpoint
+    Validates data sent in a request then calls the database to remove the associated account
+
+    Args:
+        request: A request object that contains args with keys: email, token
+    
+    Returns:
+        Http 200 string response
+
+    Raises:
+        Http 400 when the json is missing required keys: email, token
+        or if the token is not valid
     """
     fields = ["email", "token"]
 
