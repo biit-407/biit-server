@@ -72,7 +72,12 @@ def account_get(request):
     # TODO uncomment once db is implemented
     # return jsonHttp200("Data",account.get(args))
     # TODO remove once db is implemented
-    return http200("Account Returned")
+    account_db = Database("accounts")
+
+    try:
+        return account_db.get(args["email"])
+    except:
+        return http400("Account not found")
 
 
 def account_put(request):
