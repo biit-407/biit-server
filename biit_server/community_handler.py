@@ -7,7 +7,7 @@ def community_post(request):
     """
     Handles the community POST endpoint
     """
-    fields = ["name", "codeofconduct", "Admins", "Members", "mpm", "meettype","token"]
+    fields = ["name", "codeofconduct", "Admins", "Members", "mpm", "meettype", "token"]
     body = None
 
     try:
@@ -155,7 +155,6 @@ def community_leave_post(request, community_id):
     # check that body validation succeeded
     if body_validation[1] != 200:
         return body_validation
-        
     auth = azure_refresh_token(body["token"])
     if not auth[0]:
         return http400("Not Authenticated")
