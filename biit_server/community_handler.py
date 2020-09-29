@@ -1,12 +1,13 @@
 from .http_responses import http200, http400
 from .query_helper import *
+from .azure import azure_refresh_token
 
 
 def community_post(request):
     """
     Handles the community POST endpoint
     """
-    fields = ["name", "codeofconduct", "Admins", "Members", "mpm", "meettype"]
+    fields = ["name", "codeofconduct", "Admins", "Members", "mpm", "meettype","token"]
     body = None
 
     try:
@@ -19,8 +20,14 @@ def community_post(request):
     if body_validation[1] != 200:
         return body_validation
 
+    auth = azure_refresh_token(body["token"])
+    if not auth[0]:
+        return http400("Not Authenticated")
+    # TODO Add tuple ot response
+
     # TODO @Ryan Create the DB stuff
     # if community.create(body):
+
     return http200("community Created")
 
     # TODO uncomment once the DB is implemented
@@ -63,7 +70,10 @@ def community_put(request):
     if query_validation[1] != 200:
         return query_validation
 
-    # TODO Add Authentication
+    auth = azure_refresh_token(args["token"])
+    if not auth[0]:
+        return http400("Not Authenticated")
+    # TODO Add tuple ot response
 
     # TODO uncomment once db is implemented
     # return community.update(args)
@@ -86,7 +96,10 @@ def community_delete(request):
     if query_validation[1] != 200:
         return query_validation
 
-    # TODO Add Authentication
+    auth = azure_refresh_token(args["token"])
+    if not auth[0]:
+        return http400("Not Authenticated")
+    # TODO Add tuple ot response
 
     # TODO uncomment once db is implemented
     # return community.delete(args)
@@ -111,6 +124,11 @@ def community_join_post(request, community_id):
     # check that body validation succeeded
     if body_validation[1] != 200:
         return body_validation
+
+    auth = azure_refresh_token(body["token"])
+    if not auth[0]:
+        return http400("Not Authenticated")
+    # TODO Add tuple to response
 
     # TODO @Ryan Create the DB stuff
     # if community.join(body,community_id):
@@ -137,6 +155,11 @@ def community_leave_post(request, community_id):
     # check that body validation succeeded
     if body_validation[1] != 200:
         return body_validation
+        
+    auth = azure_refresh_token(body["token"])
+    if not auth[0]:
+        return http400("Not Authenticated")
+    # TODO Add tuple ot response
 
     # TODO @Ryan Create the DB stuff
     # if community.join(body,community_id):
