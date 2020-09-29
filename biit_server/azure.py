@@ -23,26 +23,26 @@ def azure_refresh_token(refresh_token: str) -> Tuple[str, str]:
     new access token and refresh token
 
     Args:
-        refresh_token (str): the refresh token provided by azure 
+        refresh_token (str): the refresh token provided by azure
                              when authenticating on the client.
-    
+
     Returns:
-        Tuple[str, str]: A tuple containing the new access token 
-                         and the new refresh token for the client 
-                         to use. 
-                         
-                         NOTE: if the request fails then 
-                         a tuple of 2 empty strings will be 
-                         returned. When this happens the client 
-                         will need to redo the entire oauth 
-                         process and obtain a new refresh token. 
+        Tuple[str, str]: A tuple containing the new access token
+                         and the new refresh token for the client
+                         to use.
+
+                         NOTE: if the request fails then
+                         a tuple of 2 empty strings will be
+                         returned. When this happens the client
+                         will need to redo the entire oauth
+                         process and obtain a new refresh token.
 
     """
     url = f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/token"
 
-    payload = f'client_id={CLIENT_ID}&scope=https://graph.microsoft.com/User.Read&redirect_uri={REDIRECT_URI}&grant_type=refresh_token&refresh_token={refresh_token}'
+    payload = f"client_id={CLIENT_ID}&scope=https://graph.microsoft.com/User.Read&redirect_uri={REDIRECT_URI}&grant_type=refresh_token&refresh_token={refresh_token}"
     headers = {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        "Content-Type": "application/x-www-form-urlencoded",
     }
 
     response = requests.request("POST", url, headers=headers, data=payload)
@@ -51,4 +51,4 @@ def azure_refresh_token(refresh_token: str) -> Tuple[str, str]:
     if response.status_code != 200:
         return ("", "")
 
-    return (rjson['access_token'], rjson['refresh_token'])
+    return (rjson["access_token"], rjson["refresh_token"])

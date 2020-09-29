@@ -2,6 +2,7 @@ from .http_responses import http200, http400
 from .query_helper import *
 from .azure import azure_refresh_token
 
+
 def ban_post(request):
     """
     Handles the ban post endpoint
