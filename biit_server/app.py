@@ -7,6 +7,8 @@ from .community_handler import (
     community_get,
     community_post,
     community_put,
+    community_join_post,
+    community_leave_post,
 )
 
 # This runs on Firebase/Cloud Run!
