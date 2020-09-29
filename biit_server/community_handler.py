@@ -94,6 +94,7 @@ def community_delete(request):
     # TODO remove once db is implemented
     return http200("community Deleted")
 
+
 def community_join_post(request, community_id):
     """
     Handles the community POST endpoint
@@ -118,6 +119,7 @@ def community_join_post(request, community_id):
     # TODO uncomment once the DB is implemented
     # this was commented out for testing purposes
     # return http400("Failed to create community")
+
 
 def community_leave_post(request, community_id):
     """
