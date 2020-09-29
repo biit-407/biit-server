@@ -93,3 +93,53 @@ def community_delete(request):
 
     # TODO remove once db is implemented
     return http200("community Deleted")
+
+def community_join_post(request, community_id):
+    """
+    Handles the community POST endpoint
+    """
+    fields = ["name"]
+    body = None
+
+    try:
+        body = request.get_json()
+    except:
+        return http400("Missing body")
+
+    body_validation = validate_body(body, fields)
+    # check that body validation succeeded
+    if body_validation[1] != 200:
+        return body_validation
+
+    # TODO @Ryan Create the DB stuff
+    # if community.join(body,community_id):
+    return http200("Community Joined")
+
+    # TODO uncomment once the DB is implemented
+    # this was commented out for testing purposes
+    # return http400("Failed to create community")
+
+def community_leave_post(request, community_id):
+    """
+    Handles the community POST endpoint
+    """
+    fields = ["name"]
+    body = None
+
+    try:
+        body = request.get_json()
+    except:
+        return http400("Missing body")
+
+    body_validation = validate_body(body, fields)
+    # check that body validation succeeded
+    if body_validation[1] != 200:
+        return body_validation
+
+    # TODO @Ryan Create the DB stuff
+    # if community.join(body,community_id):
+    return http200("Community Left")
+
+    # TODO uncomment once the DB is implemented
+    # this was commented out for testing purposes
+    # return http400("Failed to create community")
