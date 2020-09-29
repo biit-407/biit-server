@@ -41,6 +41,16 @@ def create_app():
         elif request.method == "DELETE":
             return community_delete(request)
 
+    @app.route("/community/<id>/join", methods=["POST"])
+    def join_route(id):
+        if request.method == "POST":
+            return community_join_post(request, id)
+
+    @app.route("/community/<id>/leave", methods=["POST"])
+    def leave_route(id):
+        if request.method == "POST":
+            return community_leave_post(request, id)
+
     @app.route("/ban", methods=["POST", "PUT"])
     def ban_route():
         if request.method == "POST":
