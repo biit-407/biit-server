@@ -1,6 +1,8 @@
 from .http_responses import http200, http400
 from .query_helper import *
-
+from .database import (
+    Database
+)
 
 def account_post(request):
     """
@@ -20,7 +22,14 @@ def account_post(request):
         return body_validation
 
     # TODO @Ryan Create the DB stuff
-    # if account.create(body):
+    account_db = Database("accounts")
+
+    try:
+        account_db.add(body, id=body["email"])
+    except:
+        return http400("Email already taken")
+
+
     return http200("Account Created")
 
     # TODO uncomment once the DB is implemented
