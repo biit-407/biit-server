@@ -51,11 +51,12 @@ def account_get(request):
     if query_validation[1] != 200:
         return query_validation
 
-    # TODO uncomment once db is implemented
-    # return account.get(args)
+    account_db = Database("accounts")
 
-    # TODO remove once db is implemented
-    return http200("Account Returned")
+    try:
+        return account_db.get(args["email"])
+    except:
+        return http400("Account not found")
 
 
 def account_put(request):
