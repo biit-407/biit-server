@@ -1,6 +1,6 @@
 from .http_responses import http200, http400
 from .query_helper import *
-from .azure import *
+from .azure import azure_refresh_token
 
 
 def account_post(request):
