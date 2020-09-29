@@ -1,5 +1,6 @@
 from .http_responses import http200, http400
 from .query_helper import *
+from .azure import *
 
 
 def account_post(request):
@@ -63,7 +64,10 @@ def account_put(request):
     if query_validation[1] != 200:
         return query_validation
 
-    # TODO Add Authentication
+    auth = azure_refresh_token(args["token"])
+    if not auth[0]:
+        return http400("Not Authenticated")
+    # TODO Add tuple to response
 
     # TODO uncomment once db is implemented
     # return account.update(args)
@@ -86,7 +90,10 @@ def account_delete(request):
     if query_validation[1] != 200:
         return query_validation
 
-    # TODO Add Authentication
+    auth = azure_refresh_token(args["token"])
+    if not auth[0]:
+        return http400("Not Authenticated")
+    # TODO Add tuple to response
 
     # TODO uncomment once db is implemented
     # return account.delete(args)
