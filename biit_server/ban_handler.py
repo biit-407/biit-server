@@ -1,6 +1,6 @@
 from .http_responses import http200, http400
 from .query_helper import *
-
+from .azure import azure_refresh_token
 
 def ban_post(request):
     """
@@ -19,7 +19,10 @@ def ban_post(request):
     if body_validation[1] != 200:
         return body_validation
 
-    # TODO Add Authentication
+    auth = azure_refresh_token(body["token"])
+    if not auth[0]:
+        return http400("Not Authenticated")
+    # TODO Add tuple to response
 
     # TODO uncomment once db is implemented
     # return ban.add(args)
@@ -42,7 +45,10 @@ def ban_put(request):
     if query_validation[1] != 200:
         return query_validation
 
-    # TODO Add Authentication
+    auth = azure_refresh_token(args["token"])
+    if not auth[0]:
+        return http400("Not Authenticated")
+    # TODO Add tuple to response
 
     # TODO uncomment once db is implemented
     # return ban.remove(args)
