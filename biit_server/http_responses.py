@@ -16,6 +16,15 @@ def http200(description: str = ""):
 
 
 def jsonHttp200(message: str, data):
+    """Http 200 response with json as data
+
+    Args:
+        message (str): Message to be sent
+        data: Data to be sent 
+
+    Returns:
+        str: Json combination of data and message
+    """
     json = list(data)
     json.append(message)
     return jsonify(json)
