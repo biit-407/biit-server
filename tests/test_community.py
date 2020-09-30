@@ -109,7 +109,7 @@ def test_community_join_post(client):
         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.post(
             "/community/1/join",
-            json={"name": "Jeffery", "token": "Toke"},
+            json={"name": "Jeffery", "token": "Toke", "email": "Testemail@gmail.com"},
             follow_redirects=True,
         )
         assert b'["RefreshToken","AccessToken","Community Joined"]\n' == rv.data
@@ -127,7 +127,7 @@ def test_community_leave_post(client):
         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.post(
             "/community/1/leave",
-            json={"name": "Jeffery", "token": "Toke"},
+            json={"name": "Jeffery", "token": "Toke", "email": "Testemail@gmail.com"},
             follow_redirects=True,
         )
         assert b'["RefreshToken","AccessToken","Community Left"]\n' == rv.data
