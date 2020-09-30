@@ -1,4 +1,4 @@
-from .http_responses import http200, http400
+from .http_responses import http200, http400, jsonHttp200
 from .query_helper import validate_body, validate_query_params
 from .azure import azure_refresh_token
 
@@ -31,6 +31,7 @@ def account_post(request):
 
     # TODO @Ryan Create the DB stuff
     # if account.create(body):
+    
     return http200("Account Created")
 
     # TODO uncomment once the DB is implemented
@@ -76,7 +77,7 @@ def account_put(request):
         request: A request object that contains args with keys: email, token, and (any account values to be changed)
     
     Returns:
-        Http 200 string response
+        Http 200 string response with refresh token and new token
 
     Raises:
         Http 400 when the json is missing required keys: email, token
@@ -99,9 +100,9 @@ def account_put(request):
 
     # TODO uncomment once db is implemented
     # return account.update(args)
-
+    
     # TODO remove once db is implemented
-    return http200("Account Updated")
+    return jsonHttp200("Account Updated",auth)
 
 
 def account_delete(request):
@@ -112,7 +113,7 @@ def account_delete(request):
         request: A request object that contains args with keys: email, token
     
     Returns:
-        Http 200 string response
+        Http 200 string response with refresh token and new token
 
     Raises:
         Http 400 when the json is missing required keys: email, token
@@ -137,4 +138,4 @@ def account_delete(request):
     # return account.delete(args)
 
     # TODO remove once db is implemented
-    return http200("Account Deleted")
+    return jsonHttp200("Account Deleted",auth)
