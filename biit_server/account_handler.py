@@ -9,7 +9,7 @@ def account_post(request):
 
     Args:
         request: A request object that contains a json object with keys: fname, lname, email
-    
+
     Returns:
         Http 200 string response
 
@@ -31,7 +31,7 @@ def account_post(request):
 
     # TODO @Ryan Create the DB stuff
     # if account.create(body):
-    
+
     return http200("Account Created")
 
     # TODO uncomment once the DB is implemented
@@ -45,7 +45,7 @@ def account_get(request):
 
     Args:
         request: A request object that contains args with keys: email
-    
+
     Returns:
         Http 200 string response with the associated account information
 
@@ -75,7 +75,7 @@ def account_put(request):
 
     Args:
         request: A request object that contains args with keys: email, token, and (any account values to be changed)
-    
+
     Returns:
         Http 200 string response with refresh token and new token
 
@@ -100,9 +100,9 @@ def account_put(request):
 
     # TODO uncomment once db is implemented
     # return account.update(args)
-    
+
     # TODO remove once db is implemented
-    return jsonHttp200("Account Updated",auth)
+    return jsonHttp200("Account Updated", auth)
 
 
 def account_delete(request):
@@ -111,7 +111,7 @@ def account_delete(request):
 
     Args:
         request: A request object that contains args with keys: email, token
-    
+
     Returns:
         Http 200 string response with refresh token and new token
 
@@ -138,4 +138,4 @@ def account_delete(request):
     # return account.delete(args)
 
     # TODO remove once db is implemented
-    return jsonHttp200("Account Deleted",auth)
+    return jsonHttp200("Account Deleted", auth)
