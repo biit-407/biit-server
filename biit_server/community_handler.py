@@ -1,5 +1,5 @@
-from .http_responses import http200, http400
-from .query_helper import *
+from .http_responses import http200, http400, jsonHttp200
+from .query_helper import validate_query_params, validate_body
 from .azure import azure_refresh_token
 
 
@@ -28,7 +28,7 @@ def community_post(request):
     # TODO @Ryan Create the DB stuff
     # if community.create(body):
 
-    return http200("community Created")
+    return jsonHttp200("Community Created", auth)
 
     # TODO uncomment once the DB is implemented
     # this was commented out for testing purposes
@@ -53,7 +53,7 @@ def community_get(request):
     # return community.get(args)
 
     # TODO remove once db is implemented
-    return http200("community Returned")
+    return http200("Community Returned")
 
 
 def community_put(request):
@@ -79,7 +79,7 @@ def community_put(request):
     # return community.update(args)
 
     # TODO remove once db is implemented
-    return http200("community Updated")
+    return jsonHttp200("Community Updated", auth)
 
 
 def community_delete(request):
@@ -105,7 +105,7 @@ def community_delete(request):
     # return community.delete(args)
 
     # TODO remove once db is implemented
-    return http200("community Deleted")
+    return jsonHttp200("Community Deleted", auth)
 
 
 def community_join_post(request, community_id):
@@ -132,7 +132,7 @@ def community_join_post(request, community_id):
 
     # TODO @Ryan Create the DB stuff
     # if community.join(body,community_id):
-    return http200("Community Joined")
+    return jsonHttp200("Community Joined", auth)
 
     # TODO uncomment once the DB is implemented
     # this was commented out for testing purposes
@@ -162,7 +162,7 @@ def community_leave_post(request, community_id):
 
     # TODO @Ryan Create the DB stuff
     # if community.join(body,community_id):
-    return http200("Community Left")
+    return jsonHttp200("Community Left", auth)
 
     # TODO uncomment once the DB is implemented
     # this was commented out for testing purposes

@@ -36,7 +36,7 @@ def test_community_post(client):
             },
             follow_redirects=True,
         )
-        assert b"OK: community Created" == rv.data
+        assert b'["RefreshToken","AccessToken","Community Created"]\n' == rv.data
 
 
 def test_community_get(client):
@@ -50,7 +50,7 @@ def test_community_get(client):
         query_string={"name": "TestCommunity"},
         follow_redirects=True,
     )
-    assert b"OK: community Returned" == rv.data
+    assert b"OK: Community Returned" == rv.data
 
 
 def test_community_put(client):
@@ -72,7 +72,7 @@ def test_community_put(client):
             },
             follow_redirects=True,
         )
-        assert b"OK: community Updated" == rv.data
+        assert b'["RefreshToken","AccessToken","Community Updated"]\n' == rv.data
 
 
 def test_community_delete(client):
@@ -94,7 +94,7 @@ def test_community_delete(client):
             },
             follow_redirects=True,
         )
-        assert b"OK: community Deleted" == rv.data
+        assert b'["RefreshToken","AccessToken","Community Deleted"]\n' == rv.data
 
 
 def test_community_join_post(client):
@@ -112,7 +112,7 @@ def test_community_join_post(client):
             json={"name": "Jeffery", "token": "Toke"},
             follow_redirects=True,
         )
-        assert b"OK: Community Joined" == rv.data
+        assert b'["RefreshToken","AccessToken","Community Joined"]\n' == rv.data
 
 
 def test_community_leave_post(client):
@@ -130,4 +130,4 @@ def test_community_leave_post(client):
             json={"name": "Jeffery", "token": "Toke"},
             follow_redirects=True,
         )
-        assert b"OK: Community Left" == rv.data
+        assert b'["RefreshToken","AccessToken","Community Left"]\n' == rv.data
