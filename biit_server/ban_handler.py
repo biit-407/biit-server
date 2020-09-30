@@ -10,7 +10,7 @@ def ban_post(request):
         request: A request object that contains a json object with keys: banner, banner, community, token
 
     Returns:
-        Http 200 string response with refresh token and new token of the banner
+        (json): Http 200 string response with refresh token and new token of the banner
 
     Raises:
         Http 400 when the json is missing a key
@@ -48,7 +48,7 @@ def ban_put(request):
         request: A request object that contains a json object with keys: banner, bannee, community, token
 
     Returns:
-        Http 200 string response containing the banners refresh token and new token
+        (json): Http 200 string response containing the banners refresh token and new token
 
     Raises:
         Http 400 when the json is missing a key

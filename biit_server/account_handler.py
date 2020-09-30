@@ -77,7 +77,7 @@ def account_put(request):
         request: A request object that contains args with keys: email, token, and (any account values to be changed)
 
     Returns:
-        Http 200 string response with refresh token and new token
+        (json): Http 200 string response with refresh token and new token
 
     Raises:
         Http 400 when the json is missing required keys: email, token
@@ -113,7 +113,7 @@ def account_delete(request):
         request: A request object that contains args with keys: email, token
 
     Returns:
-        Http 200 string response with refresh token and new token
+        (json): Http 200 string response with refresh token and new token
 
     Raises:
         Http 400 when the json is missing required keys: email, token

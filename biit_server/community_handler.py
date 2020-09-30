@@ -10,7 +10,7 @@ def community_post(request):
         request: A request object that contains a json object with keys: name, codeofconduct, Admins, Members, mpm, meettype, token
 
     Returns:
-        Http 200 string response containing the  refresh token and new token
+        (json): Http 200 string response containing the  refresh token and new token
 
     Raises:
         Http 400 when the json is missing a key
@@ -50,7 +50,7 @@ def community_get(request):
         request: A request object that contains a json object with keys: name
 
     Returns:
-        Http 200 string response containing information about the searched community
+        (str): Http 200 string response containing information about the searched community
 
     Raises:
         Http 400 when the json is missing a key
@@ -79,7 +79,7 @@ def community_put(request):
         request: A request object that contains a json object with keys: name, email, token, and (values to change for a community)
 
     Returns:
-        Http 200 string response containing the refresh token and new token
+        (json): Http 200 string response containing the refresh token and new token
 
     Raises:
         Http 400 when the json is missing a key
@@ -113,7 +113,7 @@ def community_delete(request):
         request: A request object that contains a json object with keys: name, email, token
 
     Returns:
-        Http 200 string response containing the refresh token and new token
+        (json): Http 200 string response containing the refresh token and new token
 
     Raises:
         Http 400 when the json is missing a key
@@ -147,7 +147,7 @@ def community_join_post(request, community_id):
         request: A request object that contains a json object with keys: name, email, token
 
     Returns:
-        Http 200 string response containing the refresh token and new token
+        (json): Http 200 string response containing the refresh token and new token
 
     Raises:
         Http 400 when the json is missing a key
@@ -186,7 +186,7 @@ def community_leave_post(request, community_id):
         request: A request object that contains a json object with keys: name, email, token
 
     Returns:
-        Http 200 string response containing the refresh token and new token
+        (json): Http 200 string response containing the refresh token and new token
 
     Raises:
         Http 400 when the json is missing a key
