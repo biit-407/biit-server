@@ -69,9 +69,6 @@ def account_get(request):
     if query_validation[1] != 200:
         return query_validation
 
-    # TODO uncomment once db is implemented
-    # return jsonHttp200("Data",account.get(args))
-    # TODO remove once db is implemented
     account_db = Database("accounts")
 
     try:
