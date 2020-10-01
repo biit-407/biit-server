@@ -102,9 +102,7 @@ def test_database_update():
 
     test_collection_name = "users"
 
-    mock_db.collection(test_collection_name).document(test_data["id"]).set(
-        test_data
-    )
+    mock_db.collection(test_collection_name).document(test_data["id"]).set(test_data)
 
     test_db = Database(test_collection_name, firestore_client=mock_db)
 
@@ -121,6 +119,7 @@ def test_database_update():
     assert doc_json["id"] == test_data["id"]
     assert doc_json["name"] == test_update_data["name"]
 
+
 def test_database_delete():
     """
     Tests that database library can delete documents from database.
@@ -131,9 +130,7 @@ def test_database_delete():
 
     test_collection_name = "users"
 
-    mock_db.collection(test_collection_name).document(test_data["id"]).set(
-        test_data
-    )
+    mock_db.collection(test_collection_name).document(test_data["id"]).set(test_data)
 
     test_db = Database(test_collection_name, firestore_client=mock_db)
 
