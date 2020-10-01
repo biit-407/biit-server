@@ -20,7 +20,7 @@ def jsonHttp200(message: str, data):
 
     Args:
         message (str): Message to be sent
-        data: Data to be sent 
+        data: Data to be sent
 
     Returns:
         str: Json combination of data and message
