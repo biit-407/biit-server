@@ -16,7 +16,9 @@ class Database:
         """
         super().__init__()
         self.collection_name = collection
-        self.firestore = firestore_client if firestore is not None else firestore.client()
+        self.firestore = (
+            firestore_client if firestore_client != None else firestore.Client()
+        )
         self.collection_ref = self.firestore.collection(self.collection_name)
 
     def add(self, obj, id=None) -> bool:
@@ -75,7 +77,7 @@ class Database:
         Returns:
             True.
         """
-        
+
         try:
             results = self.collection_ref.document(id)
             results.update(update_dict)
@@ -91,10 +93,9 @@ class Database:
         Returns:
             True.
         """
-        
+
         try:
             results = self.collection_ref.document(id).delete()
             return True
         except Exception:
             return False
-
