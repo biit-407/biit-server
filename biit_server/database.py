@@ -73,7 +73,7 @@ class Database:
             id (str, int): The id of the document you want (email for us).
             update_dict (Dict[str, Any]): A dictionary of the fields you want to update
         Returns:
-            List[Dict[str, Any]] if there are no errors. Boolean value of False if there is an error.
+            True.
         """
         
         try:
@@ -82,3 +82,19 @@ class Database:
             return True
         except Exception:
             return False
+
+    def delete(self, id) -> bool:
+        """Helper function to delete documents based on parameters.
+
+        Args:
+            id (str, int): The id of the document you want to delete(email for us).
+        Returns:
+            True.
+        """
+        
+        try:
+            results = self.collection_ref.document(id).delete()
+            return True
+        except Exception:
+            return False
+
