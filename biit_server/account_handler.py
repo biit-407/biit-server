@@ -110,10 +110,14 @@ def account_put(request):
     # TODO Add tuple to response
 
     # TODO uncomment once db is implemented
-    # return account.update(args)
 
-    # TODO remove once db is implemented
-    return jsonHttp200("Account Updated", auth)
+    account_db = Database("accounts")
+
+    try:
+        account_db.update(args["email"], args["updateFields"])
+        return jsonHttp200("Account Updated", auth)
+    except:
+        return http400("Account update error")
 
 
 def account_delete(request):
