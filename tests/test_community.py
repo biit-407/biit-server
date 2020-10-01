@@ -1,5 +1,6 @@
 import pytest
-from biit_server import create_app
+from biit_server import create_app, community_handler
+from unittest.mock import patch
 
 # Waiting on DB before adding tests
 
@@ -18,19 +19,24 @@ def test_community_post(client):
 
     TODO this test needs to be modified when the database is connected
     """
-    rv = client.post(
-        "/community",
-        json={
-            "name": "Cool Community",
-            "codeofconduct": "Eatmyshorts",
-            "Admins": "Me,John,Jeff",
-            "Members": "Me,John,Adam",
-            "mpm": "Here",
-            "meettype": "Here",
-        },
-        follow_redirects=True,
-    )
-    assert b"OK: community Created" == rv.data
+    with patch.object(
+        community_handler, "azure_refresh_token"
+    ) as mock_azure_refresh_token:
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
+        rv = client.post(
+            "/community",
+            json={
+                "name": "Cool Community",
+                "codeofconduct": "Eatmyshorts",
+                "Admins": "Me,John,Jeff",
+                "Members": "Me,John,Adam",
+                "mpm": "Here",
+                "meettype": "Here",
+                "token": "TestToken",
+            },
+            follow_redirects=True,
+        )
+        assert b"OK: community Created" == rv.data
 
 
 def test_community_get(client):
@@ -53,16 +59,20 @@ def test_community_put(client):
 
     TODO this test needs to be modified when the database is connected
     """
-    rv = client.put(
-        "/community",
-        query_string={
-            "name": "TestCommunity",
-            "token": "TestToken",
-            "email": "Testemail@gmail.com",
-        },
-        follow_redirects=True,
-    )
-    assert b"OK: community Updated" == rv.data
+    with patch.object(
+        community_handler, "azure_refresh_token"
+    ) as mock_azure_refresh_token:
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
+        rv = client.put(
+            "/community",
+            query_string={
+                "name": "TestCommunity",
+                "token": "TestToken",
+                "email": "Testemail@gmail.com",
+            },
+            follow_redirects=True,
+        )
+        assert b"OK: community Updated" == rv.data
 
 
 def test_community_delete(client):
@@ -71,13 +81,53 @@ def test_community_delete(client):
 
     TODO this test needs to be modified when the database is connected
     """
-    rv = client.delete(
-        "/community",
-        query_string={
-            "name": "TestCommunity",
-            "token": "TestToken",
-            "email": "Testemail@gmail.com",
-        },
-        follow_redirects=True,
-    )
-    assert b"OK: community Deleted" == rv.data
+    with patch.object(
+        community_handler, "azure_refresh_token"
+    ) as mock_azure_refresh_token:
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
+        rv = client.delete(
+            "/community",
+            query_string={
+                "name": "TestCommunity",
+                "token": "TestToken",
+                "email": "Testemail@gmail.com",
+            },
+            follow_redirects=True,
+        )
+        assert b"OK: community Deleted" == rv.data
+
+
+def test_community_join_post(client):
+    """
+    Tests that community post works correctly
+
+    TODO this test needs to be modified when the database is connected
+    """
+    with patch.object(
+        community_handler, "azure_refresh_token"
+    ) as mock_azure_refresh_token:
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
+        rv = client.post(
+            "/community/1/join",
+            json={"name": "Jeffery", "token": "Toke"},
+            follow_redirects=True,
+        )
+        assert b"OK: Community Joined" == rv.data
+
+
+def test_community_leave_post(client):
+    """
+    Tests that community post works correctly
+
+    TODO this test needs to be modified when the database is connected
+    """
+    with patch.object(
+        community_handler, "azure_refresh_token"
+    ) as mock_azure_refresh_token:
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
+        rv = client.post(
+            "/community/1/leave",
+            json={"name": "Jeffery", "token": "Toke"},
+            follow_redirects=True,
+        )
+        assert b"OK: Community Left" == rv.data
