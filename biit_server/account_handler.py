@@ -103,7 +103,10 @@ def account_delete(request):
     # TODO Add Authentication
 
     # TODO uncomment once db is implemented
-    # return account.delete(args)
 
-    # TODO remove once db is implemented
-    return http200("Account Deleted")
+    account_db = Database("accounts")
+    try:
+        account_db.delete(args["email"])
+        return http200("Account deleted")
+    except:
+        return http400("Error in account deletion")
