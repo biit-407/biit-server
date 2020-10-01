@@ -1,9 +1,8 @@
 from .http_responses import http200, http400, jsonHttp200
 from .query_helper import validate_body, validate_query_params
 from .azure import azure_refresh_token
-from .database import (
-    Database
-)
+from .database import Database
+
 
 def account_post(request):
     """Handles the account POST endpoint
@@ -91,7 +90,7 @@ def account_put(request):
         Http 400 when the json is missing required keys: email, token
         or if the token is not valid
     """
-    fields = ["email", "token"]
+    fields = ["email", "token", "updateFields"]
 
     # serializes the quert string to a dict (neeto)
     args = request.args
