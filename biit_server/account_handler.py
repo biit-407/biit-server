@@ -1,11 +1,20 @@
-from .http_responses import http200, http400
+from .http_responses import http200, http400, jsonHttp200
 from .query_helper import validate_body, validate_query_params
 from .azure import azure_refresh_token
 
 
 def account_post(request):
-    """
-    Handles the account POST endpoint
+    """Handles the account POST endpoint
+    Validates data sent in a request then calls the database to add an account
+
+    Args:
+        request: A request object that contains a json object with keys: fname, lname, email
+
+    Returns:
+        Http 200 string response
+
+    Raises:
+        Http 400 when the json is missing a key
     """
     fields = ["fname", "lname", "email"]
     body = None
@@ -22,6 +31,7 @@ def account_post(request):
 
     # TODO @Ryan Create the DB stuff
     # if account.create(body):
+
     return http200("Account Created")
 
     # TODO uncomment once the DB is implemented
@@ -30,8 +40,17 @@ def account_post(request):
 
 
 def account_get(request):
-    """
-    Handles the account GET endpoint
+    """Handles the account GET endpoint
+    Validates data sent in a request then calls the database to get the row of the associated account
+
+    Args:
+        request: A request object that contains args with keys: email
+
+    Returns:
+        (json) Http 200 string response with the associated account information
+
+    Raises:
+        Http 400 when the json is missing a key
     """
     fields = ["email"]
 
@@ -44,15 +63,24 @@ def account_get(request):
         return query_validation
 
     # TODO uncomment once db is implemented
-    # return account.get(args)
-
+    # return jsonHttp200("Data",account.get(args))
     # TODO remove once db is implemented
     return http200("Account Returned")
 
 
 def account_put(request):
-    """
-    Handles the account PUT endpoint
+    """Handles the account POST endpoint
+    Validates data sent in a request then calls the database to edit the row of the account
+
+    Args:
+        request: A request object that contains args with keys: email, token, and (any account values to be changed)
+
+    Returns:
+        (json): Http 200 string response with refresh token and new token
+
+    Raises:
+        Http 400 when the json is missing required keys: email, token
+        or if the token is not valid
     """
     fields = ["email", "token"]
 
@@ -73,12 +101,22 @@ def account_put(request):
     # return account.update(args)
 
     # TODO remove once db is implemented
-    return http200("Account Updated")
+    return jsonHttp200("Account Updated", auth)
 
 
 def account_delete(request):
-    """
-    Handles the account DELETE endpoint
+    """Handles the account DELETE endpoint
+    Validates data sent in a request then calls the database to remove the associated account
+
+    Args:
+        request: A request object that contains args with keys: email, token
+
+    Returns:
+        (json): Http 200 string response
+
+    Raises:
+        Http 400 when the json is missing required keys: email, token
+        or if the token is not valid
     """
     fields = ["email", "token"]
 

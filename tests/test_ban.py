@@ -29,7 +29,7 @@ def test_ban_post(client):
             },
             follow_redirects=True,
         )
-        assert b"OK: last has been banned" == rv.data
+        assert b'["RefreshToken","AccessToken","last has been banned"]\n' == rv.data
 
 
 def test_ban_put(client):
@@ -50,4 +50,4 @@ def test_ban_put(client):
             },
             follow_redirects=True,
         )
-        assert b"OK: last has been unbanned" == rv.data
+        assert b'["RefreshToken","AccessToken","last has been unbanned"]\n' == rv.data

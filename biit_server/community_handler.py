@@ -1,11 +1,19 @@
-from .http_responses import http200, http400
-from .query_helper import *
+from .http_responses import http200, http400, jsonHttp200
+from .query_helper import validate_query_params, validate_body
 from .azure import azure_refresh_token
 
 
 def community_post(request):
-    """
-    Handles the community POST endpoint
+    """Handles the community POST endpoint
+    Validates the keys in the request then calls the database to create a commmunity
+    Args:
+        request: A request object that contains a json object with keys: name, codeofconduct, Admins, Members, mpm, meettype, token
+
+    Returns:
+        (json): Http 200 string response containing the  refresh token and new token
+
+    Raises:
+        Http 400 when the json is missing a key
     """
     fields = ["name", "codeofconduct", "Admins", "Members", "mpm", "meettype", "token"]
     body = None
@@ -28,7 +36,7 @@ def community_post(request):
     # TODO @Ryan Create the DB stuff
     # if community.create(body):
 
-    return http200("community Created")
+    return jsonHttp200("Community Created", auth)
 
     # TODO uncomment once the DB is implemented
     # this was commented out for testing purposes
@@ -36,8 +44,16 @@ def community_post(request):
 
 
 def community_get(request):
-    """
-    Handles the community GET endpoint
+    """Handles the community GET endpoint
+        Validates the keys in the request then calls the database to get information about a commmunity
+    Args:
+        request: A request object that contains a json object with keys: name
+
+    Returns:
+        (str): Http 200 string response containing information about the searched community
+
+    Raises:
+        Http 400 when the json is missing a key
     """
     fields = ["name"]
 
@@ -53,12 +69,20 @@ def community_get(request):
     # return community.get(args)
 
     # TODO remove once db is implemented
-    return http200("community Returned")
+    return http200("Community Returned")
 
 
 def community_put(request):
-    """
-    Handles the community PUT endpoint
+    """Handles the community PUT endpoint
+        Validates the keys in the request then calls the database to update a commmunity
+    Args:
+        request: A request object that contains a json object with keys: name, email, token, and (values to change for a community)
+
+    Returns:
+        (json): Http 200 string response containing the refresh token and new token
+
+    Raises:
+        Http 400 when the json is missing a key
     """
     fields = ["name", "email", "token"]
 
@@ -79,12 +103,20 @@ def community_put(request):
     # return community.update(args)
 
     # TODO remove once db is implemented
-    return http200("community Updated")
+    return jsonHttp200("Community Updated", auth)
 
 
 def community_delete(request):
-    """
-    Handles the community DELETE endpoint
+    """Handles the community DELETE endpoint
+    Validates the keys in the request then calls the database to delete the commmunity
+    Args:
+        request: A request object that contains a json object with keys: name, email, token
+
+    Returns:
+        (json): Http 200 string response containing the refresh token and new token
+
+    Raises:
+        Http 400 when the json is missing a key
     """
     fields = ["email", "token", "name"]
 
@@ -105,14 +137,22 @@ def community_delete(request):
     # return community.delete(args)
 
     # TODO remove once db is implemented
-    return http200("community Deleted")
+    return jsonHttp200("Community Deleted", auth)
 
 
 def community_join_post(request, community_id):
+    """Handles the community joining POST endpoint
+        Validates the keys in the request then calls the database to add a user to a community
+    Args:
+        request: A request object that contains a json object with keys: name, email, token
+
+    Returns:
+        (json): Http 200 string response containing the refresh token and new token
+
+    Raises:
+        Http 400 when the json is missing a key
     """
-    Handles the community joining POST endpoint
-    """
-    fields = ["name", "token"]
+    fields = ["name", "email", "token"]
     body = None
 
     try:
@@ -132,7 +172,7 @@ def community_join_post(request, community_id):
 
     # TODO @Ryan Create the DB stuff
     # if community.join(body,community_id):
-    return http200("Community Joined")
+    return jsonHttp200("Community Joined", auth)
 
     # TODO uncomment once the DB is implemented
     # this was commented out for testing purposes
@@ -140,10 +180,18 @@ def community_join_post(request, community_id):
 
 
 def community_leave_post(request, community_id):
+    """Handles the community leaveing POST endpoint
+        Validates the keys in the request then calls the database to remove a user from a community
+    Args:
+        request: A request object that contains a json object with keys: name, email, token
+
+    Returns:
+        (json): Http 200 string response containing the refresh token and new token
+
+    Raises:
+        Http 400 when the json is missing a key
     """
-    Handles the community leaveing POST endpoint
-    """
-    fields = ["name", "token"]
+    fields = ["name", "token", "email"]
     body = None
 
     try:
@@ -162,7 +210,7 @@ def community_leave_post(request, community_id):
 
     # TODO @Ryan Create the DB stuff
     # if community.join(body,community_id):
-    return http200("Community Left")
+    return jsonHttp200("Community Left", auth)
 
     # TODO uncomment once the DB is implemented
     # this was commented out for testing purposes
