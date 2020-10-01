@@ -72,4 +72,4 @@ def test_account_delete(client):
             query_string={"email": "test@email.com", "token": "TestToken"},
             follow_redirects=True,
         )
-        assert b'["RefreshToken","AccessToken","Account Deleted"]\n' == rv.data
+        assert b'Account Deleted' == rv.data

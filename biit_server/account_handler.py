@@ -47,7 +47,7 @@ def account_get(request):
         request: A request object that contains args with keys: email
 
     Returns:
-        Http 200 string response with the associated account information
+        (json) Http 200 string response with the associated account information
 
     Raises:
         Http 400 when the json is missing a key
@@ -63,8 +63,7 @@ def account_get(request):
         return query_validation
 
     # TODO uncomment once db is implemented
-    # return account.get(args)
-
+    # return jsonHttp200("Data",account.get(args))
     # TODO remove once db is implemented
     return http200("Account Returned")
 
@@ -113,7 +112,7 @@ def account_delete(request):
         request: A request object that contains args with keys: email, token
 
     Returns:
-        (json): Http 200 string response with refresh token and new token
+        (json): Http 200 string response
 
     Raises:
         Http 400 when the json is missing required keys: email, token
@@ -138,4 +137,4 @@ def account_delete(request):
     # return account.delete(args)
 
     # TODO remove once db is implemented
-    return jsonHttp200("Account Deleted", auth)
+    return http200("Account Deleted")
