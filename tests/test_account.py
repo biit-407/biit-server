@@ -1,7 +1,7 @@
 import json
 
 import pytest
-from biit_server import create_app, account_handler, Database
+from biit_server import create_app, account_handler
 from unittest.mock import patch
 
 import biit_server
