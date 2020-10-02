@@ -37,7 +37,13 @@ def account_post(request):
     account_db = Database("accounts")
 
     try:
-        account_db.add(body, id=body["email"])
+        db_entry = {
+            "fname": body["fname"],
+            "lname": body["lname"],
+            "email": body["email"],
+        }
+
+        account_db.add(db_entry, id=body["email"])
     except:
         return http400("Email already taken")
 
