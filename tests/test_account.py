@@ -22,15 +22,31 @@ def test_account_post(client):
     TODO this test needs to be modified when the database is connected
     """
 
-    with patch("biit_server.account_handler.Database") as mock_database:
+    with patch.object(
+        account_handler, "azure_refresh_token"
+    ) as mock_azure_refresh_token, patch(
+        "biit_server.account_handler.Database"
+    ) as mock_database:
         instance = mock_database.return_value
         instance.add.return_value = True
+        mock_azure_refresh_token.return_value = (
+            "yessir a new access token",
+            "yes a new refresh token",
+        )
         rv = client.post(
             "/account",
-            json={"fname": "first", "lname": "last", "email": "test@email.com"},
+            json={
+                "fname": "first",
+                "lname": "last",
+                "email": "test@email.com",
+                "token": "ah a testing refresh token",
+            },
             follow_redirects=True,
         )
-        assert b"OK: Account Created" == rv.data
+        assert (
+            b'["fname","lname","email","access_token","refresh_token","Account Created"]\n'
+            == rv.data
+        )
 
 
 def test_account_get(client):
