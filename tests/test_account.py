@@ -44,7 +44,7 @@ def test_account_post(client):
             follow_redirects=True,
         )
         assert (
-            b'["fname","lname","email","access_token","refresh_token","Account Created"]\n'
+            b'{"access_token":"yessir a new access token","email":"test@email.com","fname":"first","lname":"last","message":"Account Created","refresh_token":"yes a new refresh token","status_code":200}\n'
             == rv.data
         )
 
@@ -96,7 +96,10 @@ def test_account_put(client):
             },
             follow_redirects=True,
         )
-        assert b'["RefreshToken","AccessToken","Account Updated"]\n' == rv.data
+        assert (
+            b'{"access_token":"RefreshToken","message":"Account Updated","refresh_token":"AccessToken","status_code":200}\n'
+            == rv.data
+        )
 
 
 def test_account_delete(client):

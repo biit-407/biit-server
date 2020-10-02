@@ -55,7 +55,7 @@ def account_post(request):
         "refresh_token": auth[1],
     }
 
-    return jsonHttp200("Account Created", response.items())
+    return jsonHttp200("Account Created", response)
 
 
 def account_get(request):
@@ -124,7 +124,9 @@ def account_put(request):
 
     try:
         account_db.update(args["email"], args["updateFields"])
-        return jsonHttp200("Account Updated", auth)
+        return jsonHttp200(
+            "Account Updated", {"access_token": auth[0], "refresh_token": auth[1]}
+        )
     except:
         return http400("Account update error")
 
