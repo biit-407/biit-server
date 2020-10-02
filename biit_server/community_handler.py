@@ -36,7 +36,7 @@ def community_post(request):
     # TODO @Ryan Create the DB stuff
     # if community.create(body):
 
-    return jsonHttp200("Community Created", auth)
+    return jsonHttp200("Community Created", {'access_token': auth[0], 'refresh_token': auth[1] })
 
     # TODO uncomment once the DB is implemented
     # this was commented out for testing purposes
