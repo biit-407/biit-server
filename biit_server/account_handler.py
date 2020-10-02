@@ -17,7 +17,7 @@ def account_post(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["fname", "lname", "email"]
+    fields = ["fname", "lname", "email", "token"]
     body = None
 
     try:
@@ -30,19 +30,32 @@ def account_post(request):
     if body_validation[1] != 200:
         return body_validation
 
-    # TODO @Ryan Create the DB stuff
+    auth = azure_refresh_token(body["token"])
+    if not auth[0]:
+        return http400("Not Authenticated")
+
     account_db = Database("accounts")
 
     try:
-        account_db.add(body, id=body["email"])
+        db_entry = {
+            "fname": body["fname"],
+            "lname": body["lname"],
+            "email": body["email"],
+        }
+
+        account_db.add(db_entry, id=body["email"])
     except:
         return http400("Email already taken")
 
-    return http200("Account Created")
+    response = {
+        "fname": body["fname"],
+        "lname": body["lname"],
+        "email": body["email"],
+        "access_token": auth[0],
+        "refresh_token": auth[1],
+    }
 
-    # TODO uncomment once the DB is implemented
-    # this was commented out for testing purposes
-    # return http400("Failed to create account")
+    return jsonHttp200("Account Created", response)
 
 
 def account_get(request):
@@ -111,7 +124,9 @@ def account_put(request):
 
     try:
         account_db.update(args["email"], args["updateFields"])
-        return jsonHttp200("Account Updated", auth)
+        return jsonHttp200(
+            "Account Updated", {"access_token": auth[0], "refresh_token": auth[1]}
+        )
     except:
         return http400("Account update error")
 

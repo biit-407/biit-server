@@ -36,7 +36,9 @@ def community_post(request):
     # TODO @Ryan Create the DB stuff
     # if community.create(body):
 
-    return jsonHttp200("Community Created", auth)
+    return jsonHttp200(
+        "Community Created", {"access_token": auth[0], "refresh_token": auth[1]}
+    )
 
     # TODO uncomment once the DB is implemented
     # this was commented out for testing purposes
@@ -103,7 +105,9 @@ def community_put(request):
     # return community.update(args)
 
     # TODO remove once db is implemented
-    return jsonHttp200("Community Updated", auth)
+    return jsonHttp200(
+        "Community Updated", {"access_token": auth[0], "refresh_token": auth[1]}
+    )
 
 
 def community_delete(request):
@@ -137,7 +141,9 @@ def community_delete(request):
     # return community.delete(args)
 
     # TODO remove once db is implemented
-    return jsonHttp200("Community Deleted", auth)
+    return jsonHttp200(
+        "Community Deleted", {"access_token": auth[0], "refresh_token": auth[1]}
+    )
 
 
 def community_join_post(request, community_id):
@@ -172,7 +178,9 @@ def community_join_post(request, community_id):
 
     # TODO @Ryan Create the DB stuff
     # if community.join(body,community_id):
-    return jsonHttp200("Community Joined", auth)
+    return jsonHttp200(
+        "Community Joined", {"access_token": auth[0], "refresh_token": auth[1]}
+    )
 
     # TODO uncomment once the DB is implemented
     # this was commented out for testing purposes
@@ -210,7 +218,9 @@ def community_leave_post(request, community_id):
 
     # TODO @Ryan Create the DB stuff
     # if community.join(body,community_id):
-    return jsonHttp200("Community Left", auth)
+    return jsonHttp200(
+        "Community Left", {"access_token": auth[0], "refresh_token": auth[1]}
+    )
 
     # TODO uncomment once the DB is implemented
     # this was commented out for testing purposes
