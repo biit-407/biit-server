@@ -1,5 +1,5 @@
 from flask import jsonify
-
+from typing import Dict, Any
 
 def http405():
     return "Method not allowed", 405
@@ -15,7 +15,7 @@ def http200(description: str = ""):
     return f"OK: {description}", 200
 
 
-def jsonHttp200(message: str, data: dict):
+def jsonHttp200(message: str, data: Dict[str, Any]):
     """Http 200 response with json as data
 
     Args:
