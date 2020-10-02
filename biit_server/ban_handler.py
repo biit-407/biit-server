@@ -37,7 +37,10 @@ def ban_post(request):
     # return ban.add(args)
 
     # TODO remove once db is implemented
-    return jsonHttp200(body["bannee"] + " has been banned", {'access_token': auth[0], 'refresh_token': auth[1]})
+    return jsonHttp200(
+        body["bannee"] + " has been banned",
+        {"access_token": auth[0], "refresh_token": auth[1]},
+    )
 
 
 def ban_put(request):
@@ -72,4 +75,7 @@ def ban_put(request):
     # return ban.remove(args)
 
     # TODO remove once db is implemented
-    return jsonHttp200(args["bannee"] + " has been unbanned", {'access_token': auth[0], 'refresh_token': auth[1]})
+    return jsonHttp200(
+        args["bannee"] + " has been unbanned",
+        {"access_token": auth[0], "refresh_token": auth[1]},
+    )

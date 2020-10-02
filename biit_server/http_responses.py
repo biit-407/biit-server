@@ -1,6 +1,7 @@
 from flask import jsonify
 from typing import Dict, Any
 
+
 def http405():
     return "Method not allowed", 405
 
@@ -26,6 +27,6 @@ def jsonHttp200(message: str, data: Dict[str, Any]):
         str: Json combination of data and message
     """
     response = data
-    response['message'] = message
-    response['status_code'] = 200
+    response["message"] = message
+    response["status_code"] = 200
     return jsonify(response)
