@@ -15,7 +15,7 @@ def http200(description: str = ""):
     return f"OK: {description}", 200
 
 
-def jsonHttp200(message: str, data):
+def jsonHttp200(message: str, data: dict):
     """Http 200 response with json as data
 
     Args:
@@ -25,6 +25,7 @@ def jsonHttp200(message: str, data):
     Returns:
         str: Json combination of data and message
     """
-    json = list(data)
-    json.append(message)
-    return jsonify(json)
+    response = data
+    response['message'] = message
+    response['status_code'] = 200
+    return jsonify(response)

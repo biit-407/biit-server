@@ -55,7 +55,7 @@ def account_post(request):
         "refresh_token": auth[1],
     }
 
-    return jsonHttp200("Account Created", response)
+    return jsonHttp200("Account Created", response.items())
 
 
 def account_get(request):
