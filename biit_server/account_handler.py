@@ -1,6 +1,7 @@
 from .http_responses import http200, http400, jsonHttp200
 from .query_helper import validate_body, validate_query_params
 from .azure import azure_refresh_token
+from .database import Database
 
 
 def account_post(request):
@@ -16,7 +17,7 @@ def account_post(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["fname", "lname", "email"]
+    fields = ["fname", "lname", "email", "token"]
     body = None
 
     try:
@@ -29,14 +30,32 @@ def account_post(request):
     if body_validation[1] != 200:
         return body_validation
 
-    # TODO @Ryan Create the DB stuff
-    # if account.create(body):
+    auth = azure_refresh_token(body["token"])
+    if not auth[0]:
+        return http400("Not Authenticated")
 
-    return http200("Account Created")
+    account_db = Database("accounts")
 
-    # TODO uncomment once the DB is implemented
-    # this was commented out for testing purposes
-    # return http400("Failed to create account")
+    try:
+        db_entry = {
+            "fname": body["fname"],
+            "lname": body["lname"],
+            "email": body["email"],
+        }
+
+        account_db.add(db_entry, id=body["email"])
+    except:
+        return http400("Email already taken")
+
+    response = {
+        "fname": body["fname"],
+        "lname": body["lname"],
+        "email": body["email"],
+        "access_token": auth[0],
+        "refresh_token": auth[1],
+    }
+
+    return jsonHttp200("Account Created", response)
 
 
 def account_get(request):
@@ -62,10 +81,12 @@ def account_get(request):
     if query_validation[1] != 200:
         return query_validation
 
-    # TODO uncomment once db is implemented
-    # return jsonHttp200("Data",account.get(args))
-    # TODO remove once db is implemented
-    return http200("Account Returned")
+    account_db = Database("accounts")
+
+    try:
+        return account_db.get(args["email"])
+    except:
+        return http400("Account not found")
 
 
 def account_put(request):
@@ -82,7 +103,7 @@ def account_put(request):
         Http 400 when the json is missing required keys: email, token
         or if the token is not valid
     """
-    fields = ["email", "token"]
+    fields = ["email", "token", "updateFields"]
 
     # serializes the quert string to a dict (neeto)
     args = request.args
@@ -98,10 +119,16 @@ def account_put(request):
     # TODO Add tuple to response
 
     # TODO uncomment once db is implemented
-    # return account.update(args)
 
-    # TODO remove once db is implemented
-    return jsonHttp200("Account Updated", auth)
+    account_db = Database("accounts")
+
+    try:
+        account_db.update(args["email"], args["updateFields"])
+        return jsonHttp200(
+            "Account Updated", {"access_token": auth[0], "refresh_token": auth[1]}
+        )
+    except:
+        return http400("Account update error")
 
 
 def account_delete(request):
@@ -134,7 +161,10 @@ def account_delete(request):
     # TODO Add tuple to response
 
     # TODO uncomment once db is implemented
-    # return account.delete(args)
 
-    # TODO remove once db is implemented
-    return http200("Account Deleted")
+    account_db = Database("accounts")
+    try:
+        account_db.delete(args["email"])
+        return http200("Account deleted")
+    except:
+        return http400("Error in account deletion")

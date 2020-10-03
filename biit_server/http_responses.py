@@ -1,4 +1,5 @@
 from flask import jsonify
+from typing import Dict, Any
 
 
 def http405():
@@ -15,16 +16,17 @@ def http200(description: str = ""):
     return f"OK: {description}", 200
 
 
-def jsonHttp200(message: str, data):
+def jsonHttp200(message: str, data: Dict[str, Any]):
     """Http 200 response with json as data
 
     Args:
         message (str): Message to be sent
-        data: Data to be sent 
+        data: Data to be sent
 
     Returns:
         str: Json combination of data and message
     """
-    json = list(data)
-    json.append(message)
-    return jsonify(json)
+    response = data
+    response["message"] = message
+    response["status_code"] = 200
+    return jsonify(response)
