@@ -60,5 +60,11 @@ def create_app():
 
         elif request.method == "PUT":
             return ban_put(request)
+    @app.route("/profile", methods=["POST","GET"])
+    def profile_route():
+        if request.method == "POST":
+            return profile_post(request)
 
+        elif request.method == "GET":
+            return profile_put(request)
     return app
