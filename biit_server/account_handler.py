@@ -124,13 +124,9 @@ def account_put(request):
 
     try:
         account_db.update(args["email"], args["updateFields"])
-<<<<<<< HEAD
-        return jsonHttp200("Account Updated", auth)
-=======
         return jsonHttp200(
             "Account Updated", {"access_token": auth[0], "refresh_token": auth[1]}
         )
->>>>>>> upstream/master
     except:
         return http400("Account update error")
 
