@@ -190,7 +190,6 @@ def profile_post(request):
 
     try:
         body = request.form
-        print(body)
     except:
         return http400("Missing body")
 
@@ -230,7 +229,7 @@ def profile_get(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["email"]
+    fields = ["email", "file"]
 
     # serializes the quert string to a dict (neeto)
     args = request.args
@@ -244,7 +243,8 @@ def profile_get(request):
 
     try:
         return send_file(
-            profile_storage.get(args["email"]), attachment_filename="picture.jpg"
+            profile_storage.get(args["file"]),
+            attachment_filename=args["file"],
         )
     except:
         return http400("File not found")

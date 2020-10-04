@@ -123,6 +123,7 @@ def test_account_delete(client):
         )
         assert b"OK: Account deleted" == rv.data
 
+
 def test_profile_post(client):
     """
     Tests that account delete works correctly
@@ -139,12 +140,19 @@ def test_profile_post(client):
         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.post(
             "/profile",
-            content_type='multipart/form-data',
-            data = {"email": "test@email.com",
-                "token": "ah a testing refresh token","file":(BytesIO(b'TestByte'),"test.jpg")},           
+            content_type="multipart/form-data",
+            data={
+                "email": "test@email.com",
+                "token": "ah a testing refresh token",
+                "file": (BytesIO(b"TestByte"), "test.jpg"),
+            },
             follow_redirects=True,
         )
-        assert b'{"access_token":"RefreshToken","message":"File Uploaded","refresh_token":"AccessToken","status_code":200}\n' == rv.data
+        assert (
+            b'{"access_token":"RefreshToken","message":"File Uploaded","refresh_token":"AccessToken","status_code":200}\n'
+            == rv.data
+        )
+
 
 def test_profile_get(client):
     """
@@ -158,11 +166,11 @@ def test_profile_get(client):
         "biit_server.account_handler.Storage"
     ) as mock_storage:
         instance = mock_storage.return_value
-        instance.get.return_value = (BytesIO(b'hello'))
+        instance.get.return_value = BytesIO(b"hello")
         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.get(
             "/profile",
-            query_string={"email": "test@email.com"},
+            query_string={"email": "test@email.com", "file": "test.jpg"},
             follow_redirects=True,
         )
         assert b"hello" == rv.data

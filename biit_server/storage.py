@@ -44,9 +44,9 @@ class Storage:
             File if the document is successfully added. Boolean value of False if there was an error.
         """
         try:
-            newfile = None
             blob = self.bucket.get_blob(name)
-            blob.download_to_file(newfile)
-            return newfile
+            with open(name, "wb") as file_obj:
+                blob.download_to_file(file_obj)
+            return file_obj
         except Exception:
             return False
