@@ -1,5 +1,5 @@
-
 from google.cloud import storage
+
 
 class Storage:
     def __init__(self, bucket, storage_client=None) -> None:
@@ -14,12 +14,10 @@ class Storage:
         """
         super().__init__()
         self.name = bucket
-        self.storage = (
-            storage_client if storage_client != None else storage.Client()
-        )
+        self.storage = storage_client if storage_client != None else storage.Client()
         self.bucket = self.storage.getbucket(self.name)
 
-    def add(self, file, name:str) -> bool:
+    def add(self, file, name: str) -> bool:
         """Helper function to add file into the storage bucket.
 
         Args:
@@ -49,6 +47,6 @@ class Storage:
             newfile = None
             blob = self.bucket.get_blob(name)
             blob.download_to_file(newfile)
-            return send_file(newfile)
+            return newfile
         except Exception:
             return False

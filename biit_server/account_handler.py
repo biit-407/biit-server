@@ -3,6 +3,7 @@ from .query_helper import validate_body, validate_query_params
 from .azure import azure_refresh_token
 from .database import Database
 from .storage import Storage
+from flask import send_file
 
 
 def account_post(request):
@@ -170,6 +171,7 @@ def account_delete(request):
     except:
         return http400("Error in account deletion")
 
+
 def profile_post(request):
     """Handles the account POST endpoint
     Validates data sent in a request then calls the database to add an account
@@ -187,7 +189,8 @@ def profile_post(request):
     body = None
 
     try:
-        body = request.get_json()
+        body = request.form
+        print(body)
     except:
         return http400("Missing body")
 
@@ -203,7 +206,7 @@ def profile_post(request):
     profile_storage = Storage("biit_profiles")
 
     try:
-        profile_storage.add(request.files[file],body["email"])
+        profile_storage.add(request.files["file"], body["email"])
     except:
         return http400("File was unable to be uploaded")
 
@@ -240,7 +243,8 @@ def profile_get(request):
     profile_storage = Storage("biit_profiles")
 
     try:
-        return profile_storage.get(args["email"])
+        return send_file(
+            profile_storage.get(args["email"]), attachment_filename="picture.jpg"
+        )
     except:
         return http400("File not found")
-
