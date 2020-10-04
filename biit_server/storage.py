@@ -7,7 +7,7 @@ class Storage:
 
         Args:
             bucket (str): the name of the bucket
-            storage (google.cloud.storage.client): A storage client object, or a mock test object.
+            storage (google.cloud.storage.client): A storage client object
 
         Returns:
             None
