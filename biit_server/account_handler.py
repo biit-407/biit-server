@@ -203,9 +203,9 @@ def profile_post(request):
         return http400("Not Authenticated")
 
     profile_storage = Storage("biit_profiles")
-
+    file = request.files["file"]
     try:
-        profile_storage.add(request.files["file"], body["email"])
+        profile_storage.add(file, file.filename)
     except:
         return http400("File was unable to be uploaded")
 
