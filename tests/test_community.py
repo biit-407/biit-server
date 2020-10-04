@@ -1,3 +1,4 @@
+import json
 import pytest
 from biit_server import create_app, community_handler
 from unittest.mock import patch
@@ -53,12 +54,22 @@ def test_community_get(client):
 
     TODO this test needs to be modified when the database is connected
     """
-    rv = client.get(
-        "/community",
-        query_string={"name": "TestCommunity"},
-        follow_redirects=True,
-    )
-    assert b"OK: Community Returned" == rv.data
+    with patch("biit_server.community_handler.Database") as mock_database:
+
+        instance = mock_database.return_value
+
+        query_data = {
+            "name": "TestCommunity",
+        }
+
+        instance.get.return_value = query_data
+
+        rv = client.get(
+            "/community",
+            query_string={"name": "TestCommunity"},
+            follow_redirects=True,
+        )
+        assert query_data == json.loads(rv.data)
 
 
 def test_community_put(client):
@@ -69,7 +80,12 @@ def test_community_put(client):
     """
     with patch.object(
         community_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token:
+    ) as mock_azure_refresh_token, patch(
+        "biit_server.community_handler.Database"
+    ) as mock_database:
+        instance = mock_database.return_value
+        instance.put.return_value = True
+
         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.put(
             "/community",
@@ -77,6 +93,7 @@ def test_community_put(client):
                 "name": "TestCommunity",
                 "token": "TestToken",
                 "email": "Testemail@gmail.com",
+                "updateFields": {"name": "lanes"},
             },
             follow_redirects=True,
         )

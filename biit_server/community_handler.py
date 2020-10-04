@@ -75,12 +75,9 @@ def community_get(request):
     community_db = Database("communities")
 
     try:
-        return community_db.get(args["name"]).to_json()
+        return community_db.get(args["name"])
     except:
         return http400("Community name already taken")
-
-    # TODO remove once db is implemented
-    return http200("Community Returned")
 
 
 def community_put(request):
@@ -95,7 +92,7 @@ def community_put(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["name", "email", "token"]
+    fields = ["name", "email", "token", "updateFields"]
 
     # serializes the quert string to a dict (neeto)
     args = request.args
@@ -111,12 +108,15 @@ def community_put(request):
     # TODO Add tuple ot response
 
     # TODO uncomment once db is implemented
-    # return community.update(args)
+    community_db = Database("communities")
 
-    # TODO remove once db is implemented
-    return jsonHttp200(
-        "Community Updated", {"access_token": auth[0], "refresh_token": auth[1]}
-    )
+    try:
+        community_db.update(args["name"], args["updateFields"])
+        return jsonHttp200(
+            "Community Updated", {"access_token": auth[0], "refresh_token": auth[1]}
+        )
+    except:
+        return http400("Community update error")
 
 
 def community_delete(request):
