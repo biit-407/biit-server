@@ -72,8 +72,12 @@ def community_get(request):
     if query_validation[1] != 200:
         return query_validation
 
-    # TODO uncomment once db is implemented
-    # return community.get(args)
+    community_db = Database("communities")
+
+    try:
+        return community_db.get(args["name"]).to_json()
+    except:
+        return http400("Community name already taken")
 
     # TODO remove once db is implemented
     return http200("Community Returned")
