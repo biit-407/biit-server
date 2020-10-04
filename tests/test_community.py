@@ -36,7 +36,10 @@ def test_community_post(client):
             },
             follow_redirects=True,
         )
-        assert b'["RefreshToken","AccessToken","Community Created"]\n' == rv.data
+        assert (
+            b'{"access_token":"RefreshToken","message":"Community Created","refresh_token":"AccessToken","status_code":200}\n'
+            == rv.data
+        )
 
 
 def test_community_get(client):
@@ -72,7 +75,10 @@ def test_community_put(client):
             },
             follow_redirects=True,
         )
-        assert b'["RefreshToken","AccessToken","Community Updated"]\n' == rv.data
+        assert (
+            b'{"access_token":"RefreshToken","message":"Community Updated","refresh_token":"AccessToken","status_code":200}\n'
+            == rv.data
+        )
 
 
 def test_community_delete(client):
@@ -94,7 +100,10 @@ def test_community_delete(client):
             },
             follow_redirects=True,
         )
-        assert b'["RefreshToken","AccessToken","Community Deleted"]\n' == rv.data
+        assert (
+            b'{"access_token":"RefreshToken","message":"Community Deleted","refresh_token":"AccessToken","status_code":200}\n'
+            == rv.data
+        )
 
 
 def test_community_join_post(client):
@@ -112,7 +121,10 @@ def test_community_join_post(client):
             json={"name": "Jeffery", "token": "Toke", "email": "Testemail@gmail.com"},
             follow_redirects=True,
         )
-        assert b'["RefreshToken","AccessToken","Community Joined"]\n' == rv.data
+        assert (
+            b'{"access_token":"RefreshToken","message":"Community Joined","refresh_token":"AccessToken","status_code":200}\n'
+            == rv.data
+        )
 
 
 def test_community_leave_post(client):
@@ -130,4 +142,7 @@ def test_community_leave_post(client):
             json={"name": "Jeffery", "token": "Toke", "email": "Testemail@gmail.com"},
             follow_redirects=True,
         )
-        assert b'["RefreshToken","AccessToken","Community Left"]\n' == rv.data
+        assert (
+            b'{"access_token":"RefreshToken","message":"Community Left","refresh_token":"AccessToken","status_code":200}\n'
+            == rv.data
+        )
