@@ -173,11 +173,11 @@ def account_delete(request):
 
 
 def profile_post(request):
-    """Handles the account POST endpoint
-    Validates data sent in a request then calls the database to add an account
+    """Handles the profile picture POST endpoint
+    Validates data sent in a request then calls gcs to save photo
 
     Args:
-        request: A request object that contains a json object with keys: fname, lname, email
+        request: A request object that contains a json object with keys: email, token and a file in request.files
 
     Returns:
         Http 200 string response
@@ -217,17 +217,17 @@ def profile_post(request):
 
 
 def profile_get(request):
-    """Handles the account GET endpoint
-    Validates data sent in a request then calls the database to get the row of the associated account
+    """Handles the profile picture GET endpoint
+    Validates data sent in a request then calls the gcs to get the photo
 
     Args:
-        request: A request object that contains args with keys: email
+        request: A request object that contains args with keys: email and file
 
     Returns:
-        (json) Http 200 string response with the associated account information
+        (File) The Data of the file is returned
 
     Raises:
-        Http 400 when the json is missing a key
+        Http 400 when the json is missing a key or the fils is not found
     """
     fields = ["email", "file"]
 
