@@ -21,8 +21,8 @@ class Storage:
         """Helper function to add file into the storage bucket.
 
         Args:
-            obj (Dict[str, Any]): A Dictionary containing the data you want to insert.
-            name (str): An identifying string
+            file (file): A File-like object to be uploaded to the bucket
+            name (str): Naming for the blob object
 
         Returns:
             boolean, True if the document is successfully added, False if there was an error.
@@ -38,10 +38,10 @@ class Storage:
         """Helper function to get documents from the database.
 
         Args:
-            id (int, str): An identifying string or int.
+            name (str): The name of the blob to be found
 
         Returns:
-            File if the document is successfully added. Boolean value of False if there was an error.
+            File if the document is successfully returned. Boolean value of False if there was an error.
         """
         try:
             blob = self.bucket.get_blob(name)
