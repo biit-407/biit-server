@@ -1,6 +1,7 @@
 from .http_responses import http200, http400, jsonHttp200
 from .query_helper import validate_query_params, validate_body
 from .azure import azure_refresh_token
+from .database import Database
 
 
 def community_post(request):
@@ -33,8 +34,12 @@ def community_post(request):
         return http400("Not Authenticated")
     # TODO Add tuple ot response
 
-    # TODO @Ryan Create the DB stuff
-    # if community.create(body):
+    community_db = Database("communities")
+
+    try:
+        community_db.add(body, id=body["name"])
+    except:
+        return http400("Community name already taken")
 
     return jsonHttp200(
         "Community Created", {"access_token": auth[0], "refresh_token": auth[1]}
