@@ -111,7 +111,11 @@ def test_community_delete(client):
     """
     with patch.object(
         community_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token:
+    ) as mock_azure_refresh_token, patch(
+        "biit_server.community_handler.Database"
+    ) as mock_database:
+        instance = mock_database.return_value
+        instance.delete.return_value = True
         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.delete(
             "/community",

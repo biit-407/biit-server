@@ -148,11 +148,15 @@ def community_delete(request):
 
     # TODO uncomment once db is implemented
     # return community.delete(args)
+    community_db = Database("communities")
 
-    # TODO remove once db is implemented
-    return jsonHttp200(
-        "Community Deleted", {"access_token": auth[0], "refresh_token": auth[1]}
-    )
+    try:
+        community_db.delete(args["name"])
+        return jsonHttp200(
+            "Community Deleted", {"access_token": auth[0], "refresh_token": auth[1]}
+        )
+    except:
+        return http400("Community update error")
 
 
 def community_join_post(request, community_id):
