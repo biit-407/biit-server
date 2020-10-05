@@ -14,6 +14,14 @@ def client():
         yield client
 
 
+class MockCollection:
+    def __init__(self):
+        self.name = "mock"
+
+    def to_json(self):
+        return {"name": self.name, "members": []}
+
+
 def test_community_post(client):
     """
     Tests that community post works correctly
@@ -140,7 +148,13 @@ def test_community_join_post(client):
     """
     with patch.object(
         community_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token:
+    ) as mock_azure_refresh_token, patch(
+        "biit_server.community_handler.Database"
+    ) as mock_database:
+        instance = mock_database.return_value
+        instance.get.return_value = MockCollection()
+        instance.update.return_value = True
+
         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.post(
             "/community/1/join",
@@ -161,7 +175,13 @@ def test_community_leave_post(client):
     """
     with patch.object(
         community_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token:
+    ) as mock_azure_refresh_token, patch(
+        "biit_server.community_handler.Database"
+    ) as mock_database:
+        instance = mock_database.return_value
+        instance.get.return_value = MockCollection()
+        instance.update.return_value = True
+
         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.post(
             "/community/1/leave",
