@@ -1,5 +1,5 @@
 from .http_responses import http200, http400, jsonHttp200
-from .query_helper import validate_body, validate_query_params
+from .query_helper import validate_body, validate_query_params, validate_photo
 from .azure import azure_refresh_token
 from .database import Database
 from .storage import Storage
@@ -195,15 +195,20 @@ def profile_post(request):
 
     body_validation = validate_body(body, fields)
     # check that body validation succeeded
-    if body_validation[1] != 200 or "file" not in request.files:
+    if (
+        body_validation[1] != 200
+        or "file" not in request.files
+        or not validate_photo(request.files["file"].filename)
+    ):
         return body_validation
 
     auth = azure_refresh_token(body["token"])
     if not auth[0]:
         return http400("Not Authenticated")
 
-    profile_storage = Storage("biit_profiles")
     file = request.files["file"]
+    profile_storage = Storage("biit_profiles")
+
     try:
         profile_storage.add(file, file.filename)
     except:
@@ -236,7 +241,7 @@ def profile_get(request):
 
     query_validation = validate_query_params(args, fields)
     # check that body validation succeeded
-    if query_validation[1] != 200:
+    if query_validation[1] != 200 or not validate_photo(args["file"]):
         return query_validation
 
     profile_storage = Storage("biit_profiles")
