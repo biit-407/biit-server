@@ -37,6 +37,7 @@ def community_post(request):
     community_db = Database("communities")
 
     try:
+        body["members"] = []
         community_db.add(body, id=body["name"])
     except:
         return http400("Community name already taken")
@@ -190,14 +191,12 @@ def community_join_post(request, community_id):
     # TODO Add tuple to response
 
     # TODO @Ryan Create the DB stuff
-    # if community.join(body,community_id):
+    community_db = Database("communities")
+    community = community_db.get(community_id).to_json()
+    community_db.update(community_id, {"members": community["members"] + [body]})
     return jsonHttp200(
         "Community Joined", {"access_token": auth[0], "refresh_token": auth[1]}
     )
-
-    # TODO uncomment once the DB is implemented
-    # this was commented out for testing purposes
-    # return http400("Failed to create community")
 
 
 def community_leave_post(request, community_id):
@@ -229,12 +228,16 @@ def community_leave_post(request, community_id):
         return http400("Not Authenticated")
     # TODO Add tuple ot response
 
-    # TODO @Ryan Create the DB stuff
-    # if community.join(body,community_id):
+    community_db = Database("communities")
+    community = community_db.get(community_id).to_json()
+    community_db.update(
+        community_id,
+        {
+            "members": [
+                user for user in community["members"] if user["email"] != body["email"]
+            ]
+        },
+    )
     return jsonHttp200(
         "Community Left", {"access_token": auth[0], "refresh_token": auth[1]}
     )
-
-    # TODO uncomment once the DB is implemented
-    # this was commented out for testing purposes
-    # return http400("Failed to create community")
