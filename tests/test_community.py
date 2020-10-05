@@ -16,9 +16,11 @@ def client():
 
 class MockCollection:
     def __init__(self):
+        """Helper class to simulate a collection"""
         self.name = "mock"
 
     def to_json(self):
+        """Returns a mock collection entry"""
         return {"name": self.name, "members": []}
 
 
