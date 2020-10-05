@@ -193,6 +193,11 @@ def community_join_post(request, community_id):
     # TODO @Ryan Create the DB stuff
     community_db = Database("communities")
     community = community_db.get(community_id).to_json()
+
+    for member in community["members"]:
+        if member["email"] == body["email"]:
+            raise Exception
+
     community_db.update(community_id, {"members": community["members"] + [body]})
     return jsonHttp200(
         "Community Joined", {"access_token": auth[0], "refresh_token": auth[1]}
