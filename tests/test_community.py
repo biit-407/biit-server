@@ -27,8 +27,6 @@ class MockCollection:
 def test_community_post(client):
     """
     Tests that community post works correctly
-
-    TODO this test needs to be modified when the database is connected
     """
     with patch.object(
         community_handler, "azure_refresh_token"
@@ -61,8 +59,6 @@ def test_community_post(client):
 def test_community_get(client):
     """
     Tests that community get works correctly
-
-    TODO this test needs to be modified when the database is connected
     """
     with patch("biit_server.community_handler.Database") as mock_database:
 
@@ -85,8 +81,6 @@ def test_community_get(client):
 def test_community_put(client):
     """
     Tests that community put works correctly
-
-    TODO this test needs to be modified when the database is connected
     """
     with patch.object(
         community_handler, "azure_refresh_token"
@@ -116,8 +110,6 @@ def test_community_put(client):
 def test_community_delete(client):
     """
     Tests that community delete works correctly
-
-    TODO this test needs to be modified when the database is connected
     """
     with patch.object(
         community_handler, "azure_refresh_token"
@@ -145,8 +137,6 @@ def test_community_delete(client):
 def test_community_join_post(client):
     """
     Tests that community post works correctly
-
-    TODO this test needs to be modified when the database is connected
     """
     with patch.object(
         community_handler, "azure_refresh_token"
@@ -172,8 +162,6 @@ def test_community_join_post(client):
 def test_community_leave_post(client):
     """
     Tests that community post works correctly
-
-    TODO this test needs to be modified when the database is connected
     """
     with patch.object(
         community_handler, "azure_refresh_token"
