@@ -21,7 +21,7 @@ class MockCollection:
 
     def to_json(self):
         """Returns a mock collection entry"""
-        return {"name": self.name, "members": []}
+        return {"name": self.name, "Members": []}
 
 
 def test_community_post(client):
@@ -36,24 +36,28 @@ def test_community_post(client):
         instance = mock_database.return_value
         instance.add.return_value = True
 
+        test_json = {
+            "name": "Cool Community",
+            "codeofconduct": "Eatmyshorts",
+            "Admins": "Me,John,Jeff",
+            "Members": "Me,John,Adam",
+            "mpm": "Here",
+            "meettype": "Here",
+            "token": "TestToken",
+        }
+
         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.post(
             "/community",
-            json={
-                "name": "Cool Community",
-                "codeofconduct": "Eatmyshorts",
-                "Admins": "Me,John,Jeff",
-                "Members": "Me,John,Adam",
-                "mpm": "Here",
-                "meettype": "Here",
-                "token": "TestToken",
-            },
+            json=test_json,
             follow_redirects=True,
         )
         assert (
             b'{"access_token":"RefreshToken","message":"Community Created","refresh_token":"AccessToken","status_code":200}\n'
             == rv.data
         )
+
+        instance.add.assert_called_once_with(test_json, id=test_json["name"])
 
 
 def test_community_get(client):
@@ -76,6 +80,8 @@ def test_community_get(client):
             follow_redirects=True,
         )
         assert query_data == json.loads(rv.data)
+
+        instance.get.assert_called_once_with("TestCommunity")
 
 
 def test_community_put(client):
@@ -178,6 +184,7 @@ def test_community_leave_post(client):
             json={"name": "Jeffery", "token": "Toke", "email": "Testemail@gmail.com"},
             follow_redirects=True,
         )
+
         assert (
             b'{"access_token":"RefreshToken","message":"Community Left","refresh_token":"AccessToken","status_code":200}\n'
             == rv.data
