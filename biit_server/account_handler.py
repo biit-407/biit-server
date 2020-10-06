@@ -86,7 +86,7 @@ def account_get(request):
     account_db = Database("accounts")
 
     try:
-        return account_db.get(args["email"])
+        return account_db.get(args["email"]).to_dict()
     except:
         return http400("Account not found")
 
