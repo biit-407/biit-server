@@ -1,3 +1,4 @@
+import ast
 import json
 
 from .http_responses import http200, http400, jsonHttp200
@@ -112,8 +113,7 @@ def community_put(request):
     # TODO uncomment once db is implemented
     community_db = Database("communities")
 
-    print(json.loads(args["updateFields"]))
-    community_db.update(args["name"], args["updateFields"])
+    community_db.update(args["name"], ast.literal_eval(args["updateFields"]))
     return jsonHttp200(
         "Community Updated", {"access_token": auth[0], "refresh_token": auth[1]}
     )
