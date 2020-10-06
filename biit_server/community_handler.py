@@ -65,22 +65,32 @@ def community_get(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["name"]
+    fields = ["name", "token"]
 
-    # serializes the quert string to a dict (neeto)
     args = request.args
 
     query_validation = validate_query_params(args, fields)
-    # check that body validation succeeded
+
     if query_validation[1] != 200:
         return query_validation
+
+    auth = azure_refresh_token(args["token"])
+    if not auth[0]:
+        return http400("Not Authenticated")
 
     community_db = Database("communities")
 
     try:
-        return community_db.get(args["name"])
+        return jsonHttp200(
+            "Community Received",
+            {
+                "access_token": auth[0],
+                "refresh_token": auth[1],
+                "data": community_db.get(args["name"]),
+            },
+        )
     except:
-        return http400("Community name already taken")
+        return http400("Community not found")
 
 
 def community_put(request):
