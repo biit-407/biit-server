@@ -72,6 +72,7 @@ def test_account_get(client):
         instance = mock_database.return_value
 
         query_data = {"email": "test@email.com", "token": "henlo"}
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
 
         instance.get.return_value = MockAccount(query_data["email"])
 
@@ -81,7 +82,10 @@ def test_account_get(client):
             follow_redirects=True,
         )
 
-        assert {"email": query_data["email"]} == json.loads(rv.data)
+        assert (
+            b'{"access_token":"RefreshToken","data":{"email":"test@email.com"},"message":"Account returned","refresh_token":"AccessToken","status_code":200}\n'
+            == rv.data
+        )
 
 
 def test_account_put(client):

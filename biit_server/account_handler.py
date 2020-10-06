@@ -90,7 +90,14 @@ def account_get(request):
     account_db = Database("accounts")
 
     try:
-        return account_db.get(args["email"]).to_dict()
+        return jsonHttp200(
+            "Account returned",
+            {
+                "access_token": auth[0],
+                "refresh_token": auth[1],
+                "data": account_db.get(args["email"]).to_dict(),
+            },
+        )
     except:
         return http400("Account not found")
 
