@@ -14,8 +14,6 @@
    - 'dev'
    - '--image'
    - 'gcr.io/$PROJECT_ID/dev:$COMMIT_SHA'
-   - '--region'
-   - 'us-central1'
    - '--platform'
    - 'managed'
  images:
