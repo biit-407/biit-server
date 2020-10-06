@@ -15,6 +15,14 @@ def client():
         yield client
 
 
+class MockAccount:
+    def __init__(self, email):
+        self.email = email
+
+    def to_dict(self):
+        return {"email": self.email}
+
+
 def test_account_post(client):
     """
     Tests that account post works correctly
@@ -62,7 +70,7 @@ def test_account_get(client):
             "email": "test@email.com",
         }
 
-        instance.get.return_value = query_data
+        instance.get.return_value = MockAccount(query_data["email"])
 
         rv = client.get(
             "/account",
@@ -70,7 +78,7 @@ def test_account_get(client):
             follow_redirects=True,
         )
 
-        assert query_data == json.loads(rv.data.decode("utf-8"))
+        assert query_data == json.loads(rv.data)
 
 
 def test_account_put(client):
