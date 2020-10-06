@@ -39,6 +39,8 @@ def community_post(request):
 
     community_db = Database("communities")
 
+    body["bans"] = []
+
     try:
         community_db.add(body, id=body["name"])
     except:
