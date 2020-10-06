@@ -94,23 +94,27 @@ def test_community_put(client):
         "biit_server.community_handler.Database"
     ) as mock_database:
         instance = mock_database.return_value
-        instance.put.return_value = True
+        instance.update.return_value = True
 
-        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
-        rv = client.put(
-            "/community",
-            query_string={
+        test_json={
                 "name": "TestCommunity",
                 "token": "TestToken",
                 "email": "Testemail@gmail.com",
                 "updateFields": {"name": "lanes"},
-            },
+            }
+
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
+        rv = client.put(
+            "/community",
+            query_string=test_json,
             follow_redirects=True,
         )
         assert (
             b'{"access_token":"RefreshToken","message":"Community Updated","refresh_token":"AccessToken","status_code":200}\n'
             == rv.data
         )
+
+        instance.update.assert_called_once_with(test_json["name"], test_json["updateFields"])
 
 
 def test_community_delete(client):
@@ -138,6 +142,8 @@ def test_community_delete(client):
             b'{"access_token":"RefreshToken","message":"Community Deleted","refresh_token":"AccessToken","status_code":200}\n'
             == rv.data
         )
+
+        instance.delete.assert_called_once_with("TestCommunity")
 
 
 def test_community_join_post(client):

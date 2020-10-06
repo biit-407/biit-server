@@ -1,3 +1,5 @@
+import json
+
 from .http_responses import http200, http400, jsonHttp200
 from .query_helper import validate_query_params, validate_body
 from .azure import azure_refresh_token
@@ -37,7 +39,6 @@ def community_post(request):
     community_db = Database("communities")
 
     try:
-        body["members"] = []
         community_db.add(body, id=body["name"])
     except:
         return http400("Community name already taken")
@@ -111,13 +112,11 @@ def community_put(request):
     # TODO uncomment once db is implemented
     community_db = Database("communities")
 
-    try:
-        community_db.update(args["name"], args["updateFields"])
-        return jsonHttp200(
-            "Community Updated", {"access_token": auth[0], "refresh_token": auth[1]}
-        )
-    except:
-        return http400("Community update error")
+    print(json.loads(args["updateFields"]))
+    community_db.update(args["name"], args["updateFields"])
+    return jsonHttp200(
+        "Community Updated", {"access_token": auth[0], "refresh_token": auth[1]}
+    )
 
 
 def community_delete(request):
@@ -194,11 +193,11 @@ def community_join_post(request, community_id):
     community_db = Database("communities")
     community = community_db.get(community_id).to_json()
 
-    for member in community["members"]:
+    for member in community["Members"]:
         if member["email"] == body["email"]:
             raise Exception
 
-    community_db.update(community_id, {"members": community["members"] + [body]})
+    community_db.update(community_id, {"Members": community["Members"] + [body]})
     return jsonHttp200(
         "Community Joined", {"access_token": auth[0], "refresh_token": auth[1]}
     )
@@ -238,8 +237,8 @@ def community_leave_post(request, community_id):
     community_db.update(
         community_id,
         {
-            "members": [
-                user for user in community["members"] if user["email"] != body["email"]
+            "Members": [
+                user for user in community["Members"] if user["email"] != body["email"]
             ]
         },
     )
