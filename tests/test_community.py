@@ -68,6 +68,8 @@ def test_community_post(client):
             == rv.data
         )
 
+        test_json["bans"] = []
+
         instance.add.assert_called_once_with(test_json, id=test_json["name"])
 
 
