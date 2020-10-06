@@ -1,3 +1,5 @@
+import ast
+
 from .http_responses import http200, http400, jsonHttp200
 from .query_helper import validate_body, validate_query_params, validate_photo
 from .azure import azure_refresh_token
@@ -136,7 +138,7 @@ def account_put(request):
     account_db = Database("accounts")
 
     try:
-        account_db.update(args["email"], args["updateFields"])
+        account_db.update(args["email"], ast.literal_eval(args["updateFields"]))
         return jsonHttp200(
             "Account Updated", {"access_token": auth[0], "refresh_token": auth[1]}
         )
