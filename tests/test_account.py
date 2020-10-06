@@ -63,12 +63,15 @@ def test_account_get(client):
 
     TODO this test needs to be modified when the database is connected
     """
-    with patch("biit_server.account_handler.Database") as mock_database:
+    with patch.object(
+        account_handler, "azure_refresh_token"
+    ) as mock_azure_refresh_token, patch(
+        "biit_server.account_handler.Database"
+    ) as mock_database:
+
         instance = mock_database.return_value
 
-        query_data = {
-            "email": "test@email.com",
-        }
+        query_data = {"email": "test@email.com", "token": "henlo"}
 
         instance.get.return_value = MockAccount(query_data["email"])
 
@@ -78,7 +81,7 @@ def test_account_get(client):
             follow_redirects=True,
         )
 
-        assert query_data == json.loads(rv.data)
+        assert {"email": query_data["email"]} == json.loads(rv.data)
 
 
 def test_account_put(client):

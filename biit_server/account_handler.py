@@ -73,7 +73,7 @@ def account_get(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["email"]
+    fields = ["email", "token"]
 
     # serializes the quert string to a dict (neeto)
     args = request.args
@@ -82,6 +82,10 @@ def account_get(request):
     # check that body validation succeeded
     if query_validation[1] != 200:
         return query_validation
+
+    auth = azure_refresh_token(args["token"])
+    if not auth[0]:
+        return http400("Not Authenticated")
 
     account_db = Database("accounts")
 
