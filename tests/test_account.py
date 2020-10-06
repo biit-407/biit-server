@@ -15,6 +15,14 @@ def client():
         yield client
 
 
+class MockAccount:
+    def __init__(self, email):
+        self.email = email
+
+    def to_dict(self):
+        return {"email": self.email}
+
+
 def test_account_post(client):
     """
     Tests that account post works correctly
@@ -55,14 +63,18 @@ def test_account_get(client):
 
     TODO this test needs to be modified when the database is connected
     """
-    with patch("biit_server.account_handler.Database") as mock_database:
+    with patch.object(
+        account_handler, "azure_refresh_token"
+    ) as mock_azure_refresh_token, patch(
+        "biit_server.account_handler.Database"
+    ) as mock_database:
+
         instance = mock_database.return_value
 
-        query_data = {
-            "email": "test@email.com",
-        }
+        query_data = {"email": "test@email.com", "token": "henlo"}
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
 
-        instance.get.return_value = query_data
+        instance.get.return_value = MockAccount(query_data["email"])
 
         rv = client.get(
             "/account",
@@ -70,7 +82,10 @@ def test_account_get(client):
             follow_redirects=True,
         )
 
-        assert query_data == json.loads(rv.data.decode("utf-8"))
+        assert (
+            b'{"access_token":"RefreshToken","data":{"email":"test@email.com"},"message":"Account returned","refresh_token":"AccessToken","status_code":200}\n'
+            == rv.data
+        )
 
 
 def test_account_put(client):
