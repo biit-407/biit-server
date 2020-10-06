@@ -1,7 +1,9 @@
 from .http_responses import http200, http400, jsonHttp200
-from .query_helper import validate_body, validate_query_params
+from .query_helper import validate_body, validate_query_params, validate_photo
 from .azure import azure_refresh_token
 from .database import Database
+from .storage import Storage
+from flask import send_file
 
 
 def account_post(request):
@@ -168,3 +170,86 @@ def account_delete(request):
         return http200("Account deleted")
     except:
         return http400("Error in account deletion")
+
+
+def profile_post(request):
+    """Handles the profile picture POST endpoint
+    Validates data sent in a request then calls gcs to save photo
+
+    Args:
+        request: A request object that contains a json object with keys: email, token and a file in request.files
+
+    Returns:
+        Http 200 string response
+
+    Raises:
+        Http 400 when the json is missing a key
+    """
+    fields = ["email", "token"]
+    body = None
+
+    try:
+        body = request.form
+    except:
+        return http400("Missing body")
+
+    body_validation = validate_body(body, fields)
+    # check that body validation succeeded
+    if (
+        body_validation[1] != 200
+        or "file" not in request.files
+        or not validate_photo(request.files["file"].filename)
+    ):
+        return body_validation
+
+    auth = azure_refresh_token(body["token"])
+    if not auth[0]:
+        return http400("Not Authenticated")
+
+    file = request.files["file"]
+    profile_storage = Storage("biit_profiles")
+
+    try:
+        profile_storage.add(file, file.filename)
+    except:
+        return http400("File was unable to be uploaded")
+
+    response = {
+        "access_token": auth[0],
+        "refresh_token": auth[1],
+    }
+    return jsonHttp200("File Uploaded", response)
+
+
+def profile_get(request):
+    """Handles the profile picture GET endpoint
+    Validates data sent in a request then calls the gcs to get the photo
+
+    Args:
+        request: A request object that contains args with keys: email and file
+
+    Returns:
+        (File) The Data of the file is returned
+
+    Raises:
+        Http 400 when the json is missing a key or the fils is not found
+    """
+    fields = ["email", "file"]
+
+    # serializes the quert string to a dict (neeto)
+    args = request.args
+
+    query_validation = validate_query_params(args, fields)
+    # check that body validation succeeded
+    if query_validation[1] != 200 or not validate_photo(args["file"]):
+        return query_validation
+
+    profile_storage = Storage("biit_profiles")
+
+    try:
+        return send_file(
+            profile_storage.get(args["file"]),
+            attachment_filename=args["file"],
+        )
+    except:
+        return http400("File not found")

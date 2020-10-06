@@ -3,7 +3,7 @@ import json
 import pytest
 from biit_server import create_app, account_handler
 from unittest.mock import patch
-
+from io import BytesIO
 import biit_server
 
 
@@ -122,3 +122,55 @@ def test_account_delete(client):
             follow_redirects=True,
         )
         assert b"OK: Account deleted" == rv.data
+
+
+def test_profile_post(client):
+    """
+    Tests that account delete works correctly
+
+    TODO this test needs to be modified when the database is connected
+    """
+    with patch.object(
+        account_handler, "azure_refresh_token"
+    ) as mock_azure_refresh_token, patch(
+        "biit_server.account_handler.Storage"
+    ) as mock_storage:
+        instance = mock_storage.return_value
+        instance.add.return_value = True
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
+        rv = client.post(
+            "/profile",
+            content_type="multipart/form-data",
+            data={
+                "email": "test@email.com",
+                "token": "ah a testing refresh token",
+                "file": (BytesIO(b"TestByte"), "test.jpg"),
+            },
+            follow_redirects=True,
+        )
+        assert (
+            b'{"access_token":"RefreshToken","message":"File Uploaded","refresh_token":"AccessToken","status_code":200}\n'
+            == rv.data
+        )
+
+
+def test_profile_get(client):
+    """
+    Tests that account delete works correctly
+
+    TODO this test needs to be modified when the database is connected
+    """
+    with patch.object(
+        account_handler, "azure_refresh_token"
+    ) as mock_azure_refresh_token, patch(
+        "biit_server.account_handler.Storage"
+    ) as mock_storage:
+        instance = mock_storage.return_value
+        instance.get.return_value = BytesIO(b"hello")
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
+        rv = client.get(
+            "/profile",
+            query_string={"email": "test@email.com", "file": "test.jpg"},
+            follow_redirects=True,
+        )
+        assert b"hello" == rv.data
