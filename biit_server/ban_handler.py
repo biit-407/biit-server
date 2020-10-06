@@ -1,6 +1,9 @@
 from .http_responses import http200, http400, jsonHttp200
 from .query_helper import validate_body, validate_query_params
 from .azure import azure_refresh_token
+from .database import Database
+
+from google.cloud import firestore
 
 
 def ban_post(request):
@@ -36,7 +39,19 @@ def ban_post(request):
     # TODO uncomment once db is implemented
     # return ban.add(args)
 
-    # TODO remove once db is implemented
+    ban_db = Database("communities")
+
+    banned_user = ban_db.get(body["community"]).to_dict()
+
+    insert_data = {
+        "name": body["bannee"],
+        "ordered_by": body["banner"],
+    }
+
+    banned_user["bans"].append(insert_data)
+
+    ban_db.update(body["community"], {"bans": banned_user["bans"]})
+
     return jsonHttp200(
         body["bannee"] + " has been banned",
         {"access_token": auth[0], "refresh_token": auth[1]},
@@ -71,10 +86,19 @@ def ban_put(request):
         return http400("Not Authenticated")
     # TODO Add tuple to response
 
-    # TODO uncomment once db is implemented
-    # return ban.remove(args)
+    ban_db = Database("communities")
 
-    # TODO remove once db is implemented
+    banned_user = ban_db.get(args["community"]).to_dict()
+
+    ban_db.update(
+        args["community"],
+        {
+            "bans": [
+                user for user in banned_user["bans"] if user["name"] != args["bannee"]
+            ]
+        },
+    )
+
     return jsonHttp200(
         args["bannee"] + " has been unbanned",
         {"access_token": auth[0], "refresh_token": auth[1]},
