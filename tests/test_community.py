@@ -75,7 +75,12 @@ def test_community_get(client):
     """
     Tests that community get works correctly
     """
-    with patch("biit_server.community_handler.Database") as mock_database:
+    with patch.object(
+        community_handler, "azure_refresh_token"
+    ) as mock_azure_refresh_token, patch(
+        "biit_server.community_handler.Database"
+    ) as mock_database:
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
 
         instance = mock_database.return_value
 
@@ -87,10 +92,14 @@ def test_community_get(client):
 
         rv = client.get(
             "/community",
-            query_string={"name": "TestCommunity"},
+            query_string={"name": "TestCommunity", "token": "dabonem"},
             follow_redirects=True,
         )
-        assert query_data == json.loads(rv.data)
+
+        assert (
+            b'{"access_token":"RefreshToken","data":{"name":"TestCommunity"},"message":"Community Received","refresh_token":"AccessToken","status_code":200}\n'
+            == rv.data
+        )
 
         instance.get.assert_called_once_with("TestCommunity")
 
