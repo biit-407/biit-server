@@ -47,7 +47,12 @@ def community_post(request):
         return http400("Community name already taken")
 
     return jsonHttp200(
-        "Community Created", {"access_token": auth[0], "refresh_token": auth[1]}
+        "Community created",
+        {
+            "access_token": auth[0],
+            "refresh_token": auth[1],
+            "data": community_db.get(body["name"]),
+        },
     )
 
     # TODO uncomment once the DB is implemented
@@ -127,7 +132,12 @@ def community_put(request):
 
     community_db.update(args["name"], ast.literal_eval(args["updateFields"]))
     return jsonHttp200(
-        "Community Updated", {"access_token": auth[0], "refresh_token": auth[1]}
+        "Community Updated",
+        {
+            "access_token": auth[0],
+            "refresh_token": auth[1],
+            "data": community_db.get(args["name"]),
+        },
     )
 
 

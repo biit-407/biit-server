@@ -46,6 +46,11 @@ def test_community_post(client):
     ) as mock_database:
         instance = mock_database.return_value
         instance.add.return_value = True
+        query_data = {
+            "name": "TestCommunity",
+        }
+
+        instance.get.return_value = query_data
 
         test_json = {
             "name": "Cool Community",
@@ -64,7 +69,7 @@ def test_community_post(client):
             follow_redirects=True,
         )
         assert (
-            b'{"access_token":"RefreshToken","message":"Community Created","refresh_token":"AccessToken","status_code":200}\n'
+            b'{"access_token":"RefreshToken","data":{"name":"TestCommunity"},"message":"Community created","refresh_token":"AccessToken","status_code":200}\n'
             == rv.data
         )
 
@@ -117,7 +122,11 @@ def test_community_put(client):
     ) as mock_database:
         instance = mock_database.return_value
         instance.update.return_value = True
+        query_data = {
+            "name": "TestCommunity",
+        }
 
+        instance.get.return_value = query_data
         test_json = {
             "name": "TestCommunity",
             "token": "TestToken",
@@ -132,7 +141,7 @@ def test_community_put(client):
             follow_redirects=True,
         )
         assert (
-            b'{"access_token":"RefreshToken","message":"Community Updated","refresh_token":"AccessToken","status_code":200}\n'
+            b'{"access_token":"RefreshToken","data":{"name":"TestCommunity"},"message":"Community Updated","refresh_token":"AccessToken","status_code":200}\n'
             == rv.data
         )
 
