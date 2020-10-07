@@ -101,6 +101,8 @@ def test_account_put(client):
     ) as mock_database:
         instance = mock_database.return_value
         instance.update.return_value = True
+        query_data = {"email": "test@email.com"}
+        instance.get.return_value = MockAccount(query_data["email"])
         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.put(
             "/account",
@@ -112,7 +114,7 @@ def test_account_put(client):
             follow_redirects=True,
         )
         assert (
-            b'{"access_token":"RefreshToken","message":"Account Updated","refresh_token":"AccessToken","status_code":200}\n'
+            b'{"access_token":"RefreshToken","email":"test@email.com","message":"Account Updated","refresh_token":"AccessToken","status_code":200}\n'
             == rv.data
         )
 
