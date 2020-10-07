@@ -221,7 +221,12 @@ def community_join_post(request, community_id):
 
     community_db.update(int(community_id), {"Members": community["Members"] + [body]})
     return jsonHttp200(
-        "Community Joined", {"access_token": auth[0], "refresh_token": auth[1]}
+        "Community Joined",
+        {
+            "access_token": auth[0],
+            "refresh_token": auth[1],
+            "data": community_db.get(int(community_id)).to_json(),
+        },
     )
 
 
@@ -265,5 +270,10 @@ def community_leave_post(request, community_id):
         },
     )
     return jsonHttp200(
-        "Community Left", {"access_token": auth[0], "refresh_token": auth[1]}
+        "Community Left",
+        {
+            "access_token": auth[0],
+            "refresh_token": auth[1],
+            "data": community_db.get(int(community_id)).to_json(),
+        },
     )

@@ -202,11 +202,11 @@ def test_community_join_post(client):
             follow_redirects=True,
         )
         assert (
-            b'{"access_token":"RefreshToken","message":"Community Joined","refresh_token":"AccessToken","status_code":200}\n'
+            b'{"access_token":"RefreshToken","data":{"Members":[],"name":"mock"},"message":"Community Joined","refresh_token":"AccessToken","status_code":200}\n'
             == rv.data
         )
 
-        instance.get.assert_called_once_with(test_id)
+        instance.get.assert_called_with(test_id)
         instance.update.assert_called_once_with(test_id, {"Members": [test_data]})
 
 
@@ -234,9 +234,9 @@ def test_community_leave_post(client):
         )
 
         assert (
-            b'{"access_token":"RefreshToken","message":"Community Left","refresh_token":"AccessToken","status_code":200}\n'
+            b'{"access_token":"RefreshToken","data":{"Members":[{"email":"Testemail@gmail.com","name":"Jeffery","token":"Toke"}],"name":"mock"},"message":"Community Left","refresh_token":"AccessToken","status_code":200}\n'
             == rv.data
         )
 
-        instance.get.assert_called_once_with(test_id)
+        instance.get.assert_called_with(test_id)
         instance.update.assert_called_once_with(test_id, {"Members": []})
