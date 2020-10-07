@@ -192,7 +192,7 @@ def test_community_join_post(client):
         instance.get.return_value = MockCollection()
         instance.update.return_value = True
 
-        test_data = {"name": "Jeffery", "token": "Toke", "email": "Testemail@gmail.com"}
+        test_data = {"token": "Toke", "email": "Testemail@gmail.com"}
         test_id = 1
 
         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
@@ -207,7 +207,9 @@ def test_community_join_post(client):
         )
 
         instance.get.assert_called_with(test_id)
-        instance.update.assert_called_once_with(test_id, {"Members": [test_data]})
+        instance.update.assert_called_once_with(
+            test_id, {"Members": [test_data["email"]]}
+        )
 
 
 def test_community_leave_post(client):
@@ -219,11 +221,11 @@ def test_community_leave_post(client):
     ) as mock_azure_refresh_token, patch(
         "biit_server.community_handler.Database"
     ) as mock_database:
-        test_data = {"name": "Jeffery", "token": "Toke", "email": "Testemail@gmail.com"}
+        test_data = {"token": "Toke", "email": "Testemail@gmail.com"}
         test_id = 1
 
         instance = mock_database.return_value
-        instance.get.return_value = MockCollectionLeave(test_data)
+        instance.get.return_value = MockCollectionLeave(test_data["email"])
         instance.update.return_value = True
 
         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
@@ -234,7 +236,7 @@ def test_community_leave_post(client):
         )
 
         assert (
-            b'{"access_token":"RefreshToken","data":{"Members":[{"email":"Testemail@gmail.com","name":"Jeffery","token":"Toke"}],"name":"mock"},"message":"Community Left","refresh_token":"AccessToken","status_code":200}\n'
+            b'{"access_token":"RefreshToken","data":{"Members":["Testemail@gmail.com"],"name":"mock"},"message":"Community Left","refresh_token":"AccessToken","status_code":200}\n'
             == rv.data
         )
 

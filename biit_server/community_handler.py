@@ -193,7 +193,7 @@ def community_join_post(request, community_id):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["name", "email", "token"]
+    fields = ["email", "token"]
     body = None
 
     try:
@@ -215,11 +215,12 @@ def community_join_post(request, community_id):
     community_db = Database("communities")
     community = community_db.get(int(community_id)).to_json()
 
-    for member in community["Members"]:
-        if member["email"] == body["email"]:
-            raise Exception
+    if body["email"] in community["Members"]:
+        raise Exception
 
-    community_db.update(int(community_id), {"Members": community["Members"] + [body]})
+    community_db.update(
+        int(community_id), {"Members": community["Members"] + [body["email"]]}
+    )
     return jsonHttp200(
         "Community Joined",
         {
@@ -242,7 +243,7 @@ def community_leave_post(request, community_id):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["name", "token", "email"]
+    fields = ["token", "email"]
     body = None
 
     try:
@@ -263,11 +264,7 @@ def community_leave_post(request, community_id):
     community = community_db.get(int(community_id)).to_json()
     community_db.update(
         int(community_id),
-        {
-            "Members": [
-                user for user in community["Members"] if user["email"] != body["email"]
-            ]
-        },
+        {"Members": [user for user in community["Members"] if user != body["email"]]},
     )
     return jsonHttp200(
         "Community Left",
