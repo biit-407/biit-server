@@ -23,6 +23,10 @@ class MockCollection:
         """Returns a mock collection entry"""
         return {"name": self.name, "Members": []}
 
+    def to_dict(self):
+        """Returns a mock collection entry"""
+        return {"name": self.name, "Members": []}
+
 
 class MockCollectionLeave:
     def __init__(self, test_data):
@@ -33,6 +37,18 @@ class MockCollectionLeave:
     def to_json(self):
         """Returns a mock collection entry"""
         return {"name": self.name, "Members": self.members}
+
+    def to_dict(self):
+        """Returns a mock collection entry"""
+        return {"name": self.name, "Members": self.members}
+
+
+class MockCommunity:
+    def __init__(self, name):
+        self.name = name
+
+    def to_dict(self):
+        return {"name": self.name}
 
 
 def test_community_post(client):
@@ -50,7 +66,7 @@ def test_community_post(client):
             "name": "TestCommunity",
         }
 
-        instance.get.return_value = query_data
+        instance.get.return_value = MockCommunity(query_data["name"])
 
         test_json = {
             "name": "Cool Community",
@@ -95,7 +111,7 @@ def test_community_get(client):
             "name": "TestCommunity",
         }
 
-        instance.get.return_value = query_data
+        instance.get.return_value = MockCommunity(query_data["name"])
 
         rv = client.get(
             "/community",
@@ -126,7 +142,7 @@ def test_community_put(client):
             "name": "TestCommunity",
         }
 
-        instance.get.return_value = query_data
+        instance.get.return_value = MockCommunity(query_data["name"])
         test_json = {
             "name": "TestCommunity",
             "token": "TestToken",
