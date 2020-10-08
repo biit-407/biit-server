@@ -219,7 +219,7 @@ def community_join_post(request, community_id):
         raise Exception
 
     community_db.update(
-        int(community_id), {"Members": community["Members"] + [body["email"]]}
+        community_id, {"Members": community["Members"] + [body["email"]]}
     )
     return jsonHttp200(
         "Community Joined",
@@ -263,7 +263,7 @@ def community_leave_post(request, community_id):
     community_db = Database("communities")
     community = community_db.get(community_id).to_dict()
     community_db.update(
-        int(community_id),
+        community_id,
         {"Members": [user for user in community["Members"] if user != body["email"]]},
     )
     return jsonHttp200(
