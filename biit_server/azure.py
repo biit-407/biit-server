@@ -39,7 +39,7 @@ def azure_refresh_token(refresh_token: str) -> Tuple[str, str]:
                          process and obtain a new refresh token.
 
     """
-    stage = os.environ.get["STAGE"]
+    stage = os.getenv["STAGE"]
     if stage is "dev":
         return ("AccessToken", "RefreshToken")
 
