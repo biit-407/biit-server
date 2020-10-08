@@ -15,7 +15,7 @@ class Storage:
         super().__init__()
         self.name = bucket
         self.storage = storage_client if storage_client != None else storage.Client()
-        self.bucket = self.storage.getbucket(self.name)
+        self.bucket = self.storage.get_bucket(self.name)
 
     def add(self, file, name: str) -> bool:
         """Helper function to add file into the storage bucket.

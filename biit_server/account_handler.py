@@ -208,13 +208,15 @@ def profile_post(request):
         return http400("Missing body")
 
     body_validation = validate_body(body, fields)
+    print(request.files["file"].filename)
+
     # check that body validation succeeded
     if (
         body_validation[1] != 200
         or "file" not in request.files
-        or not validate_photo(request.files["file"].filename)
     ):
-        return body_validation
+        print("Problem in validation")
+        return http400("Problem Validating Request")
 
     auth = azure_refresh_token(body["token"])
     if not auth[0]:
@@ -226,6 +228,7 @@ def profile_post(request):
     try:
         profile_storage.add(file, file.filename)
     except:
+        print("File Couldn't be uploaded")
         return http400("File was unable to be uploaded")
 
     response = {
