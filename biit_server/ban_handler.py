@@ -39,6 +39,13 @@ def ban_post(request):
     # TODO uncomment once db is implemented
     # return ban.add(args)
 
+    community_db = Database("communities")
+    community = community_db.get(body["community"]).to_dict()
+    community_db.update(
+        body["community"],
+        {"Members": [user for user in community["Members"] if user != body["bannee"]]},
+    )
+
     ban_db = Database("communities")
 
     banned_user = ban_db.get(body["community"]).to_dict()
