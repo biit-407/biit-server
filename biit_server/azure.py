@@ -39,8 +39,8 @@ def azure_refresh_token(refresh_token: str) -> Tuple[str, str]:
                          process and obtain a new refresh token.
 
     """
-    stage = os.getenv["STAGE"]
-    if stage is "dev":
+    stage = os.getenv("STAGE")
+    if stage == "dev":
         return ("AccessToken", "RefreshToken")
 
     url = f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/token"
