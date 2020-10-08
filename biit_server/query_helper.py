@@ -32,6 +32,6 @@ def validate_photo(filename: str):
     """
     if not filename:
         return False
-    if not re.match("([A-Za-z0-9])*.(jpg|png)", filename)[2]:
+    if not re.match("([A-Za-z0-9])*.(jpg|png)", filename):
         return False
     return True
