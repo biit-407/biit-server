@@ -1,6 +1,7 @@
 from google.cloud import storage
 import io
 
+
 class Storage:
     def __init__(self, bucket, storage_client=None) -> None:
         """The constructor for the Storage class. Used to instantiate a Bucket reference object.
@@ -30,7 +31,6 @@ class Storage:
         blob = self.bucket.blob(name)
         blob.upload_from_string(file)
         return True
-
 
     def get(self, name):
         """Helper function to get documents from the database.
