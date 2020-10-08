@@ -6,7 +6,7 @@ from .azure import azure_refresh_token
 from .database import Database
 from .storage import Storage
 from flask import send_file
-
+import base64
 
 def account_post(request):
     """Handles the account POST endpoint
@@ -199,7 +199,7 @@ def profile_post(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["email", "token"]
+    fields = ["email", "token", "file", "filename"]
     body = None
 
     try:
@@ -208,27 +208,22 @@ def profile_post(request):
         return http400("Missing body")
 
     body_validation = validate_body(body, fields)
-    print(request.files["file"].filename)
 
     # check that body validation succeeded
     if (
         body_validation[1] != 200
-        or "file" not in request.files
     ):
-        print("Problem in validation")
         return http400("Problem Validating Request")
 
     auth = azure_refresh_token(body["token"])
     if not auth[0]:
         return http400("Not Authenticated")
 
-    file = request.files["file"]
     profile_storage = Storage("biit_profiles")
-
+    file_decode = base64.b64decode(body["file"])
     try:
-        profile_storage.add(file, file.filename)
+        profile_storage.add(file_decode, body["filename"])
     except:
-        print("File Couldn't be uploaded")
         return http400("File was unable to be uploaded")
 
     response = {
@@ -251,23 +246,23 @@ def profile_get(request):
     Raises:
         Http 400 when the json is missing a key or the fils is not found
     """
-    fields = ["email", "file"]
+    fields = ["email", "filename"]
 
     # serializes the quert string to a dict (neeto)
     args = request.args
 
     query_validation = validate_query_params(args, fields)
     # check that body validation succeeded
-    if query_validation[1] != 200 or not validate_photo(args["file"]):
+    if query_validation[1] != 200 or not validate_photo(args["filename"]):
         return query_validation
 
     profile_storage = Storage("biit_profiles")
 
     try:
-        ret_file = profile_storage.get(args["file"])
+        ret_file = profile_storage.get(args["filename"])
         return send_file(
             ret_file,
-            attachment_filename=args["file"],
+            attachment_filename=args["filename"],
         )
     except:
         return http400("File not found")

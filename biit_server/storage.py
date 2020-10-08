@@ -27,12 +27,10 @@ class Storage:
         Returns:
             boolean, True if the document is successfully added, False if there was an error.
         """
-        try:
-            blob = self.bucket.blob(name)
-            blob.upload_from_file(file)
-            return True
-        except Exception:
-            return False
+        blob = self.bucket.blob(name)
+        blob.upload_from_string(file)
+        return True
+
 
     def get(self, name):
         """Helper function to get documents from the database.
