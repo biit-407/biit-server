@@ -8,6 +8,7 @@ from .storage import Storage
 from flask import send_file
 import base64
 
+
 def account_post(request):
     """Handles the account POST endpoint
     Validates data sent in a request then calls the database to add an account
@@ -210,9 +211,7 @@ def profile_post(request):
     body_validation = validate_body(body, fields)
 
     # check that body validation succeeded
-    if (
-        body_validation[1] != 200
-    ):
+    if body_validation[1] != 200:
         return http400("Problem Validating Request")
 
     auth = azure_refresh_token(body["token"])

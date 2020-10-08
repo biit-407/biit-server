@@ -161,7 +161,8 @@ def test_profile_post(client):
             data={
                 "email": "test@email.com",
                 "token": "ah a testing refresh token",
-                "file": (BytesIO(b"TestByte"), "test.jpg"),
+                "file": b"garbage",
+                "filename": "file.jpg",
             },
             follow_redirects=True,
         )
@@ -187,7 +188,7 @@ def test_profile_get(client):
         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.get(
             "/profile",
-            query_string={"email": "test@email.com", "file": "test.jpg"},
+            query_string={"email": "test@email.com", "filename": "test.jpg"},
             follow_redirects=True,
         )
         assert b"hello" == rv.data
