@@ -11,7 +11,7 @@
    args:
    - 'run'
    - 'deploy'
-   - 'dev'
+   - 'prod'
    - '--image'
    - 'gcr.io/$PROJECT_ID/prod:$COMMIT_SHA'
    - '--region'
