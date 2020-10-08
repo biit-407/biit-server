@@ -213,20 +213,20 @@ def community_join_post(request, community_id):
 
     # TODO @Ryan Create the DB stuff
     community_db = Database("communities")
-    community = community_db.get(int(community_id)).to_dict()
+    community = community_db.get(community_id).to_dict()
 
     if body["email"] in community["Members"]:
         raise Exception
 
     community_db.update(
-        int(community_id), {"Members": community["Members"] + [body["email"]]}
+        community_id, {"Members": community["Members"] + [body["email"]]}
     )
     return jsonHttp200(
         "Community Joined",
         {
             "access_token": auth[0],
             "refresh_token": auth[1],
-            "data": community_db.get(int(community_id)).to_dict(),
+            "data": community_db.get(community_id).to_dict(),
         },
     )
 
@@ -261,9 +261,9 @@ def community_leave_post(request, community_id):
     # TODO Add tuple ot response
 
     community_db = Database("communities")
-    community = community_db.get(int(community_id)).to_dict()
+    community = community_db.get(community_id).to_dict()
     community_db.update(
-        int(community_id),
+        community_id,
         {"Members": [user for user in community["Members"] if user != body["email"]]},
     )
     return jsonHttp200(
@@ -271,6 +271,6 @@ def community_leave_post(request, community_id):
         {
             "access_token": auth[0],
             "refresh_token": auth[1],
-            "data": community_db.get(int(community_id)).to_dict(),
+            "data": community_db.get(community_id).to_dict(),
         },
     )
