@@ -1,4 +1,5 @@
 import requests
+import os
 from typing import Tuple
 
 CLIENT_ID = "c128fe76-dc54-4daa-993c-1a13c1e82080"
@@ -38,6 +39,10 @@ def azure_refresh_token(refresh_token: str) -> Tuple[str, str]:
                          process and obtain a new refresh token.
 
     """
+    stage = os.environ.get["STAGE"]
+    if stage is "dev":
+        return ("AccessToken", "RefreshToken")
+
     url = f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/token"
 
     payload = f"client_id={CLIENT_ID}&scope=https://graph.microsoft.com/User.Read&redirect_uri={REDIRECT_URI}&grant_type=refresh_token&refresh_token={refresh_token}"
