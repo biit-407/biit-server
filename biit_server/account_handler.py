@@ -259,9 +259,7 @@ def profile_get(request):
 
     try:
         ret_file = profile_storage.get(args["filename"])
-        return send_file(
-            ret_file,
-            attachment_filename=args["filename"],
-        )
+        response = {"data": ret_file}
+        return jsonHttp200("File Received", response)
     except:
         return http400("File not found")

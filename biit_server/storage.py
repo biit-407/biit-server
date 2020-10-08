@@ -1,5 +1,5 @@
 from google.cloud import storage
-import io
+import base64
 
 
 class Storage:
@@ -44,9 +44,7 @@ class Storage:
         try:
             blob = self.bucket.get_blob(name)
             file_obj = blob.download_as_string()
-            byte_file = io.BytesIO()
-            byte_file.write(file_obj)
-            byte_file.seek(0)
-            return byte_file
+            byte_file = base64.b64encode(file_obj)
+            return byte_file.decode("ascii")
         except Exception:
             return False
