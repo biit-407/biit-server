@@ -13,11 +13,12 @@ def client():
 
 
 class MockBanEmpty:
-    def __init__(self):
+    def __init__(self, member):
         self.bans = []
+        self.members = [member]
 
     def to_dict(self):
-        return {"bans": self.bans}
+        return {"bans": self.bans, "Members": self.members}
 
 
 class MockBan:
@@ -40,7 +41,7 @@ def test_ban_post(client):
         "biit_server.ban_handler.Database"
     ) as mock_database:
         instance = mock_database.return_value
-        instance.get.return_value = MockBanEmpty()
+        instance.get.return_value = MockBanEmpty("last")
         instance.update.return_value = True
 
         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
