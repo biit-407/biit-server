@@ -261,8 +261,9 @@ def profile_get(request):
     profile_storage = Storage("biit_profiles")
 
     try:
+        ret_file = profile_storage.get(args["file"])
         return send_file(
-            profile_storage.get(args["file"]),
+            ret_file,
             attachment_filename=args["file"],
         )
     except:

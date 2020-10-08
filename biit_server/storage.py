@@ -1,5 +1,5 @@
 from google.cloud import storage
-
+import io
 
 class Storage:
     def __init__(self, bucket, storage_client=None) -> None:
@@ -45,8 +45,10 @@ class Storage:
         """
         try:
             blob = self.bucket.get_blob(name)
-            with open(name, "wb") as file_obj:
-                blob.download_to_file(file_obj)
-            return file_obj
+            file_obj = blob.download_as_string()
+            byte_file = io.BytesIO()
+            byte_file.write(file_obj)
+            byte_file.seek(0)
+            return byte_file
         except Exception:
             return False
