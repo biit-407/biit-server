@@ -51,7 +51,7 @@ def community_post(request):
         {
             "access_token": auth[0],
             "refresh_token": auth[1],
-            "data": community_db.get(body["name"]),
+            "data": community_db.get(body["name"]).to_dict(),
         },
     )
 
@@ -93,7 +93,7 @@ def community_get(request):
             {
                 "access_token": auth[0],
                 "refresh_token": auth[1],
-                "data": community_db.get(args["name"]),
+                "data": community_db.get(args["name"]).to_dict(),
             },
         )
     except:
@@ -136,7 +136,7 @@ def community_put(request):
         {
             "access_token": auth[0],
             "refresh_token": auth[1],
-            "data": community_db.get(args["name"]),
+            "data": community_db.get(args["name"]).to_dict(),
         },
     )
 
@@ -213,7 +213,7 @@ def community_join_post(request, community_id):
 
     # TODO @Ryan Create the DB stuff
     community_db = Database("communities")
-    community = community_db.get(int(community_id)).to_json()
+    community = community_db.get(int(community_id)).to_dict()
 
     if body["email"] in community["Members"]:
         raise Exception
@@ -226,7 +226,7 @@ def community_join_post(request, community_id):
         {
             "access_token": auth[0],
             "refresh_token": auth[1],
-            "data": community_db.get(int(community_id)).to_json(),
+            "data": community_db.get(int(community_id)).to_dict(),
         },
     )
 
@@ -261,7 +261,7 @@ def community_leave_post(request, community_id):
     # TODO Add tuple ot response
 
     community_db = Database("communities")
-    community = community_db.get(int(community_id)).to_json()
+    community = community_db.get(int(community_id)).to_dict()
     community_db.update(
         int(community_id),
         {"Members": [user for user in community["Members"] if user != body["email"]]},
@@ -271,6 +271,6 @@ def community_leave_post(request, community_id):
         {
             "access_token": auth[0],
             "refresh_token": auth[1],
-            "data": community_db.get(int(community_id)).to_json(),
+            "data": community_db.get(int(community_id)).to_dict(),
         },
     )
