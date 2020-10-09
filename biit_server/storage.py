@@ -1,5 +1,6 @@
 from google.cloud import storage
-import io
+import base64
+
 
 class Storage:
     def __init__(self, bucket, storage_client=None) -> None:
@@ -27,12 +28,9 @@ class Storage:
         Returns:
             boolean, True if the document is successfully added, False if there was an error.
         """
-        try:
-            blob = self.bucket.blob(name)
-            blob.upload_from_file(file)
-            return True
-        except Exception:
-            return False
+        blob = self.bucket.blob(name)
+        blob.upload_from_string(file)
+        return True
 
     def get(self, name):
         """Helper function to get documents from the database.
@@ -46,9 +44,7 @@ class Storage:
         try:
             blob = self.bucket.get_blob(name)
             file_obj = blob.download_as_string()
-            byte_file = io.BytesIO()
-            byte_file.write(file_obj)
-            byte_file.seek(0)
-            return byte_file
+            byte_file = base64.b64encode(file_obj)
+            return byte_file.decode("ascii")
         except Exception:
             return False

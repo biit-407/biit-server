@@ -161,7 +161,8 @@ def test_profile_post(client):
             data={
                 "email": "test@email.com",
                 "token": "ah a testing refresh token",
-                "file": (BytesIO(b"TestByte"), "test.jpg"),
+                "file": b"garbage",
+                "filename": "file.jpg",
             },
             follow_redirects=True,
         )
@@ -183,11 +184,18 @@ def test_profile_get(client):
         "biit_server.account_handler.Storage"
     ) as mock_storage:
         instance = mock_storage.return_value
-        instance.get.return_value = BytesIO(b"hello")
+        instance.get.return_value = "hello"
         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.get(
             "/profile",
-            query_string={"email": "test@email.com", "file": "test.jpg"},
+            query_string={
+                "email": "test@email.com",
+                "token": "toke",
+                "filename": "test.jpg",
+            },
             follow_redirects=True,
         )
-        assert b"hello" == rv.data
+        assert (
+            b'{"access_token":"RefreshToken","data":"hello","message":"File Received","refresh_token":"AccessToken","status_code":200}\n'
+            == rv.data
+        )
