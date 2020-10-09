@@ -48,3 +48,17 @@ class Storage:
             return byte_file.decode("ascii")
         except Exception:
             return False
+
+    def delete(self, name):
+        """Helper function to delete documents from the database.
+
+        Args:
+            name (str): The name of the blob to be found
+
+        Returns:
+            True if deleted
+        """
+        blob = self.bucket.get_blob(name)  
+        if blob:
+            file_obj = blob.delete()
+        return True
