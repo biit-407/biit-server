@@ -188,9 +188,14 @@ def test_profile_get(client):
         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.get(
             "/profile",
-            query_string={"email": "test@email.com", "filename": "test.jpg"},
+            query_string={
+                "email": "test@email.com",
+                "token": "toke",
+                "filename": "test.jpg",
+            },
             follow_redirects=True,
         )
         assert (
-            b'{"data":"hello","message":"File Received","status_code":200}\n' == rv.data
+            b'{"access_token":"RefreshToken","data":"hello","message":"File Received","refresh_token":"AccessToken","status_code":200}\n'
+            == rv.data
         )

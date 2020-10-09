@@ -245,11 +245,13 @@ def profile_get(request):
     Raises:
         Http 400 when the json is missing a key or the fils is not found
     """
-    fields = ["email", "filename"]
+    fields = ["email", "token", "filename"]
 
     # serializes the quert string to a dict (neeto)
     args = request.args
-
+    auth = azure_refresh_token(args["token"])
+    if not auth[0]:
+        return http400("Not Authenticated")
     query_validation = validate_query_params(args, fields)
     # check that body validation succeeded
     if query_validation[1] != 200 or not validate_photo(args["filename"]):
@@ -259,7 +261,7 @@ def profile_get(request):
 
     try:
         ret_file = profile_storage.get(args["filename"])
-        response = {"data": ret_file}
+        response = {"data": ret_file, "access_token": auth[0], "refresh_token": auth[1]}
         return jsonHttp200("File Received", response)
     except:
         return http400("File not found")
