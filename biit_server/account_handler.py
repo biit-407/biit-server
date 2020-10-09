@@ -180,8 +180,10 @@ def account_delete(request):
     # TODO uncomment once db is implemented
 
     account_db = Database("accounts")
+    storage = Storage("biit_profiles")
     try:
         account_db.delete(args["email"])
+        storage.delete(args["email"] + ".jpg")
         return http200("Account deleted")
     except:
         return http400("Error in account deletion")
