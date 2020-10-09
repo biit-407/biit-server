@@ -209,7 +209,7 @@ def test_community_join_post(client):
         instance.update.return_value = True
 
         test_data = {"token": "Toke", "email": "Testemail@gmail.com"}
-        test_id = 1
+        test_id = "Johnson"
 
         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.post(
@@ -238,7 +238,7 @@ def test_community_leave_post(client):
         "biit_server.community_handler.Database"
     ) as mock_database:
         test_data = {"token": "Toke", "email": "Testemail@gmail.com"}
-        test_id = 1
+        test_id = "Johnson"
 
         instance = mock_database.return_value
         instance.get.return_value = MockCollectionLeave(test_data["email"])
