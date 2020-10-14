@@ -34,9 +34,7 @@ def ban_post(request):
     auth = azure_refresh_token(body["token"])
     if not auth[0]:
         return http400("Not Authenticated")
-    # TODO Add tuple to response
 
-    # TODO uncomment once db is implemented
     # return ban.add(args)
 
     community_db = Database("communities")
@@ -59,10 +57,9 @@ def ban_post(request):
 
     ban_db.update(body["community"], {"bans": banned_user["bans"]})
 
-    return jsonHttp200(
-        body["bannee"] + " has been banned",
-        {"access_token": auth[0], "refresh_token": auth[1]},
-    )
+    response = {"access_token": auth[0], "refresh_token": auth[1]}
+
+    return jsonHttp200(body["bannee"] + " has been banned", response)
 
 
 def ban_put(request):
@@ -91,7 +88,6 @@ def ban_put(request):
     auth = azure_refresh_token(args["token"])
     if not auth[0]:
         return http400("Not Authenticated")
-    # TODO Add tuple to response
 
     ban_db = Database("communities")
 
@@ -106,7 +102,6 @@ def ban_put(request):
         },
     )
 
-    return jsonHttp200(
-        args["bannee"] + " has been unbanned",
-        {"access_token": auth[0], "refresh_token": auth[1]},
-    )
+    response = {"access_token": auth[0], "refresh_token": auth[1]}
+
+    return jsonHttp200(args["bannee"] + " has been unbanned", response)
