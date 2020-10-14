@@ -33,7 +33,7 @@ def test_ban_post(client):
     """
     Tests that account post works correctly
 
-    TODO this test needs to be modified when the database is connected
+
     """
     with patch.object(
         ban_handler, "azure_refresh_token"
@@ -65,7 +65,7 @@ def test_ban_put(client):
     """
     Tests that account get works correctly
 
-    TODO this test needs to be modified when the database is connected
+
     """
     with patch.object(
         ban_handler, "azure_refresh_token"

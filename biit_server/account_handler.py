@@ -93,14 +93,12 @@ def account_get(request):
     account_db = Database("accounts")
 
     try:
-        return jsonHttp200(
-            "Account returned",
-            {
-                "access_token": auth[0],
-                "refresh_token": auth[1],
-                "data": account_db.get(args["email"]).to_dict(),
-            },
-        )
+        response = {
+            "access_token": auth[0],
+            "refresh_token": auth[1],
+            "data": account_db.get(args["email"]).to_dict(),
+        }
+        return jsonHttp200("Account returned", response)
     except:
         return http400("Account not found")
 
@@ -132,17 +130,18 @@ def account_put(request):
     auth = azure_refresh_token(args["token"])
     if not auth[0]:
         return http400("Not Authenticated")
-    # TODO Add tuple to response
-
-    # TODO uncomment once db is implemented
+    #  Add tuple to response
 
     account_db = Database("accounts")
 
     try:
         account_db.update(args["email"], ast.literal_eval(args["updateFields"]))
-        response = account_db.get(args["email"]).to_dict()
-        response["access_token"] = auth[0]
-        response["refresh_token"] = auth[1]
+        response = {
+            "access_token": auth[0],
+            "refresh_token": auth[1],
+        }
+        response.update(account_db.get(args["email"]).to_dict())
+
         return jsonHttp200("Account Updated", response)
     except:
         return http400("Account update error")
@@ -175,9 +174,6 @@ def account_delete(request):
     auth = azure_refresh_token(args["token"])
     if not auth[0]:
         return http400("Not Authenticated")
-    # TODO Add tuple to response
-
-    # TODO uncomment once db is implemented
 
     account_db = Database("accounts")
     storage = Storage("biit_profiles")
@@ -262,8 +258,11 @@ def profile_get(request):
     profile_storage = Storage("biit_profiles")
 
     try:
-        ret_file = profile_storage.get(args["filename"])
-        response = {"data": ret_file, "access_token": auth[0], "refresh_token": auth[1]}
+        response = {
+            "data": profile_storage.get(args["filename"]),
+            "access_token": auth[0],
+            "refresh_token": auth[1],
+        }
         return jsonHttp200("File Received", response)
     except:
         return http400("File not found")
