@@ -35,7 +35,6 @@ def community_post(request):
     auth = azure_refresh_token(body["token"])
     if not auth[0]:
         return http400("Not Authenticated")
-    # TODO Add tuple ot response
 
     community_db = Database("communities")
 
@@ -46,16 +45,13 @@ def community_post(request):
     except:
         return http400("Community name already taken")
 
-    return jsonHttp200(
-        "Community created",
-        {
-            "access_token": auth[0],
-            "refresh_token": auth[1],
-            "data": community_db.get(body["name"]).to_dict(),
-        },
-    )
+    response = {
+        "access_token": auth[0],
+        "refresh_token": auth[1],
+        "data": community_db.get(body["name"]).to_dict(),
+    }
+    return jsonHttp200("Community created", response)
 
-    # TODO uncomment once the DB is implemented
     # this was commented out for testing purposes
     # return http400("Failed to create community")
 
@@ -88,14 +84,12 @@ def community_get(request):
     community_db = Database("communities")
 
     try:
-        return jsonHttp200(
-            "Community Received",
-            {
-                "access_token": auth[0],
-                "refresh_token": auth[1],
-                "data": community_db.get(args["name"]).to_dict(),
-            },
-        )
+        response = {
+            "access_token": auth[0],
+            "refresh_token": auth[1],
+            "data": community_db.get(args["name"]).to_dict(),
+        }
+        return jsonHttp200("Community Received", response)
     except:
         return http400("Community not found")
 
@@ -125,20 +119,16 @@ def community_put(request):
     auth = azure_refresh_token(args["token"])
     if not auth[0]:
         return http400("Not Authenticated")
-    # TODO Add tuple ot response
 
-    # TODO uncomment once db is implemented
     community_db = Database("communities")
 
     community_db.update(args["name"], ast.literal_eval(args["updateFields"]))
-    return jsonHttp200(
-        "Community Updated",
-        {
-            "access_token": auth[0],
-            "refresh_token": auth[1],
-            "data": community_db.get(args["name"]).to_dict(),
-        },
-    )
+    response = {
+        "access_token": auth[0],
+        "refresh_token": auth[1],
+        "data": community_db.get(args["name"]).to_dict(),
+    }
+    return jsonHttp200("Community Updated", response)
 
 
 def community_delete(request):
@@ -166,17 +156,14 @@ def community_delete(request):
     auth = azure_refresh_token(args["token"])
     if not auth[0]:
         return http400("Not Authenticated")
-    # TODO Add tuple ot response
 
-    # TODO uncomment once db is implemented
     # return community.delete(args)
     community_db = Database("communities")
 
     try:
         community_db.delete(args["name"])
-        return jsonHttp200(
-            "Community Deleted", {"access_token": auth[0], "refresh_token": auth[1]}
-        )
+        response = {"access_token": auth[0], "refresh_token": auth[1]}
+        return jsonHttp200("Community Deleted", response)
     except:
         return http400("Community update error")
 
@@ -209,9 +196,7 @@ def community_join_post(request, community_id):
     auth = azure_refresh_token(body["token"])
     if not auth[0]:
         return http400("Not Authenticated")
-    # TODO Add tuple to response
 
-    # TODO @Ryan Create the DB stuff
     community_db = Database("communities")
     community = community_db.get(community_id).to_dict()
 
@@ -219,16 +204,15 @@ def community_join_post(request, community_id):
         raise Exception
 
     community_db.update(
-        community_id, {"Members": community["Members"] + [body["email"]]}
-    )
-    return jsonHttp200(
-        "Community Joined",
-        {
-            "access_token": auth[0],
-            "refresh_token": auth[1],
-            "data": community_db.get(community_id).to_dict(),
-        },
-    )
+        community_id, {"Members": community["Members"] + [body["email"]]})
+      
+    response = {
+        "access_token": auth[0],
+        "refresh_token": auth[1],
+        "data": community_db.get(community_id).to_dict(),
+    }
+
+    return jsonHttp200("Community Joined", response)
 
 
 def community_leave_post(request, community_id):
@@ -255,10 +239,10 @@ def community_leave_post(request, community_id):
     # check that body validation succeeded
     if body_validation[1] != 200:
         return body_validation
+
     auth = azure_refresh_token(body["token"])
     if not auth[0]:
         return http400("Not Authenticated")
-    # TODO Add tuple ot response
 
     community_db = Database("communities")
     community = community_db.get(community_id).to_dict()
@@ -266,11 +250,11 @@ def community_leave_post(request, community_id):
         community_id,
         {"Members": [user for user in community["Members"] if user != body["email"]]},
     )
-    return jsonHttp200(
-        "Community Left",
-        {
-            "access_token": auth[0],
-            "refresh_token": auth[1],
-            "data": community_db.get(community_id).to_dict(),
-        },
-    )
+    response = {
+        "access_token": auth[0],
+        "refresh_token": auth[1],
+        "data": community_db.get(community_id).to_dict(),
+    }
+
+    return jsonHttp200("Community Left", response)
+

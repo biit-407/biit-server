@@ -27,7 +27,7 @@ def test_account_post(client):
     """
     Tests that account post works correctly
 
-    TODO this test needs to be modified when the database is connected
+
     """
 
     with patch.object(
@@ -61,7 +61,7 @@ def test_account_get(client):
     """
     Tests that account get works correctly
 
-    TODO this test needs to be modified when the database is connected
+
     """
     with patch.object(
         account_handler, "azure_refresh_token"
@@ -92,7 +92,7 @@ def test_account_put(client):
     """
     Tests that account put works correctly
 
-    TODO this test needs to be modified when the database is connected
+
     """
     with patch.object(
         account_handler, "azure_refresh_token"
@@ -123,7 +123,7 @@ def test_account_delete(client):
     """
     Tests that account delete works correctly
 
-    TODO this test needs to be modified when the database is connected
+
     """
     with patch.object(
         account_handler, "azure_refresh_token"
@@ -149,7 +149,7 @@ def test_profile_post(client):
     """
     Tests that account delete works correctly
 
-    TODO this test needs to be modified when the database is connected
+
     """
     with patch.object(
         account_handler, "azure_refresh_token"
@@ -180,7 +180,7 @@ def test_profile_get(client):
     """
     Tests that account delete works correctly
 
-    TODO this test needs to be modified when the database is connected
+
     """
     with patch.object(
         account_handler, "azure_refresh_token"

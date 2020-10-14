@@ -58,7 +58,8 @@ class Storage:
         Returns:
             True if deleted
         """
-        blob = self.bucket.get_blob(name)  
+        blob = self.bucket.get_blob(name)
+
         if blob:
             file_obj = blob.delete()
         return True
