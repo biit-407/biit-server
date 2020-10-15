@@ -125,11 +125,12 @@ def account_put(request):
     fields = ["email", "token", "updateFields"]
     valid_updates = [
         "age",
+        "agePref"
         "covid",
         "email",
         "fname",
         "lname",
-        "meettype",
+        "meetType",
         "opt-in",
         "schedule",
     ]
