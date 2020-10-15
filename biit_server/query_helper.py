@@ -27,10 +27,16 @@ def validate_update_field(params, fields):
     """
     Validates that the update fields contains an updatable field
     """
-    updateField = json.loads(params["updateFields"].replace("'", '"'))
-
-    if not updateField:
+    if not params["updateFields"]:
         return http400(f"Update Field empty")
+
+    if not fields:
+        return http400(f"Fields not being set")
+
+    try:
+        updateField = json.loads(params["updateFields"].replace("'", '"'))
+    except:
+        return http400(f"Issue when serializing updateFields")
 
     for field in updateField:
         if field not in fields:
