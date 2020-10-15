@@ -1,7 +1,12 @@
 import ast
 
 from .http_responses import http200, http400, jsonHttp200
-from .query_helper import validate_body, validate_query_params, validate_photo
+from .query_helper import (
+    validate_body,
+    validate_query_params,
+    validate_photo,
+    validate_update_field,
+)
 from .azure import azure_refresh_token
 from .database import Database
 from .storage import Storage
@@ -118,6 +123,16 @@ def account_put(request):
         or if the token is not valid
     """
     fields = ["email", "token", "updateFields"]
+    valid_updates = [
+        "age",
+        "covid",
+        "email",
+        "fname",
+        "lname",
+        "meettype",
+        "opt-in",
+        "schedule",
+    ]
 
     # serializes the quert string to a dict (neeto)
     args = request.args
@@ -126,6 +141,10 @@ def account_put(request):
     # check that body validation succeeded
     if query_validation[1] != 200:
         return query_validation
+
+    update_validation = validate_update_field(args, valid_updates)
+    if update_validation[1] != 200:
+        return update_validation
 
     auth = azure_refresh_token(args["token"])
     if not auth[0]:
