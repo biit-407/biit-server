@@ -1,3 +1,5 @@
+from biit_server.feedback_handler import feedback_post
+from biit_server.meetup_handler import meeting_accept, meeting_decline
 from flask import Flask, request
 import json
 from .account_handler import (
@@ -29,6 +31,8 @@ from .meeting_handler import (
 )
 
 # This runs on Firebase/Cloud Run!
+
+
 def create_app():
     app = Flask(__name__)
 
@@ -112,5 +116,20 @@ def create_app():
     def meeting_user_update_route():
         if request.method == "PUT":
             return meeting_user_put(request)
+            
+    @app.route("/meetup/<id>/accept", methods=["POST"])
+    def accept_route(id):
+        if request.method == "POST":
+            return meeting_accept(request, id)
+
+    @app.route("/meetup/<id>/decline", methods=["POST"])
+    def decline_route(id):
+        if request.method == "POST":
+            return meeting_decline(request, id)
+
+    @app.route("/feedback/", methods=["POST"])
+    def feedback_route():
+        if request.method == "POST":
+            return feedback_post(request)
 
     return app
