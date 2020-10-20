@@ -111,6 +111,6 @@ def create_app():
     @app.route("/meeting/user", methods=["PUT"])
     def meeting_user_update_route():
         if request.method == "PUT":
-            return meeting_user_update_route(request)
+            return meeting_user_put(request)
 
     return app
