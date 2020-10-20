@@ -94,7 +94,7 @@ def create_app():
         elif request.method == "GET":
             return rating_get(request)
 
-    @app.route("/meeting", methods=["POST", "GET"])
+    @app.route("/meeting", methods=["POST", "GET", "PUT", "DELETE"])
     def meeting_route():
         if request.method == "POST":
             return meeting_post(request)
