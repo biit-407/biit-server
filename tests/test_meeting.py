@@ -148,9 +148,9 @@ def test_meeting_get(client):
         instance.get.assert_called_once_with("TestMeeting")
 
 
-def test_community_put(client):
+def test_meeting_put(client):
     """
-    Tests that community put works correctly
+    Tests that meeting put works correctly
     """
     with patch.object(
         meeting_handler, "azure_refresh_token"
@@ -208,33 +208,33 @@ def test_community_put(client):
         assert return_data["status_code"] == 200
 
 
-# def test_community_delete(client):
-#     """
-#     Tests that community delete works correctly
-#     """
-#     with patch.object(
-#         community_handler, "azure_refresh_token"
-#     ) as mock_azure_refresh_token, patch(
-#         "biit_server.community_handler.Database"
-#     ) as mock_database:
-#         instance = mock_database.return_value
-#         instance.delete.return_value = True
-#         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
-#         rv = client.delete(
-#             "/community",
-#             query_string={
-#                 "name": "TestCommunity",
-#                 "token": "TestToken",
-#                 "email": "Testemail@gmail.com",
-#             },
-#             follow_redirects=True,
-#         )
-#         assert (
-#             b'{"access_token":"RefreshToken","message":"Community Deleted","refresh_token":"AccessToken","status_code":200}\n'
-#             == rv.data
-#         )
+def test_community_delete(client):
+    """
+    Tests that community delete works correctly
+    """
+    with patch.object(
+        community_handler, "azure_refresh_token"
+    ) as mock_azure_refresh_token, patch(
+        "biit_server.community_handler.Database"
+    ) as mock_database:
+        instance = mock_database.return_value
+        instance.delete.return_value = True
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
+        rv = client.delete(
+            "/community",
+            query_string={
+                "name": "TestCommunity",
+                "token": "TestToken",
+                "email": "Testemail@gmail.com",
+            },
+            follow_redirects=True,
+        )
+        assert (
+            b'{"access_token":"RefreshToken","message":"Community Deleted","refresh_token":"AccessToken","status_code":200}\n'
+            == rv.data
+        )
 
-#         instance.delete.assert_called_once_with("TestCommunity")
+        instance.delete.assert_called_once_with("TestCommunity")
 
 
 # def test_community_join_post(client):
