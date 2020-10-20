@@ -1,9 +1,10 @@
 from biit_server.authentication import AuthenticatedType, authenticated
-from .http_responses import http400, jsonHttp200
-from .query_helper import validate_body, validate_query_params
+from .http_responses import jsonHttp200
+from .query_helper import ValidateType, validate_fields
 from .database import Database
 
 
+@validate_fields(["banner", "bannee", "community", "token"], ValidateType.BODY)
 @authenticated(AuthenticatedType.BODY)
 def ban_post(request, auth):
     """Handles the ban post endpoint
@@ -17,18 +18,7 @@ def ban_post(request, auth):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["banner", "bannee", "community", "token"]
-    body = None
-
-    try:
-        body = request.get_json()
-    except:
-        return http400("Missing body")
-
-    body_validation = validate_body(body, fields)
-    # check that body validation succeeded
-    if body_validation[1] != 200:
-        return body_validation
+    body = request.get_json()  # wont fail because validation occurs first
 
     community_db = Database("communities")
     community = community_db.get(body["community"]).to_dict()
@@ -55,6 +45,7 @@ def ban_post(request, auth):
     return jsonHttp200(body["bannee"] + " has been banned", response)
 
 
+@validate_fields(["banner", "bannee", "community", "token"], ValidateType.QUERY)
 @authenticated(AuthenticatedType.QUERY)
 def ban_put(request, auth):
     """Handles the ban PUT endpoint
@@ -69,15 +60,8 @@ def ban_put(request, auth):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["banner", "bannee", "community", "token"]
-
     # serializes the quert string to a dict (neeto)
-    args = request.args
-
-    query_validation = validate_query_params(args, fields)
-    # check that body validation succeeded
-    if query_validation[1] != 200:
-        return query_validation
+    args = request.args  # wont fail because validation occurs first
 
     ban_db = Database("communities")
 
