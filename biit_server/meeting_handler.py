@@ -245,14 +245,14 @@ def meeting_user_put(request):
 
     meeting = Meeting(document_snapshot=meeting_snapshot)
 
-    if args["function"] == MeetingFunction.REMOVE:
+    if int(args["function"]) == MeetingFunction.REMOVE.value:
         try:
-            meeting.remove_user(args["email"])
+            new_users = meeting.remove_user(args["email"])
         except UserNotInMeetingException:
             return http400(f"User {args['email']} was not found in the meeting")
-    elif args["function"] == MeetingFunction.ADD:
+    elif int(args["function"]) == MeetingFunction.ADD.value:
         try:
-            meeting.add_user(args["email"])
+            new_users = meeting.add_user(args["email"])
         except UserInMeetingException:
             return http400(f"User {args['email']} is already in this meeting!")
     else:
@@ -261,6 +261,7 @@ def meeting_user_put(request):
         )
 
     try:
+        meeting_db.update(args["id"], {"user_list": new_users})
         response = {
             "access_token": auth[0],
             "refresh_token": auth[1],
@@ -270,4 +271,4 @@ def meeting_user_put(request):
             f"User {'added' if args['function'] else 'removed'}", response
         )
     except:
-        return http400("Community update error")
+        return http400("Meeting update error")

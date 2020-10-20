@@ -262,37 +262,66 @@ def test_community_delete(client):
         instance.delete.assert_called_once_with(query_data["id"])
 
 
-# def test_community_join_post(client):
-#     """
-#     Tests that community post works correctly
-#     """
-#     with patch.object(
-#         community_handler, "azure_refresh_token"
-#     ) as mock_azure_refresh_token, patch(
-#         "biit_server.community_handler.Database"
-#     ) as mock_database:
-#         instance = mock_database.return_value
-#         instance.get.return_value = MockCollection()
-#         instance.update.return_value = True
+def test_meeting_user_put_join(client):
+    """
+    Tests that community post works correctly
+    """
+    with patch.object(
+        meeting_handler, "azure_refresh_token"
+    ) as mock_azure_refresh_token, patch(
+        "biit_server.meeting_handler.Database"
+    ) as mock_database, patch(
+        "biit_server.meeting_handler.Meeting"
+    ) as mock_meeting:
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
 
-#         test_data = {"token": "Toke", "email": "Testemail@gmail.com"}
-#         test_id = "Johnson"
+        instance = mock_database.return_value
+        instance.delete.return_value = True
 
-#         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
-#         rv = client.post(
-#             f"/community/{test_id}/join",
-#             json=test_data,
-#             follow_redirects=True,
-#         )
-#         assert (
-#             b'{"access_token":"RefreshToken","data":{"Members":[],"name":"mock"},"message":"Community Joined","refresh_token":"AccessToken","status_code":200}\n'
-#             == rv.data
-#         )
+        query_data = {
+            "id": "TestMeeting",
+            "email": "traveller@purdue.edu",
+            "token": "dabonem",
+            "function": 1,
+        }
 
-#         instance.get.assert_called_with(test_id)
-#         instance.update.assert_called_once_with(
-#             test_id, {"Members": [test_data["email"]]}
-#         )
+        test_json = {
+            "id": query_data["id"],
+            "user_list": ["amber@purdue.edu"],
+            "duration": 110,
+            "location": "Mondstatd",
+            "meettype": "LicenseTest",
+            "timestamp": "noon",
+        }
+
+        mocked_meeting = Meeting(
+            id=test_json["id"],
+            user_list=test_json["user_list"],
+            duration=test_json["duration"],
+            location=test_json["location"],
+            meeting_type=test_json["meettype"],
+            timestamp=test_json["timestamp"],
+        )
+
+        mock_meeting.return_value = mocked_meeting
+
+        rv = client.put(
+            f"/meeting/user",
+            query_string=query_data,
+            follow_redirects=True,
+        )
+
+        return_data = json.loads(rv.data.decode())
+
+        assert return_data["access_token"] == "RefreshToken"
+        assert return_data["data"]["timestamp"] == test_json["timestamp"]
+        assert return_data["data"]["location"] == test_json["location"]
+        assert return_data["data"]["meettype"] == test_json["meettype"]
+        assert return_data["data"]["user_list"] == test_json["user_list"]
+        assert return_data["data"]["duration"] == test_json["duration"]
+        assert return_data["message"] == "User added"
+        assert return_data["refresh_token"] == "AccessToken"
+        assert return_data["status_code"] == 200
 
 
 # def test_community_leave_post(client):
