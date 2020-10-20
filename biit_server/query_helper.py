@@ -1,6 +1,8 @@
 from .http_responses import http200, http400
 import json
 import re
+from enum import Enum
+from typing import List
 
 
 def validate_body(body, fields):
@@ -58,3 +60,59 @@ def validate_photo(filename: str):
     if not re.match("([A-Za-z0-9])*.(jpg|png)", filename):
         return False
     return True
+
+
+class ValidateType(Enum):
+    BODY = 0
+    """
+    the token to authenticate with is located in the body 
+    of the request
+    """
+    QUERY = 1
+    """
+    the token to authenticate with is located in the query
+    parameters of the request
+    """
+    NONE = 2
+    """
+    there is no authentication for this request
+    """
+
+
+def validate_fields(fields: List[str], type: ValidateType = ValidateType.NONE):
+    """
+    Decorator for making sure a request has the correct fields
+
+    Args:
+        fields (List[str]): the fields to be validated
+        type (ValidateType): the location of the fields
+
+    """
+
+    def decorator(func):
+        def wrapper(request):
+            if type == ValidateType.BODY:
+                body = None
+                try:
+                    body = request.get_json()
+                except:
+                    return http400("Missing body")
+
+                body_validation = validate_body(body, fields)
+                # check that body validation succeeded
+                if body_validation[1] != 200:
+                    return body_validation
+
+            if type == ValidateType.QUERY:
+                args = request.args
+                query_validation = validate_query_params(args, fields)
+                # check that body validation succeeded
+                if query_validation[1] != 200:
+                    return query_validation
+
+            result = func(request)
+            return result
+
+        return wrapper
+
+    return decorator
