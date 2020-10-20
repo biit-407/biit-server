@@ -213,28 +213,53 @@ def test_community_delete(client):
     Tests that community delete works correctly
     """
     with patch.object(
-        community_handler, "azure_refresh_token"
+        meeting_handler, "azure_refresh_token"
     ) as mock_azure_refresh_token, patch(
-        "biit_server.community_handler.Database"
-    ) as mock_database:
+        "biit_server.meeting_handler.Database"
+    ) as mock_database, patch(
+        "biit_server.meeting_handler.Meeting"
+    ) as mock_meeting:
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
+
         instance = mock_database.return_value
         instance.delete.return_value = True
-        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
-        rv = client.delete(
-            "/community",
-            query_string={
-                "name": "TestCommunity",
-                "token": "TestToken",
-                "email": "Testemail@gmail.com",
-            },
-            follow_redirects=True,
-        )
-        assert (
-            b'{"access_token":"RefreshToken","message":"Community Deleted","refresh_token":"AccessToken","status_code":200}\n'
-            == rv.data
+
+        query_data = {
+            "id": "TestMeeting",
+            "token": "dabonem",
+        }
+
+        test_json = {
+            "id": query_data["id"],
+            "user_list": ["amber@purdue.edu"],
+            "duration": 110,
+            "location": "Mondstatd",
+            "meettype": "LicenseTest",
+            "timestamp": "noon",
+        }
+
+        mock_meeting.return_value = Meeting(
+            id=test_json["id"],
+            user_list=test_json["user_list"],
+            duration=test_json["duration"],
+            location=test_json["location"],
+            meeting_type=test_json["meettype"],
+            timestamp=test_json["timestamp"],
         )
 
-        instance.delete.assert_called_once_with("TestCommunity")
+        rv = client.delete(
+            "/meeting",
+            query_string=query_data,
+            follow_redirects=True,
+        )
+
+        return_data = json.loads(rv.data.decode())
+
+        assert return_data["message"] == "Meeting deleted"
+        assert return_data["refresh_token"] == "AccessToken"
+        assert return_data["status_code"] == 200
+
+        instance.delete.assert_called_once_with(query_data["id"])
 
 
 # def test_community_join_post(client):
