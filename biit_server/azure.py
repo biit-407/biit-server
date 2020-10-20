@@ -57,3 +57,39 @@ def azure_refresh_token(refresh_token: str) -> Tuple[str, str]:
         return ("", "")
 
     return (rjson["access_token"], rjson["refresh_token"])
+
+
+def azure_validate_email(email: str, access_token: str) -> bool:
+    """
+    Validates that a given email and access token correspond to 
+    the same account. 
+
+    This method should be used with validation to prevent a user 
+    from modifying another account 
+
+    Args:
+        email (str): the email of the account that is being modified. 
+        access_token: (str): the current access token  
+
+    Returns:
+        bool: true if the email matches the access_token and 
+            false otherwise
+    """
+
+    stage = os.getenv("STAGE")
+    if stage == "dev":
+        return True
+
+    url = "https://graph.microsoft.com/oidc/userinfo"
+    headers = {
+        "Authorization": "Bearer " + access_token,
+        "Content-Type": "application/json",
+    }
+
+    response = requests.get(url=url, headers=headers)
+    rjson = response.json()
+
+    if response.status_code != 200:
+        return False
+
+    return rjson["email"] == email
