@@ -1,12 +1,12 @@
-from .http_responses import http200, http400, jsonHttp200
-from .query_helper import validate_body, validate_query_params
-from .azure import azure_refresh_token
+from biit_server.authentication import AuthenticatedType, authenticated
+from .http_responses import jsonHttp200
+from .query_helper import ValidateType, validate_fields
 from .database import Database
 
-from google.cloud import firestore
 
-
-def ban_post(request):
+@validate_fields(["banner", "bannee", "community", "token"], ValidateType.BODY)
+@authenticated(AuthenticatedType.BODY)
+def ban_post(request, auth):
     """Handles the ban post endpoint
     Validates data in from the request then calls the db to ban the user
     Args:
@@ -18,24 +18,7 @@ def ban_post(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["banner", "bannee", "community", "token"]
-    body = None
-
-    try:
-        body = request.get_json()
-    except:
-        return http400("Missing body")
-
-    body_validation = validate_body(body, fields)
-    # check that body validation succeeded
-    if body_validation[1] != 200:
-        return body_validation
-
-    auth = azure_refresh_token(body["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
-
-    # return ban.add(args)
+    body = request.get_json()  # wont fail because validation occurs first
 
     community_db = Database("communities")
     community = community_db.get(body["community"]).to_dict()
@@ -62,7 +45,9 @@ def ban_post(request):
     return jsonHttp200(body["bannee"] + " has been banned", response)
 
 
-def ban_put(request):
+@validate_fields(["banner", "bannee", "community", "token"], ValidateType.QUERY)
+@authenticated(AuthenticatedType.QUERY)
+def ban_put(request, auth):
     """Handles the ban PUT endpoint
     Validates the request and calls the db to unban the banner
 
@@ -75,19 +60,8 @@ def ban_put(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["banner", "bannee", "community", "token"]
-
     # serializes the quert string to a dict (neeto)
-    args = request.args
-
-    query_validation = validate_query_params(args, fields)
-    # check that body validation succeeded
-    if query_validation[1] != 200:
-        return query_validation
-
-    auth = azure_refresh_token(args["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
+    args = request.args  # wont fail because validation occurs first
 
     ban_db = Database("communities")
 
