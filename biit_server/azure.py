@@ -1,3 +1,4 @@
+from biit_server.utils import mock_dev
 import requests
 import os
 from typing import Tuple
@@ -18,6 +19,7 @@ The redirect url registered with azure.
 """
 
 
+@mock_dev(("AccessToken", "RefreshToken"))
 def azure_refresh_token(refresh_token: str) -> Tuple[str, str]:
     """
     Refreshes a given refresh token and returns the
@@ -39,9 +41,6 @@ def azure_refresh_token(refresh_token: str) -> Tuple[str, str]:
                          process and obtain a new refresh token.
 
     """
-    stage = os.getenv("STAGE")
-    if stage == "dev":
-        return ("AccessToken", "RefreshToken")
 
     url = f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/token"
 
@@ -59,6 +58,7 @@ def azure_refresh_token(refresh_token: str) -> Tuple[str, str]:
     return (rjson["access_token"], rjson["refresh_token"])
 
 
+@mock_dev(True)
 def azure_validate_email(email: str, access_token: str) -> bool:
     """
     Validates that a given email and access token correspond to 
@@ -75,11 +75,6 @@ def azure_validate_email(email: str, access_token: str) -> bool:
         bool: true if the email matches the access_token and 
             false otherwise
     """
-
-    stage = os.getenv("STAGE")
-    if stage == "dev":
-        return True
-
     url = "https://graph.microsoft.com/oidc/userinfo"
     headers = {
         "Authorization": "Bearer " + access_token,
