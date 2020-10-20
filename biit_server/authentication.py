@@ -18,7 +18,7 @@ class AuthenticatedType(Enum):
     """
     the token to authenticate with is located in the body, 
     under the form section within the request
-    """ 
+    """
     NONE = 3
     """
     there is no authentication for this request

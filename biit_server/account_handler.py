@@ -4,11 +4,9 @@ from biit_server.authentication import AuthenticatedType, authenticated
 from .http_responses import http200, http400, jsonHttp200
 from .query_helper import (
     ValidateType,
-    validate_body,
     validate_fields,
     validate_update_field,
 )
-from .azure import azure_refresh_token
 from .database import Database
 from .storage import Storage
 import base64
@@ -163,7 +161,9 @@ def account_delete(request, auth):
         return http400("Error in account deletion")
 
 
-def profile_post(request):
+@validate_fields(["email", "token", "file", "filename"], ValidateType.FORM)
+@authenticated(AuthenticatedType.FORM)
+def profile_post(request, auth):
     """Handles the profile picture POST endpoint
     Validates data sent in a request then calls gcs to save photo
 
@@ -176,23 +176,7 @@ def profile_post(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["email", "token", "file", "filename"]
-    body = None
-
-    try:
-        body = request.form
-    except:
-        return http400("Missing body")
-
-    body_validation = validate_body(body, fields)
-
-    # check that body validation succeeded
-    if body_validation[1] != 200:
-        return http400("Problem Validating Request")
-
-    auth = azure_refresh_token(body["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
+    body = request.form
 
     profile_storage = Storage("biit_profiles")
     file_decode = base64.b64decode(body["file"])

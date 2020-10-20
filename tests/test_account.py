@@ -1,5 +1,5 @@
 import pytest
-from biit_server import create_app, account_handler
+from biit_server import create_app
 from unittest.mock import patch
 
 
@@ -123,14 +123,9 @@ def test_profile_post(client):
 
 
     """
-    with patch.object(
-        account_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token, patch(
-        "biit_server.account_handler.Storage"
-    ) as mock_storage:
+    with patch("biit_server.account_handler.Storage") as mock_storage:
         instance = mock_storage.return_value
         instance.add.return_value = True
-        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.post(
             "/profile",
             content_type="multipart/form-data",
@@ -143,7 +138,7 @@ def test_profile_post(client):
             follow_redirects=True,
         )
         assert (
-            b'{"access_token":"RefreshToken","message":"File Uploaded","refresh_token":"AccessToken","status_code":200}\n'
+            b'{"access_token":"AccessToken","message":"File Uploaded","refresh_token":"RefreshToken","status_code":200}\n'
             == rv.data
         )
 
