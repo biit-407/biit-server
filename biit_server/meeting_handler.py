@@ -8,14 +8,20 @@ from .query_helper import validate_query_params, validate_body
 from .azure import azure_refresh_token
 from .database import Database
 
-from .meeting import Meeting, MeetingType, MeetingFunction, UserInMeetingException, UserNotInMeetingException
+from .meeting import (
+    Meeting,
+    MeetingType,
+    MeetingFunction,
+    UserInMeetingException,
+    UserNotInMeetingException,
+)
 
 
 def meeting_post(request):
     """Handles the meeting POST endpoint
     Validates the keys in the request then calls the database to create a meeting
     Args:
-        request: A request object that contains a json object with keys: name, codeofconduct, Admins, Members, mpm, meettype, token
+        request: A request object that contains a json object with keys: name, codeofconduct, Admins, Members, mpm, meettype, token, duration
 
     Returns:
         (json): Http 200 string response containing the  refresh token and new token
@@ -23,7 +29,7 @@ def meeting_post(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["time", "location", "users", "meettype", "token"]
+    fields = ["timestamp", "location", "user_list", "meettype", "duration", "token"]
     body = None
 
     try:
@@ -42,15 +48,17 @@ def meeting_post(request):
 
     meeting_db = Database("meetings")
 
-    random_id = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(64))
+    random_id = "".join(
+        random.choice(string.ascii_letters + string.digits) for i in range(64)
+    )
 
     meeting = Meeting(
-        user_list=body["users"],
-        time_stamp=body["time"],
+        user_list=body["user_list"],
+        timestamp=body["timestamp"],
         duration=body["duration"],
         meeting_type=body["meettype"],
         location=body["location"],
-        id=random_id
+        id=random_id,
     )
 
     try:
@@ -96,7 +104,9 @@ def meeting_get(request):
     meeting_db_response = meeting_db.get(args["id"])
 
     if not meeting_db_response:
-        return http400(f"Meeting with ID {args['id']} was not found in the Firestore database.")
+        return http400(
+            f"Meeting with ID {args['id']} was not found in the Firestore database."
+        )
 
     meeting = Meeting(document_snapshot=meeting_db_response)
 
@@ -106,7 +116,7 @@ def meeting_get(request):
             "refresh_token": auth[1],
             "data": meeting.to_dict(),
         }
-        return jsonHttp200("Meeting Received", response)
+        return jsonHttp200("Meeting retrieved", response)
     except:
         return http400("Meeting not found")
 
@@ -144,7 +154,9 @@ def meeting_put(request):
     updated_meeting_snapshot = meeting_db.get(args["id"])
 
     if not updated_meeting_snapshot:
-        return http400(f"Error retrieving updated meeting with id {args['id']} from the Firestore database.")
+        return http400(
+            f"Error retrieving updated meeting with id {args['id']} from the Firestore database."
+        )
 
     updated_rating = Meeting(document_snapshot=updated_meeting_snapshot)
 
@@ -193,6 +205,7 @@ def meeting_delete(request):
     except:
         return http400("Community update error")
 
+
 def meeting_user_put(request):
     """A handler function to join a meeting
     Validates the keys in the request then adds the user in the meeting.
@@ -226,8 +239,10 @@ def meeting_user_put(request):
     meeting_snapshot = meeting_db.get(args["id"])
 
     if not meeting_snapshot:
-        return http400(f"Error in retrieving meeting id {args['id']} from the Firestore database.")
-    
+        return http400(
+            f"Error in retrieving meeting id {args['id']} from the Firestore database."
+        )
+
     meeting = Meeting(document_snapshot=meeting_snapshot)
 
     if args["function"] == MeetingFunction.REMOVE:
@@ -241,11 +256,18 @@ def meeting_user_put(request):
         except UserInMeetingException:
             return http400(f"User {args['email']} is already in this meeting!")
     else:
-        return http400(f"Function value {args['function']} was not recognized by the server. Options are 0 to remove and 1 to add users.")
-
+        return http400(
+            f"Function value {args['function']} was not recognized by the server. Options are 0 to remove and 1 to add users."
+        )
 
     try:
-        response = {"access_token": auth[0], "refresh_token": auth[1], "data": meeting.to_dict()}
-        return jsonHttp200(f"User {'added' if args['function'] else 'removed'}", response)
+        response = {
+            "access_token": auth[0],
+            "refresh_token": auth[1],
+            "data": meeting.to_dict(),
+        }
+        return jsonHttp200(
+            f"User {'added' if args['function'] else 'removed'}", response
+        )
     except:
         return http400("Community update error")
