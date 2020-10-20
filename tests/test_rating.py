@@ -101,9 +101,9 @@ def test_rating_post_empty(client):
         )
 
 
-def test_community_get(client):
+def test_rating_get(client):
     """
-    Tests that community get works correctly
+    Tests that rating get works correctly
     """
     with patch.object(
         rating_handler, "azure_refresh_token"
