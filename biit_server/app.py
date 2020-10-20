@@ -20,6 +20,11 @@ from .community_handler import (
 
 from .rating_handler import rating_get, rating_post
 
+from .meeting_handler import (
+    meeting_get,
+    meeting_post
+)
+
 # This runs on Firebase/Cloud Run!
 def create_app():
     app = Flask(__name__)
@@ -85,5 +90,13 @@ def create_app():
 
         elif request.method == "GET":
             return rating_get(request)
+
+    @app.route("/meeting", methods=["POST", "GET"])
+    def meeting_route():
+        if request.method == "POST":
+            return meeting_post(request)
+
+        elif request.method == "GET":
+            return meeting_get(request)
 
     return app
