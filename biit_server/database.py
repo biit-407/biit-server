@@ -4,6 +4,7 @@ from google.cloud import firestore
 
 from google.cloud.firestore_v1.document import DocumentSnapshot
 
+
 class Database:
     def __init__(self, collection, firestore_client=None) -> None:
         """The constructor for the Database class. Used to instantiate a Database reference object.
