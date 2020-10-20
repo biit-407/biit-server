@@ -1,6 +1,5 @@
 from biit_server.utils import mock_dev
 import requests
-import os
 from typing import Tuple
 
 CLIENT_ID = "c128fe76-dc54-4daa-993c-1a13c1e82080"
@@ -61,18 +60,18 @@ def azure_refresh_token(refresh_token: str) -> Tuple[str, str]:
 @mock_dev(True)
 def azure_validate_email(email: str, access_token: str) -> bool:
     """
-    Validates that a given email and access token correspond to 
-    the same account. 
+    Validates that a given email and access token correspond to
+    the same account.
 
-    This method should be used with validation to prevent a user 
-    from modifying another account 
+    This method should be used with validation to prevent a user
+    from modifying another account
 
     Args:
-        email (str): the email of the account that is being modified. 
-        access_token: (str): the current access token  
+        email (str): the email of the account that is being modified.
+        access_token: (str): the current access token
 
     Returns:
-        bool: true if the email matches the access_token and 
+        bool: true if the email matches the access_token and
             false otherwise
     """
     url = "https://graph.microsoft.com/oidc/userinfo"
