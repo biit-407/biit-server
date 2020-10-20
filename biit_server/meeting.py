@@ -41,7 +41,7 @@ class Meeting:
     def add_user(self, user) -> List[str]:
         self.user_list.append(user)
 
-    def remove(self, target_user) -> List[str]:
+    def remove_user(self, target_user) -> List[str]:
         if target_user not in self.user_list:
             raise UserNotInMeetingException
 
