@@ -14,11 +14,11 @@ class AvailabilityManager:
         Constructor for Availability manager
 
         Args:
-            people (List[List[Tuple[int, int]]]): a list of list of tuples where each 
+            people (List[List[Tuple[int, int]]]): a list of list of tuples where each
                 list of tuples is a persons availability and each tuple is a time
                 frame in which that person is available
 
-            meeting_length (int): the minimum time in which a meeting should span. if 
+            meeting_length (int): the minimum time in which a meeting should span. if
                 no time frame where all participants can attend is at least this long
                 then no meeting time will be returned
         """
