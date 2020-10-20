@@ -125,7 +125,8 @@ def account_put(request):
     fields = ["email", "token", "updateFields"]
     valid_updates = [
         "age",
-        "agePref", "covid",
+        "agePref",
+        "covid",
         "email",
         "fname",
         "lname",
@@ -154,8 +155,7 @@ def account_put(request):
     account_db = Database("accounts")
 
     try:
-        account_db.update(
-            args["email"], ast.literal_eval(args["updateFields"]))
+        account_db.update(args["email"], ast.literal_eval(args["updateFields"]))
         response = {
             "access_token": auth[0],
             "refresh_token": auth[1],
