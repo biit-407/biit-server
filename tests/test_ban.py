@@ -1,7 +1,6 @@
 import pytest
-from biit_server import create_app, ban_handler
+from biit_server import create_app
 from unittest.mock import patch
-from mockfirestore import MockFirestore
 
 
 @pytest.fixture
@@ -35,16 +34,11 @@ def test_ban_post(client):
 
 
     """
-    with patch.object(
-        ban_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token, patch(
-        "biit_server.ban_handler.Database"
-    ) as mock_database:
+    with patch("biit_server.ban_handler.Database") as mock_database:
         instance = mock_database.return_value
         instance.get.return_value = MockBanEmpty("last")
         instance.update.return_value = True
 
-        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.post(
             "/ban",
             json={
@@ -56,7 +50,7 @@ def test_ban_post(client):
             follow_redirects=True,
         )
         assert (
-            b'{"access_token":"RefreshToken","message":"last has been banned","refresh_token":"AccessToken","status_code":200}\n'
+            b'{"access_token":"AccessToken","message":"last has been banned","refresh_token":"RefreshToken","status_code":200}\n'
             == rv.data
         )
 
@@ -67,20 +61,7 @@ def test_ban_put(client):
 
 
     """
-    with patch.object(
-        ban_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token, patch(
-        "biit_server.ban_handler.Database"
-    ) as mock_database:
-        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
-
-        test_data = {
-            "banner": "first",
-            "bannee": "last",
-            "community": "com",
-            "token": "test",
-        }
-
+    with patch("biit_server.ban_handler.Database") as mock_database:
         instance = mock_database.return_value
         instance.get.return_value = MockBan({"name": "last", "ordered_by": "first"})
         instance.update.return_value = True
@@ -95,6 +76,6 @@ def test_ban_put(client):
             follow_redirects=True,
         )
         assert (
-            b'{"access_token":"RefreshToken","message":"last has been unbanned","refresh_token":"AccessToken","status_code":200}\n'
+            b'{"access_token":"AccessToken","message":"last has been unbanned","refresh_token":"RefreshToken","status_code":200}\n'
             == rv.data
         )

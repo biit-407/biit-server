@@ -1,12 +1,11 @@
-from .http_responses import http200, http400, jsonHttp200
+from biit_server.authentication import AuthenticatedType, authenticated
+from .http_responses import http400, jsonHttp200
 from .query_helper import validate_body, validate_query_params
-from .azure import azure_refresh_token
 from .database import Database
 
-from google.cloud import firestore
 
-
-def ban_post(request):
+@authenticated(AuthenticatedType.BODY)
+def ban_post(request, auth):
     """Handles the ban post endpoint
     Validates data in from the request then calls the db to ban the user
     Args:
@@ -30,12 +29,6 @@ def ban_post(request):
     # check that body validation succeeded
     if body_validation[1] != 200:
         return body_validation
-
-    auth = azure_refresh_token(body["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
-
-    # return ban.add(args)
 
     community_db = Database("communities")
     community = community_db.get(body["community"]).to_dict()
@@ -62,7 +55,8 @@ def ban_post(request):
     return jsonHttp200(body["bannee"] + " has been banned", response)
 
 
-def ban_put(request):
+@authenticated(AuthenticatedType.QUERY)
+def ban_put(request, auth):
     """Handles the ban PUT endpoint
     Validates the request and calls the db to unban the banner
 
@@ -84,10 +78,6 @@ def ban_put(request):
     # check that body validation succeeded
     if query_validation[1] != 200:
         return query_validation
-
-    auth = azure_refresh_token(args["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
 
     ban_db = Database("communities")
 
