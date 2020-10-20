@@ -111,7 +111,7 @@ def meeting_get(request):
         return http400("Meeting not found")
 
 
-def community_put(request):
+def meeting_put(request):
     """Handles the community PUT endpoint
         Validates the keys in the request then calls the database to update a commmunity
     Args:
@@ -123,7 +123,7 @@ def community_put(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["name", "email", "token", "updateFields"]
+    fields = ["id", "token", "updateFields"]
 
     # serializes the quert string to a dict (neeto)
     args = request.args
@@ -137,22 +137,31 @@ def community_put(request):
     if not auth[0]:
         return http400("Not Authenticated")
 
-    community_db = Database("communities")
+    meeting_db = Database("meetings")
 
-    community_db.update(args["name"], ast.literal_eval(args["updateFields"]))
+    meeting_db.update(args["id"], ast.literal_eval(args["updateFields"]))
+
+    updated_meeting_snapshot = meeting_db.get(args["id"])
+
+    if not updated_meeting_snapshot:
+        return http400(f"Error retrieving updated meeting with id {args['id']} from the Firestore database.")
+
+    updated_rating = Meeting(document_snapshot=updated_meeting_snapshot)
+
     response = {
         "access_token": auth[0],
         "refresh_token": auth[1],
-        "data": community_db.get(args["name"]).to_dict(),
+        "data": updated_rating.to_dict(),
     }
-    return jsonHttp200("Community Updated", response)
+
+    return jsonHttp200("Meeting Updated", response)
 
 
-def community_delete(request):
-    """Handles the community DELETE endpoint
-    Validates the keys in the request then calls the database to delete the commmunity
+def meeting_delete(request):
+    """Handles the meeting DELETE endpoint
+    Validates the keys in the request then calls the database to delete the meeting.
     Args:
-        request: A request object that contains a json object with keys: name, email, token
+        request: A request object that contains a json object with keys: id, token
 
     Returns:
         (json): Http 200 string response containing the refresh token and new token
@@ -160,7 +169,7 @@ def community_delete(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["email", "token", "name"]
+    fields = ["id", "token"]
 
     # serializes the quert string to a dict (neeto)
     args = request.args
@@ -175,10 +184,10 @@ def community_delete(request):
         return http400("Not Authenticated")
 
     # return community.delete(args)
-    community_db = Database("communities")
+    meeting_db = Database("meetings")
 
     try:
-        community_db.delete(args["name"])
+        meeting_db.delete(args["id"])
         response = {"access_token": auth[0], "refresh_token": auth[1]}
         return jsonHttp200("Community Deleted", response)
     except:
