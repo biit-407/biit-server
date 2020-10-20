@@ -13,7 +13,7 @@ def mock_dev(return_value):
 
     def decorator(func):
         def wrapper(*args, **kwargs):
-            stage = os.getenv("STAGE")
+            stage = os.getenv("STAGE", "dev")
             if stage == "dev":
                 return return_value
 
