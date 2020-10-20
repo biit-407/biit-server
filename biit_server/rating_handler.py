@@ -52,7 +52,9 @@ def rating_post(request):
         except RatingAlreadySetException:
             return http400(f"Rating for user {body['user']} has already been set")
 
-        success = rating_db.update(body["meeting_id"], rating.get_ratings())
+        success = rating_db.update(
+            body["meeting_id"], {"rating_dict": rating.get_ratings()}
+        )
 
     if not success:
         return http400(
