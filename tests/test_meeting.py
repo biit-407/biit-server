@@ -276,7 +276,7 @@ def test_meeting_user_put_join(client):
         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
 
         instance = mock_database.return_value
-        instance.delete.return_value = True
+        instance.get.return_value = True
 
         query_data = {
             "id": "TestMeeting",
@@ -324,33 +324,63 @@ def test_meeting_user_put_join(client):
         assert return_data["status_code"] == 200
 
 
-# def test_community_leave_post(client):
-#     """
-#     Tests that community post works correctly
-#     """
-#     with patch.object(
-#         community_handler, "azure_refresh_token"
-#     ) as mock_azure_refresh_token, patch(
-#         "biit_server.community_handler.Database"
-#     ) as mock_database:
-#         test_data = {"token": "Toke", "email": "Testemail@gmail.com"}
-#         test_id = "Johnson"
+def test_meeting_user_put_leave(client):
+    """
+    Tests that community post works correctly
+    """
+    with patch.object(
+        meeting_handler, "azure_refresh_token"
+    ) as mock_azure_refresh_token, patch(
+        "biit_server.meeting_handler.Database"
+    ) as mock_database, patch(
+        "biit_server.meeting_handler.Meeting"
+    ) as mock_meeting:
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
 
-#         instance = mock_database.return_value
-#         instance.get.return_value = MockCollectionLeave(test_data["email"])
-#         instance.update.return_value = True
+        instance = mock_database.return_value
+        instance.delete.return_value = True
 
-#         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
-#         rv = client.post(
-#             f"/community/{test_id}/leave",
-#             json=test_data,
-#             follow_redirects=True,
-#         )
+        query_data = {
+            "id": "TestMeeting",
+            "email": "traveller@purdue.edu",
+            "token": "dabonem",
+            "function": 0,
+        }
 
-#         assert (
-#             b'{"access_token":"RefreshToken","data":{"Members":["Testemail@gmail.com"],"name":"mock"},"message":"Community Left","refresh_token":"AccessToken","status_code":200}\n'
-#             == rv.data
-#         )
+        test_json = {
+            "id": query_data["id"],
+            "user_list": ["amber@purdue.edu", "traveller@purdue.edu"],
+            "duration": 110,
+            "location": "Mondstatd",
+            "meettype": "LicenseTest",
+            "timestamp": "noon",
+        }
 
-#         instance.get.assert_called_with(test_id)
-#         instance.update.assert_called_once_with(test_id, {"Members": []})
+        mocked_meeting = Meeting(
+            id=test_json["id"],
+            user_list=test_json["user_list"],
+            duration=test_json["duration"],
+            location=test_json["location"],
+            meeting_type=test_json["meettype"],
+            timestamp=test_json["timestamp"],
+        )
+
+        mock_meeting.return_value = mocked_meeting
+
+        rv = client.put(
+            f"/meeting/user",
+            query_string=query_data,
+            follow_redirects=True,
+        )
+
+        return_data = json.loads(rv.data.decode())
+
+        assert return_data["access_token"] == "RefreshToken"
+        assert return_data["data"]["timestamp"] == test_json["timestamp"]
+        assert return_data["data"]["location"] == test_json["location"]
+        assert return_data["data"]["meettype"] == test_json["meettype"]
+        assert return_data["data"]["user_list"] == ["amber@purdue.edu"]
+        assert return_data["data"]["duration"] == test_json["duration"]
+        assert return_data["message"] == "User added"
+        assert return_data["refresh_token"] == "AccessToken"
+        assert return_data["status_code"] == 200
