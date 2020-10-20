@@ -51,9 +51,9 @@ class MockCommunity:
         return {"name": self.name}
 
 
-def test_community_post(client):
+def test_meeting_post(client):
     """
-    Tests that community post works correctly
+    Tests that meeting post works correctly
     """
     with patch.object(
         meeting_handler, "azure_refresh_token"
@@ -92,9 +92,9 @@ def test_community_post(client):
         assert return_data["status_code"] == 200
 
 
-def test_community_get(client):
+def test_meeting_get(client):
     """
-    Tests that community get works correctly
+    Tests that meeting get works correctly
     """
     with patch.object(
         meeting_handler, "azure_refresh_token"
@@ -108,7 +108,7 @@ def test_community_get(client):
         instance = mock_database.return_value
         instance.get.return_value = True
 
-        query_data = {"id": "TestCommunity", "token": "dabonem"}
+        query_data = {"id": "TestMeeting", "token": "dabonem"}
 
         test_json = {
             "id": query_data["id"],
@@ -145,46 +145,46 @@ def test_community_get(client):
         assert return_data["refresh_token"] == "AccessToken"
         assert return_data["status_code"] == 200
 
-        instance.get.assert_called_once_with("TestCommunity")
+        instance.get.assert_called_once_with("TestMeeting")
 
 
-# def test_community_put(client):
-#     """
-#     Tests that community put works correctly
-#     """
-#     with patch.object(
-#         community_handler, "azure_refresh_token"
-#     ) as mock_azure_refresh_token, patch(
-#         "biit_server.community_handler.Database"
-#     ) as mock_database:
-#         instance = mock_database.return_value
-#         instance.update.return_value = True
-#         query_data = {
-#             "name": "TestCommunity",
-#         }
+def test_community_put(client):
+    """
+    Tests that community put works correctly
+    """
+    with patch.object(
+        community_handler, "azure_refresh_token"
+    ) as mock_azure_refresh_token, patch(
+        "biit_server.community_handler.Database"
+    ) as mock_database:
+        instance = mock_database.return_value
+        instance.update.return_value = True
+        query_data = {
+            "name": "TestCommunity",
+        }
 
-#         instance.get.return_value = MockCommunity(query_data["name"])
-#         test_json = {
-#             "name": "TestCommunity",
-#             "token": "TestToken",
-#             "email": "Testemail@gmail.com",
-#             "updateFields": {"name": "lanes"},
-#         }
+        instance.get.return_value = MockCommunity(query_data["name"])
+        test_json = {
+            "name": "TestCommunity",
+            "token": "TestToken",
+            "email": "Testemail@gmail.com",
+            "updateFields": {"name": "lanes"},
+        }
 
-#         mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
-#         rv = client.put(
-#             "/community",
-#             query_string=test_json,
-#             follow_redirects=True,
-#         )
-#         assert (
-#             b'{"access_token":"RefreshToken","data":{"name":"TestCommunity"},"message":"Community Updated","refresh_token":"AccessToken","status_code":200}\n'
-#             == rv.data
-#         )
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
+        rv = client.put(
+            "/community",
+            query_string=test_json,
+            follow_redirects=True,
+        )
+        assert (
+            b'{"access_token":"RefreshToken","data":{"name":"TestCommunity"},"message":"Community Updated","refresh_token":"AccessToken","status_code":200}\n'
+            == rv.data
+        )
 
-#         instance.update.assert_called_once_with(
-#             test_json["name"], test_json["updateFields"]
-#         )
+        instance.update.assert_called_once_with(
+            test_json["name"], test_json["updateFields"]
+        )
 
 
 # def test_community_delete(client):
