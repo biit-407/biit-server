@@ -22,7 +22,10 @@ from .rating_handler import rating_get, rating_post
 
 from .meeting_handler import (
     meeting_get,
-    meeting_post
+    meeting_post,
+    meeting_put,
+    meeting_delete,
+    meeting_user_put
 )
 
 # This runs on Firebase/Cloud Run!
@@ -98,5 +101,16 @@ def create_app():
 
         elif request.method == "GET":
             return meeting_get(request)
+        
+        elif request.method == "PUT":
+            return meeting_put(request)
+        
+        elif request.method == "DELETE":
+            return meeting_delete(request)
+    
+    @app.route("/meeting/user", methods=["POST", "GET"])
+    def meeting_user_update_route():
+        if request.method == "PUT":
+            return meeting_user_update_route(request)
 
     return app
