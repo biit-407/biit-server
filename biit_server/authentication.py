@@ -14,7 +14,12 @@ class AuthenticatedType(Enum):
     the token to authenticate with is located in the query
     parameters of the request
     """
-    NONE = 2
+    FORM = 2
+    """
+    the token to authenticate with is located in the body, 
+    under the form section within the request
+    """ 
+    NONE = 3
     """
     there is no authentication for this request
     """
@@ -39,12 +44,20 @@ def authenticated(type: AuthenticatedType = AuthenticatedType.NONE):
                 except:
                     return http400("Missing body")
                 auth = azure_refresh_token(body["token"])
-                print(auth, body)
                 if not auth[0]:
                     return http400("Not Authenticated")
             if type == AuthenticatedType.QUERY:
                 args = request.args
                 auth = azure_refresh_token(args["token"])
+                if not auth[0]:
+                    return http400("Not Authenticated")
+            if type == AuthenticatedType.FORM:
+                body = None
+                try:
+                    body = request.form
+                except:
+                    return http400("Missing body")
+                auth = azure_refresh_token(body["token"])
                 if not auth[0]:
                     return http400("Not Authenticated")
 
