@@ -108,7 +108,7 @@ def create_app():
         elif request.method == "DELETE":
             return meeting_delete(request)
     
-    @app.route("/meeting/user", methods=["POST", "GET"])
+    @app.route("/meeting/user", methods=["PUT"])
     def meeting_user_update_route():
         if request.method == "PUT":
             return meeting_user_update_route(request)
