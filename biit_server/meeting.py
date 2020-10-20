@@ -6,11 +6,17 @@ class UserNotInMeetingException(Exception):
     def __init__(self, user: str):
         super().__init__(f"{user} was not in meeting!")
 
+class UserInMeetingException(Exception):
+    def __init__(self, user: str):
+        super().__init__(f"{user} is already in meeting!")
 
 class MeetingType(Enum):
     IN_PERSON = 0
     VIRTUAL = 1
 
+class MeetingFunction(Enum):
+    REMOVE = 0
+    ADD = 1
 
 class Meeting:
     def __init__(
