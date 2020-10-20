@@ -17,7 +17,7 @@ def rating_post(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["meeting_id", "user", "rating" "token"]
+    fields = ["meeting_id", "user", "rating", "token"]
     body = None
 
     try:
@@ -40,8 +40,11 @@ def rating_post(request):
 
     if rating_snapshot == False:
         rating = Rating(
-            meeting_id=body["meeting_id"], rating_dict={body["user"], body["rating"]}
+            meeting_id=body["meeting_id"], rating_dict={body["user"]: body["rating"]}
         )
+
+        success = rating_db.add(rating.to_dict(), id=body["meeting_id"])
+
     else:
         rating = Rating(document_snapshot=rating_snapshot)
         try:
@@ -49,7 +52,7 @@ def rating_post(request):
         except RatingAlreadySetException:
             return http400(f"Rating for user {body['user']} has already been set")
 
-    success = rating_db.update(body["meeting_id"], rating.get_ratings())
+        success = rating_db.update(body["meeting_id"], rating.get_ratings())
 
     if not success:
         return http400(
@@ -92,10 +95,12 @@ def rating_get(request):
 
     rating_db = Database("ratings")
 
-    rating = rating_db.get("meeting_id")
+    rating_db_response = rating_db.get(args["meeting_id"])
 
-    if not rating:
+    if not rating_db_response:
         return http400(f"Error in retrieving rating from Firestore database.")
+
+    rating = Rating(document_snapshot=rating_db_response)
 
     try:
         response = {

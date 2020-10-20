@@ -22,7 +22,7 @@ class Rating:
             rating_dict = document_snapshot.get("rating_dict")
 
         self.meeting_id = meeting_id
-        self.rating_dict = rating_dict
+        self.rating_dict = {} if rating_dict == None else rating_dict
 
     def to_dict(self):
         return {"meeting_id": self.meeting_id, "rating_dict": self.rating_dict}
