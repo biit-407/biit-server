@@ -166,7 +166,7 @@ def meeting_put(request):
         "data": updated_rating.to_dict(),
     }
 
-    return jsonHttp200("Meeting Updated", response)
+    return jsonHttp200("Meeting updated", response)
 
 
 def meeting_delete(request):
