@@ -18,6 +18,8 @@ from .community_handler import (
     community_leave_post,
 )
 
+from .rating_handler import rating_get, rating_post
+
 # This runs on Firebase/Cloud Run!
 def create_app():
     app = Flask(__name__)
@@ -75,5 +77,13 @@ def create_app():
 
         elif request.method == "GET":
             return profile_get(request)
+
+    @app.route("/rating", methods=["POST", "GET"])
+    def rating_route():
+        if request.method == "POST":
+            return rating_post(request)
+
+        elif request.method == "GET":
+            return rating_get(request)
 
     return app

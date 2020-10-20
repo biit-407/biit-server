@@ -2,6 +2,8 @@ from typing import Any, Dict, List
 
 from google.cloud import firestore
 
+from google.cloud.firestore_v1.document import DocumentSnapshot
+
 
 class Database:
     def __init__(self, collection, firestore_client=None) -> None:
@@ -37,14 +39,14 @@ class Database:
         except Exception:
             return False
 
-    def get(self, id) -> Dict[str, Any]:
+    def get(self, id) -> DocumentSnapshot:
         """Helper function to get documents from the database.
 
         Args:
             id (int, str): An identifying string or int.
 
         Returns:
-            Dict[str, Any] if the document is successfully added. Boolean value of False if there was an error.
+            DocumentSnapshot if the document is successfully added. Boolean value of False if there was an error.
         """
         try:
             results = self.collection_ref.document(id).get()
@@ -52,7 +54,7 @@ class Database:
         except Exception:
             return False
 
-    def query(self, field, operation, value) -> List[Dict[str, Any]]:
+    def query(self, field, operation, value) -> List[DocumentSnapshot]:
         """Helper function to query documents based on parameters.
 
         Args:
@@ -60,7 +62,7 @@ class Database:
             operation (str): Can be "==", ">=", "<=". Find out more at this link: https://googleapis.dev/python/firestore/latest/query.html#google.cloud.firestore_v1.query.Query.where
             value (str): The value you are comparing to.
         Returns:
-            List[Dict[str, Any]] if there are no errors. Boolean value of False if there is an error.
+            List[DocumentSnapshot] if there are no errors. Boolean value of False if there is an error.
         """
         try:
             results = self.collection_ref.where(field, operation, value).stream()
