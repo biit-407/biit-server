@@ -8,7 +8,7 @@ from .query_helper import validate_query_params, validate_body
 from .azure import azure_refresh_token
 from .database import Database
 
-from .meeting import Meeting, MeetingType
+from .meeting import Meeting, MeetingType, MeetingFunction, UserInMeetingException, UserNotInMeetingException
 
 
 def meeting_post(request):
@@ -193,94 +193,59 @@ def meeting_delete(request):
     except:
         return http400("Community update error")
 
-
-def community_join_post(request, community_id):
-    """Handles the community joining POST endpoint
-        Validates the keys in the request then calls the database to add a user to a community
+def meeting_user_put(request):
+    """A handler function to join a meeting
+    Validates the keys in the request then adds the user in the meeting.
     Args:
-        request: A request object that contains a json object with keys: name, email, token
+        request: A request object that contains a json object with keys: id, email, token, function.
 
     Returns:
         (json): Http 200 string response containing the refresh token and new token
 
     Raises:
         Http 400 when the json is missing a key
+        Http 400 if the user is already in the meeting
     """
-    fields = ["email", "token"]
-    body = None
 
-    try:
-        body = request.get_json()
-    except:
-        return http400("Missing body")
+    fields = ["id", "email", "token", "function"]
 
-    body_validation = validate_body(body, fields)
+    # serializes the quert string to a dict (neeto)
+    args = request.args
+
+    query_validation = validate_query_params(args, fields)
     # check that body validation succeeded
-    if body_validation[1] != 200:
-        return body_validation
+    if query_validation[1] != 200:
+        return query_validation
 
-    auth = azure_refresh_token(body["token"])
+    auth = azure_refresh_token(args["token"])
     if not auth[0]:
         return http400("Not Authenticated")
 
-    community_db = Database("communities")
-    community = community_db.get(community_id).to_dict()
+    meeting_db = Database("meetings")
 
-    if body["email"] in community["Members"]:
-        raise Exception
+    meeting_snapshot = meeting_db.get(args["id"])
 
-    community_db.update(
-        community_id, {"Members": community["Members"] + [body["email"]]}
-    )
+    if not meeting_snapshot:
+        return http400(f"Error in retrieving meeting id {args['id']} from the Firestore database.")
+    
+    meeting = Meeting(document_snapshot=meeting_snapshot)
 
-    response = {
-        "access_token": auth[0],
-        "refresh_token": auth[1],
-        "data": community_db.get(community_id).to_dict(),
-    }
+    if args["function"] == MeetingFunction.REMOVE:
+        try:
+            meeting.remove_user(args["email"])
+        except UserNotInMeetingException:
+            return http400(f"User {args['email']} was not found in the meeting")
+    elif args["function"] == MeetingFunction.ADD:
+        try:
+            meeting.add_user(args["email"])
+        except UserInMeetingException:
+            return http400(f"User {args['email']} is already in this meeting!")
+    else:
+        return http400(f"Function value {args['function']} was not recognized by the server. Options are 0 to remove and 1 to add users.")
 
-    return jsonHttp200("Community Joined", response)
-
-
-def community_leave_post(request, community_id):
-    """Handles the community leaveing POST endpoint
-        Validates the keys in the request then calls the database to remove a user from a community
-    Args:
-        request: A request object that contains a json object with keys: name, email, token
-
-    Returns:
-        (json): Http 200 string response containing the refresh token and new token
-
-    Raises:
-        Http 400 when the json is missing a key
-    """
-    fields = ["token", "email"]
-    body = None
 
     try:
-        body = request.get_json()
+        response = {"access_token": auth[0], "refresh_token": auth[1], "data": meeting.to_dict()}
+        return jsonHttp200(f"User {'added' if args['function'] else 'removed'}", response)
     except:
-        return http400("Missing body")
-
-    body_validation = validate_body(body, fields)
-    # check that body validation succeeded
-    if body_validation[1] != 200:
-        return body_validation
-
-    auth = azure_refresh_token(body["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
-
-    community_db = Database("communities")
-    community = community_db.get(community_id).to_dict()
-    community_db.update(
-        community_id,
-        {"Members": [user for user in community["Members"] if user != body["email"]]},
-    )
-    response = {
-        "access_token": auth[0],
-        "refresh_token": auth[1],
-        "data": community_db.get(community_id).to_dict(),
-    }
-
-    return jsonHttp200("Community Left", response)
+        return http400("Community update error")
