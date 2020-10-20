@@ -110,3 +110,14 @@ def test_match_2_with_meeting_length_not_possible():
     person_2 = [(11, 15), (16, 17)]
 
     assert None == find_meeting_time(person_1, person_2, meeting_length=meeting_length)
+
+
+def test_match_2_different_days():
+    """
+    Tests that matching still works across different days
+    """
+
+    person_1 = [(9, 12), (33, 37)]
+    person_2 = [(13, 14), (34, 35)]
+
+    assert (34, 35) == find_meeting_time(person_1, person_2)
