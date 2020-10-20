@@ -117,12 +117,12 @@ def create_app():
         if request.method == "PUT":
             return meeting_user_put(request)
             
-    @app.route("/meetup/<id>/accept", methods=["POST"])
+    @app.route("/meeting/<id>/accept", methods=["POST"])
     def accept_route(id):
         if request.method == "POST":
             return meeting_accept(request, id)
 
-    @app.route("/meetup/<id>/decline", methods=["POST"])
+    @app.route("/meeting/<id>/decline", methods=["POST"])
     def decline_route(id):
         if request.method == "POST":
             return meeting_decline(request, id)
