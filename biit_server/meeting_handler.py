@@ -201,9 +201,9 @@ def meeting_delete(request):
     try:
         meeting_db.delete(args["id"])
         response = {"access_token": auth[0], "refresh_token": auth[1]}
-        return jsonHttp200("Community Deleted", response)
+        return jsonHttp200("Meeting deleted", response)
     except:
-        return http400("Community update error")
+        return http400("Meeting deletion error")
 
 
 def meeting_user_put(request):
