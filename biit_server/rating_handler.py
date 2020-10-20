@@ -4,6 +4,7 @@ from .azure import azure_refresh_token
 from .database import Database
 from .rating import Rating, RatingAlreadySetException
 
+
 def rating_post(request):
     """Handles the rating POST endpoint
     Validates the keys in the request then calls the database to create a commmunity
@@ -38,18 +39,22 @@ def rating_post(request):
     rating_snapshot = rating_db.get(body["meeting_id"])
 
     if rating_snapshot == False:
-        rating = Rating(meeting_id=body["meeting_id"], rating_dict={body["user"], body["rating"]})
+        rating = Rating(
+            meeting_id=body["meeting_id"], rating_dict={body["user"], body["rating"]}
+        )
     else:
         rating = Rating(document_snapshot=rating_snapshot)
-        try: 
+        try:
             rating.set_rating(body["user"], body["rating"])
         except RatingAlreadySetException:
             return http400(f"Rating for user {body['user']} has already been set")
-    
+
     success = rating_db.update(body["meeting_id"], rating.get_ratings())
 
     if not success:
-        return http400(f"Error in updating meeting id {body['meeting_id']} in Firestore database.")
+        return http400(
+            f"Error in updating meeting id {body['meeting_id']} in Firestore database."
+        )
 
     response = {
         "access_token": auth[0],
@@ -101,4 +106,3 @@ def rating_get(request):
         return jsonHttp200("Rating Received", response)
     except:
         return http400("Rating not found")
-
