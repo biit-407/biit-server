@@ -29,21 +29,6 @@ class MockCollection:
         return {"name": self.name, "Members": []}
 
 
-class MockCollectionLeave:
-    def __init__(self, test_data):
-        """Helper class to simulate a collection"""
-        self.name = "mock"
-        self.members = [test_data]
-
-    def to_json(self):
-        """Returns a mock collection entry"""
-        return {"name": self.name, "Members": self.members}
-
-    def to_dict(self):
-        """Returns a mock collection entry"""
-        return {"name": self.name, "Members": self.members}
-
-
 class MockRating:
     def __init__(self, meeting_id, ratings_dict):
         self.meeting_id = meeting_id
