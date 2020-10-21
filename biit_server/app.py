@@ -116,20 +116,5 @@ def create_app():
     def meeting_user_update_route():
         if request.method == "PUT":
             return meeting_user_put(request)
-            
-    @app.route("/meeting/<id>/accept", methods=["POST"])
-    def accept_route(id):
-        if request.method == "POST":
-            return meeting_accept(request, id)
-
-    @app.route("/meeting/<id>/decline", methods=["POST"])
-    def decline_route(id):
-        if request.method == "POST":
-            return meeting_decline(request, id)
-
-    @app.route("/feedback/", methods=["POST"])
-    def feedback_route():
-        if request.method == "POST":
-            return feedback_post(request)
 
     return app
