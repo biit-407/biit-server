@@ -31,10 +31,18 @@ def mock_dev(return_value):
 
 
 def utcToInt(availability):
+    """Converts POSIX time into int time
+
+    Args:
+        availability (List[List[str,str]]): List of POSIX times
+
+    Returns:
+        List[List[int,int]]: List of Int times
+    """
     intTimes = []
     for s0, s1 in availability:
-        s0datetime = datetime.fromtimestamp(s0)
-        s1datetime = datetime.fromtimestamp(s1)
+        s0datetime = datetime.utcfromtimestamp(s0)
+        s1datetime = datetime.utcfromtimestamp(s1)
         s0time = s0datetime.hour + s0datetime.weekday() * 24
         s1time = s1datetime.hour + s1datetime.weekday() * 24
         intTimes += (s0time, s1time)

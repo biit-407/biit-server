@@ -39,4 +39,4 @@ def test_empty_fields():
 def test_schedule():
     temptime = 1603300716
     valid = [(temptime, temptime)]
-    assert utcToInt(valid) == [61, 61]
+    assert utcToInt(valid) == [65, 65]
