@@ -10,6 +10,7 @@ from .query_helper import (
 from .azure import azure_refresh_token
 from .database import Database
 from .storage import Storage
+from .utils import utcToInt
 from flask import send_file
 import base64
 
@@ -151,6 +152,9 @@ def account_put(request):
     if not auth[0]:
         return http400("Not Authenticated")
     #  Add tuple to response
+
+    if "schedule" in args["updateFields"]:
+        args["updateFields"]["schedule"] = utcToInt(args["updateFields"]["schedule"])
 
     account_db = Database("accounts")
 

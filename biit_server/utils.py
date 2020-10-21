@@ -1,4 +1,9 @@
+from datetime import date
 import os
+import json
+from datetime import datetime
+import calendar
+from typing import List, Tuple
 
 
 def mock_dev(return_value):
@@ -23,3 +28,14 @@ def mock_dev(return_value):
         return wrapper
 
     return decorator
+
+
+def utcToInt(availability):
+    intTimes = []
+    for s0, s1 in availability:
+        s0datetime = datetime.fromtimestamp(s0)
+        s1datetime = datetime.fromtimestamp(s1)
+        s0time = s0datetime.hour + s0datetime.weekday() * 24
+        s1time = s1datetime.hour + s1datetime.weekday() * 24
+        intTimes += (s0time, s1time)
+    return intTimes
