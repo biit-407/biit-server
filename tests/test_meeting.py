@@ -1,6 +1,6 @@
 import json
 import pytest
-from biit_server import create_app, meeting_handler
+from biit_server import create_app
 from unittest.mock import patch
 
 from biit_server.meeting import Meeting
@@ -55,11 +55,7 @@ def test_meeting_post(client):
     """
     Tests that meeting post works correctly
     """
-    with patch.object(
-        meeting_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token, patch(
-        "biit_server.meeting_handler.Database"
-    ) as mock_database:
+    with patch("biit_server.meeting_handler.Database") as mock_database:
         test_json = {
             "timestamp": "noon",
             "location": "Mondstadt",
@@ -72,7 +68,6 @@ def test_meeting_post(client):
         instance = mock_database.return_value
         instance.add.return_value = True
 
-        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.post(
             "/meeting",
             json=test_json,
@@ -81,14 +76,14 @@ def test_meeting_post(client):
 
         return_data = json.loads(rv.data.decode())
 
-        assert return_data["access_token"] == "RefreshToken"
+        assert return_data["access_token"] == "AccessToken"
         assert len(return_data["data"]["id"]) == 64
         assert return_data["data"]["timestamp"] == test_json["timestamp"]
         assert return_data["data"]["location"] == test_json["location"]
         assert return_data["data"]["meettype"] == test_json["meettype"]
         assert return_data["data"]["user_list"] == test_json["user_list"]
         assert return_data["message"] == "Meeting created"
-        assert return_data["refresh_token"] == "AccessToken"
+        assert return_data["refresh_token"] == "RefreshToken"
         assert return_data["status_code"] == 200
 
 
@@ -96,15 +91,9 @@ def test_meeting_get(client):
     """
     Tests that meeting get works correctly
     """
-    with patch.object(
-        meeting_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token, patch(
-        "biit_server.meeting_handler.Database"
-    ) as mock_database, patch(
+    with patch("biit_server.meeting_handler.Database") as mock_database, patch(
         "biit_server.meeting_handler.Meeting"
     ) as mock_meeting:
-        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
-
         instance = mock_database.return_value
         instance.get.return_value = True
 
@@ -136,13 +125,13 @@ def test_meeting_get(client):
 
         return_data = json.loads(rv.data.decode())
 
-        assert return_data["access_token"] == "RefreshToken"
+        assert return_data["access_token"] == "AccessToken"
         assert return_data["data"]["timestamp"] == test_json["timestamp"]
         assert return_data["data"]["location"] == test_json["location"]
         assert return_data["data"]["meettype"] == test_json["meettype"]
         assert return_data["data"]["user_list"] == test_json["user_list"]
         assert return_data["message"] == "Meeting retrieved"
-        assert return_data["refresh_token"] == "AccessToken"
+        assert return_data["refresh_token"] == "RefreshToken"
         assert return_data["status_code"] == 200
 
         instance.get.assert_called_once_with("TestMeeting")
@@ -152,14 +141,9 @@ def test_meeting_put(client):
     """
     Tests that meeting put works correctly
     """
-    with patch.object(
-        meeting_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token, patch(
-        "biit_server.meeting_handler.Database"
-    ) as mock_database, patch(
+    with patch("biit_server.meeting_handler.Database") as mock_database, patch(
         "biit_server.meeting_handler.Meeting"
     ) as mock_meeting:
-        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
 
         instance = mock_database.return_value
         instance.get.return_value = True
@@ -197,14 +181,14 @@ def test_meeting_put(client):
 
         return_data = json.loads(rv.data.decode())
 
-        assert return_data["access_token"] == "RefreshToken"
+        assert return_data["access_token"] == "AccessToken"
         assert return_data["data"]["timestamp"] == test_json["timestamp"]
         assert return_data["data"]["location"] == test_json["location"]
         assert return_data["data"]["meettype"] == test_json["meettype"]
         assert return_data["data"]["user_list"] == test_json["user_list"]
         assert return_data["data"]["duration"] == query_data["updateFields"]["duration"]
         assert return_data["message"] == "Meeting updated"
-        assert return_data["refresh_token"] == "AccessToken"
+        assert return_data["refresh_token"] == "RefreshToken"
         assert return_data["status_code"] == 200
 
 
@@ -212,14 +196,9 @@ def test_community_delete(client):
     """
     Tests that community delete works correctly
     """
-    with patch.object(
-        meeting_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token, patch(
-        "biit_server.meeting_handler.Database"
-    ) as mock_database, patch(
+    with patch("biit_server.meeting_handler.Database") as mock_database, patch(
         "biit_server.meeting_handler.Meeting"
     ) as mock_meeting:
-        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
 
         instance = mock_database.return_value
         instance.delete.return_value = True
@@ -256,7 +235,7 @@ def test_community_delete(client):
         return_data = json.loads(rv.data.decode())
 
         assert return_data["message"] == "Meeting deleted"
-        assert return_data["refresh_token"] == "AccessToken"
+        assert return_data["refresh_token"] == "RefreshToken"
         assert return_data["status_code"] == 200
 
         instance.delete.assert_called_once_with(query_data["id"])
@@ -266,14 +245,9 @@ def test_meeting_user_put_join(client):
     """
     Tests that community post works correctly
     """
-    with patch.object(
-        meeting_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token, patch(
-        "biit_server.meeting_handler.Database"
-    ) as mock_database, patch(
+    with patch("biit_server.meeting_handler.Database") as mock_database, patch(
         "biit_server.meeting_handler.Meeting"
     ) as mock_meeting:
-        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
 
         instance = mock_database.return_value
         instance.get.return_value = True
@@ -313,14 +287,14 @@ def test_meeting_user_put_join(client):
 
         return_data = json.loads(rv.data.decode())
 
-        assert return_data["access_token"] == "RefreshToken"
+        assert return_data["access_token"] == "AccessToken"
         assert return_data["data"]["timestamp"] == test_json["timestamp"]
         assert return_data["data"]["location"] == test_json["location"]
         assert return_data["data"]["meettype"] == test_json["meettype"]
         assert return_data["data"]["user_list"] == test_json["user_list"]
         assert return_data["data"]["duration"] == test_json["duration"]
         assert return_data["message"] == "User added"
-        assert return_data["refresh_token"] == "AccessToken"
+        assert return_data["refresh_token"] == "RefreshToken"
         assert return_data["status_code"] == 200
 
 
@@ -328,14 +302,9 @@ def test_meeting_user_put_leave(client):
     """
     Tests that community post works correctly
     """
-    with patch.object(
-        meeting_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token, patch(
-        "biit_server.meeting_handler.Database"
-    ) as mock_database, patch(
+    with patch("biit_server.meeting_handler.Database") as mock_database, patch(
         "biit_server.meeting_handler.Meeting"
     ) as mock_meeting:
-        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
 
         instance = mock_database.return_value
         instance.delete.return_value = True
@@ -375,12 +344,12 @@ def test_meeting_user_put_leave(client):
 
         return_data = json.loads(rv.data.decode())
 
-        assert return_data["access_token"] == "RefreshToken"
+        assert return_data["access_token"] == "AccessToken"
         assert return_data["data"]["timestamp"] == test_json["timestamp"]
         assert return_data["data"]["location"] == test_json["location"]
         assert return_data["data"]["meettype"] == test_json["meettype"]
         assert return_data["data"]["user_list"] == ["amber@purdue.edu"]
         assert return_data["data"]["duration"] == test_json["duration"]
         assert return_data["message"] == "User added"
-        assert return_data["refresh_token"] == "AccessToken"
+        assert return_data["refresh_token"] == "RefreshToken"
         assert return_data["status_code"] == 200
