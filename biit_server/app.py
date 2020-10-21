@@ -1,5 +1,3 @@
-from biit_server.feedback_handler import feedback_post
-from biit_server.meetup_handler import meeting_accept, meeting_decline
 from flask import Flask, request
 import json
 from .account_handler import (
