@@ -12,6 +12,10 @@ def http400(description: str):
     return f"Bad Request: {description}", 400
 
 
+def http500(description: str):
+    return f"Internal Server Error: {description}", 500
+
+
 def http200(description: str = ""):
     if description == "":
         return "OK", 200

@@ -29,6 +29,8 @@ from .meeting_handler import (
     meeting_user_put,
 )
 
+from .feedback_handler import feedback_delete, feedback_get, feedback_post
+
 # This runs on Firebase/Cloud Run!
 
 
@@ -117,5 +119,15 @@ def create_app():
     def meeting_user_update_route():
         if request.method == "PUT":
             return meeting_user_put(request)
+
+    @app.route("/feedback", methods=["POST", "GET", "DELETE"])
+    def feedback_route():
+        if request.method == "POST":
+            return feedback_post(request)
+        if request.method == "GET":
+            return feedback_get(request)
+        if request.method == "DELETE":
+            return feedback_delete(request)
+        return http405()
 
     return app
