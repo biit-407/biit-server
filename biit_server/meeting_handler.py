@@ -351,7 +351,7 @@ def meeting_decline(request, id):
         return http400("Meeting update error")
 
 
-def meeting_set_venue(request):
+def meeting_set_venue(request, id):
     """Handles setting the venue of a meeting
     Args:
         request: A request object that contains a json object with keys: email, token, venue
