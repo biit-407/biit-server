@@ -1,9 +1,8 @@
-from datetime import date
+import asyncio
 import os
-import json
 from datetime import datetime
-import calendar
-from typing import List, Tuple
+from typing import List
+import discord
 
 
 def mock_dev(return_value):
@@ -47,3 +46,74 @@ def utcToInt(availability:List[List[str]]) -> List[List[int]]:
         s1time = s1datetime.hour + s1datetime.weekday() * 24
         intTimes += (s0time, s1time)
     return intTimes
+
+
+__TOKEN = 'NzcwNjM2ODYzNDUwNzc1NTY1.X5gdgQ.qElsjVr_-JzBPvjaoSpgHTuke3M'
+__BACKEND_CHANNEL_ID = 748341103173828689
+__GENERAL_CHANNEL_ID = 747450218836000791
+__FRONTEND_CHANNEL_ID = 748341084794388530
+
+client = discord.Client()
+
+
+@client.event
+async def on_ready():
+    channel_id, message = client.__dict__['__biit_server_message__']
+    
+    channel = client.get_channel(channel_id)
+
+    if channel == None:
+        raise KeyboardInterrupt(f'Failed to send message [{message}] to server channel [{channel_id}].')
+    
+    await channel.send(message)
+    
+    await client.close()
+
+
+def _send_discord_message(bot_token: str, channel: int, message: str):
+    if 'message_queue' in client.__dict__:
+        client.__dict__['__biit_server_message__'] = (channel, message)
+    else:
+        client.__dict__['__biit_server_message__'] = (channel, message)
+
+    loop = asyncio.get_event_loop()
+    try:
+        loop.run_until_complete(client.login(bot_token))
+        loop.run_until_complete(client.connect())
+    except KeyboardInterrupt:
+        print ('Exception was raised, ending loop function.')
+        loop.run_until_complete(client.logout())
+        # cancel all tasks lingering
+    finally:
+        loop.close()
+
+def send_biit_general(message: str):
+    """
+    Sends a message to the biit general discord
+
+    Args:
+        message (str): The message to send the discord channel
+    """
+    _send_discord_message(__TOKEN, __GENERAL_CHANNEL_ID, message)
+
+
+def send_biit_backend(message: str):
+    """
+    Sends a message to the biit backend discord
+
+    Args:
+        message (str): The message to send the discord channel
+    """
+    _send_discord_message(__TOKEN, __BACKEND_CHANNEL_ID, message)
+
+def send_biit_frontend(message: str):
+    """
+    Sends a message to the biit frontend discord
+
+    Args:
+        message (str): The message to send the discord channel
+    """
+    _send_discord_message(__TOKEN, __FRONTEND_CHANNEL_ID, message)
+
+# * commented out because this is just for testing
+# _send_discord_message(TOKEN, BACKEND_CHANNEL_ID, 'This is an automated testing message from Big BOI developers@biit. Welcome to the rice fields fine gentlemen. (standard messaging and data rates may apply)')
