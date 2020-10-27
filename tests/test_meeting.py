@@ -511,7 +511,7 @@ def test_meeting_user_decline(client):
 
 def test_meeting_set_venue(client):
     """
-    Tests that meeting acceptance works
+    Tests that meeting venues work
     """
     with patch.object(
         meeting_handler, "azure_refresh_token"
