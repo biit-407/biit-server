@@ -52,6 +52,7 @@ __TOKEN = os.getenv('DISCORD_BOT', 'awwgeezrickidkaboutthis')
 __BACKEND_CHANNEL_ID = 748341103173828689
 __GENERAL_CHANNEL_ID = 747450218836000791
 __FRONTEND_CHANNEL_ID = 748341084794388530
+__LOGGERS_ID = 770727483585724485
 
 client = discord.Client()
 
@@ -115,5 +116,11 @@ def send_biit_frontend(message: str):
     """
     _send_discord_message(__TOKEN, __FRONTEND_CHANNEL_ID, message)
 
-# * commented out because this is just for testing
-# _send_discord_message(TOKEN, BACKEND_CHANNEL_ID, 'This is an automated testing message from Big BOI developers@biit. Welcome to the rice fields fine gentlemen. (standard messaging and data rates may apply)')
+def send_biit_loggers(message: str):
+    """
+    Sends a message to the biit loggers discord
+
+    Args:
+        message (str): The message to send the discord channel
+    """
+    _send_discord_message(__TOKEN, __LOGGERS_ID, message)

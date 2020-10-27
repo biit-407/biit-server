@@ -1,3 +1,4 @@
+from biit_server.http_responses import http405
 from flask import Flask, request
 import json
 from .account_handler import (
@@ -47,6 +48,8 @@ def create_app():
 
         elif request.method == "DELETE":
             return account_delete(request)
+        else:
+            return http405(request.method)
 
     @app.route("/community", methods=["POST", "GET", "PUT", "DELETE"])
     def community_route():
