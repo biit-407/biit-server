@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import os
 from datetime import datetime
 from typing import List
@@ -54,24 +55,23 @@ __GENERAL_CHANNEL_ID = 747450218836000791
 __FRONTEND_CHANNEL_ID = 748341084794388530
 __LOGGERS_ID = 770727483585724485
 
-client = discord.Client()
-
-
-@client.event
-async def on_ready():
-    channel_id, message = client.__dict__['__biit_server_message__']
-    
-    channel = client.get_channel(channel_id)
-
-    if channel == None:
-        raise KeyboardInterrupt(f'Failed to send message [{message}] to server channel [{channel_id}].')
-    
-    await channel.send(message)
-    
-    await client.close()
-
 
 def _send_discord_message(bot_token: str, channel: int, message: str):
+    client = discord.Client()
+
+    @client.event
+    async def on_ready():
+        channel_id, message = client.__dict__['__biit_server_message__']
+        
+        channel = client.get_channel(channel_id)
+
+        if channel == None:
+            raise KeyboardInterrupt(f'Failed to send message [{message}] to server channel [{channel_id}].')
+        
+        await channel.send(message)
+        
+        await client.close()
+
     if 'message_queue' in client.__dict__:
         client.__dict__['__biit_server_message__'] = (channel, message)
     else:
@@ -123,4 +123,5 @@ def send_biit_loggers(message: str):
     Args:
         message (str): The message to send the discord channel
     """
+    logging.warning(f'sending message [{message}] to discord')
     _send_discord_message(__TOKEN, __LOGGERS_ID, message)
