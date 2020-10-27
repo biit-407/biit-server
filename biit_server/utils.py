@@ -30,7 +30,7 @@ def mock_dev(return_value):
     return decorator
 
 
-def utcToInt(availability:List[List[str]]) -> List[List[int]]:
+def utcToInt(availability: List[List[str]]) -> List[List[int]]:
     """Converts POSIX time into int time
 
     Args:
