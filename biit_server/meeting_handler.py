@@ -275,6 +275,15 @@ def meeting_user_put(request):
 
 
 def meeting_accept(request, id):
+    """A handler function when a user accepts a meeting
+
+    Args:
+        request: A request object that contains a json object with keys email and token
+        id ([int]): Id of the meeting to accept
+
+    Returns:
+        (json): Http 200 string response containing the refresh token and new token and data with meeting information
+    """
 
     fields = ["email", "token"]
 
@@ -314,6 +323,15 @@ def meeting_accept(request, id):
 
 
 def meeting_decline(request, id):
+    """A handler function when a user declines a meeting
+
+    Args:
+        request: A request object that contains a json object with keys email and token
+        id ([int]): Id of the meeting to decline
+
+    Returns:
+        (json): Http 200 string response containing the refresh token and new token and data with meeting information
+    """
     fields = ["email", "token"]
 
     # serializes the quert string to a dict (neeto)
