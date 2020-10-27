@@ -49,7 +49,6 @@ def utcToInt(availability: List[List[str]]) -> List[List[int]]:
     return intTimes
 
 
-__TOKEN = os.getenv('DISCORD_BOT', 'awwgeezrickidkaboutthis')
 __BACKEND_CHANNEL_ID = 748341103173828689
 __GENERAL_CHANNEL_ID = 747450218836000791
 __FRONTEND_CHANNEL_ID = 748341084794388530
@@ -95,6 +94,7 @@ def send_biit_general(message: str):
     Args:
         message (str): The message to send the discord channel
     """
+    __TOKEN = os.getenv('DISCORD_BOT', 'awwgeezrickidkaboutthis')
     _send_discord_message(__TOKEN, __GENERAL_CHANNEL_ID, message)
 
 
@@ -105,6 +105,7 @@ def send_biit_backend(message: str):
     Args:
         message (str): The message to send the discord channel
     """
+    __TOKEN = os.getenv('DISCORD_BOT', 'awwgeezrickidkaboutthis')
     _send_discord_message(__TOKEN, __BACKEND_CHANNEL_ID, message)
 
 def send_biit_frontend(message: str):
@@ -114,6 +115,7 @@ def send_biit_frontend(message: str):
     Args:
         message (str): The message to send the discord channel
     """
+    __TOKEN = os.getenv('DISCORD_BOT', 'awwgeezrickidkaboutthis')
     _send_discord_message(__TOKEN, __FRONTEND_CHANNEL_ID, message)
 
 def send_biit_loggers(message: str):
@@ -123,5 +125,6 @@ def send_biit_loggers(message: str):
     Args:
         message (str): The message to send the discord channel
     """
+    __TOKEN = os.getenv('DISCORD_BOT', 'awwgeezrickidkaboutthis')
     logging.warning(f'sending message [{message}] to discord')
     _send_discord_message(__TOKEN, __LOGGERS_ID, message)
