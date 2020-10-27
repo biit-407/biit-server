@@ -29,7 +29,8 @@ def meeting_post(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["timestamp", "location", "user_list", "meettype", "duration", "token"]
+    fields = ["timestamp", "location", "user_list",
+              "meettype", "duration", "token"]
     body = None
 
     try:
@@ -347,5 +348,64 @@ def meeting_decline(request, id):
             "data": meeting.to_dict(),
         }
         return jsonHttp200("User declined the meeting!", response)
+    except:
+        return http400("Meeting update error")
+
+
+def meeting_set_venue(request):
+    """Handles setting the venue of a meeting
+    Args:
+        request: A request object that contains a json object with keys: email, token, venue
+
+    Returns:
+        (json): Http 200 string response containing the refresh token and new token and meeting
+
+    Raises:
+        Http 400 when the json is missing a key
+    """
+    fields = ["email", "token", "venue"]
+
+    # serializes the quert string to a dict (neeto)
+    args = request.args
+
+    query_validation = validate_query_params(args, fields)
+    # check that body validation succeeded
+    if query_validation[1] != 200:
+        return query_validation
+
+    auth = azure_refresh_token(args["token"])
+    if not auth[0]:
+        return http400("Not Authenticated")
+
+    meeting_db = Database("meetings")
+
+    meeting_snapshot = meeting_db.get(id)
+
+    if not meeting_snapshot:
+        return http400(
+            f"Error in retrieving meeting id {id} from the Firestore database."
+        )
+    venues = json.loads(args["venue"])
+
+    meeting = Meeting(document_snapshot=meeting_snapshot)
+
+    venue = meeting.location
+
+    if meeting.location:
+        if meeting.location not in venues:
+            venues.append(meeting.location)
+            venue = random.choice(venues)
+    else:
+        venue = venues[0]
+
+    try:
+        meeting_db.update(id, {"location": venue})
+        updated_meeting = Meeting(document_snapshot=meeting_db.get(id))
+        response = {
+            "access_token": auth[0],
+            "refresh_token": auth[1],
+            "data": updated_meeting.to_dict(),
+        }
+        return jsonHttp200("User accepted the meeting!", response)
     except:
         return http400("Meeting update error")
