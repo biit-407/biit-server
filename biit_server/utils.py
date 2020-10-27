@@ -48,7 +48,7 @@ def utcToInt(availability:List[List[str]]) -> List[List[int]]:
     return intTimes
 
 
-__TOKEN = 'NzcwNjM2ODYzNDUwNzc1NTY1.X5gdgQ.qElsjVr_-JzBPvjaoSpgHTuke3M'
+__TOKEN = os.getenv('DISCORD_BOT', 'awwgeezrickidkaboutthis')
 __BACKEND_CHANNEL_ID = 748341103173828689
 __GENERAL_CHANNEL_ID = 747450218836000791
 __FRONTEND_CHANNEL_ID = 748341084794388530
