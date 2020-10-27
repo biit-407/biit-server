@@ -140,10 +140,10 @@ def create_app():
         if request.method == "PUT":
             return meeting_accept(request, id)
 
-    @app.route("/meeting/venue", methods=["PUT"])
-    def venue_route():
+    @app.route("/meeting/<id>/venue", methods=["PUT"])
+    def venue_route(id):
         if request.method == "PUT":
-            return meeting_set_venue(request)
+            return meeting_set_venue(request, id)
 
     @app.route("/meeting/<id>/decline", methods=["PUT"])
     def decline_route(id):

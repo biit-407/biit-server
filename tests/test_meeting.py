@@ -553,7 +553,7 @@ def test_meeting_set_venue(client):
         mock_meeting.return_value = mocked_meeting
 
         rv = client.put(
-            f"/meeting/venue",
+            f"/meeting/TestMeeting/venue",
             query_string=query_data,
             follow_redirects=True,
         )
