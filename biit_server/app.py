@@ -26,7 +26,7 @@ from .meeting_handler import (
     meeting_get,
     meeting_post,
     meeting_put,
-    meeting_delete,
+    meeting_delete, meeting_set_venue,
     meeting_user_put,
     meeting_accept,
     meeting_decline,
@@ -138,7 +138,10 @@ def create_app():
     def accept_route(id):
         if request.method == "PUT":
             return meeting_accept(request, id)
-
+    @app.route("/meeting/venue", methods=["PUT"])
+    def venue_route(id):
+        if request.method == "PUT":
+            return meeting_set_venue(request)
     @app.route("/meeting/<id>/decline", methods=["PUT"])
     def decline_route(id):
         if request.method == "PUT":
