@@ -29,8 +29,7 @@ def meeting_post(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["timestamp", "location", "user_list",
-              "meettype", "duration", "token"]
+    fields = ["timestamp", "location", "user_list", "meettype", "duration", "token"]
     body = None
 
     try:
@@ -363,7 +362,7 @@ def meeting_set_venue(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["email", "token", "venue"]
+    fields = ["email", "token", "venues"]
 
     # serializes the quert string to a dict (neeto)
     args = request.args
@@ -385,7 +384,7 @@ def meeting_set_venue(request):
         return http400(
             f"Error in retrieving meeting id {id} from the Firestore database."
         )
-    venues = json.loads(args["venue"])
+    venues = json.loads(args["venues"])
 
     meeting = Meeting(document_snapshot=meeting_snapshot)
 
@@ -397,15 +396,14 @@ def meeting_set_venue(request):
             venue = random.choice(venues)
     else:
         venue = venues[0]
-
+    meeting.location = venue
     try:
         meeting_db.update(id, {"location": venue})
-        updated_meeting = Meeting(document_snapshot=meeting_db.get(id))
         response = {
             "access_token": auth[0],
             "refresh_token": auth[1],
-            "data": updated_meeting.to_dict(),
+            "data": meeting.to_dict(),
         }
-        return jsonHttp200("User accepted the meeting!", response)
+        return jsonHttp200("Venue has been set!", response)
     except:
         return http400("Meeting update error")
