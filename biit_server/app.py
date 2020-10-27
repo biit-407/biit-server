@@ -27,6 +27,8 @@ from .meeting_handler import (
     meeting_put,
     meeting_delete,
     meeting_user_put,
+    meeting_accept,
+    meeting_decline,
 )
 
 from .feedback_handler import feedback_delete, feedback_get, feedback_post
@@ -127,5 +129,15 @@ def create_app():
         if request.method == "DELETE":
             return feedback_delete(request)
         return http405()
+
+    @app.route("/meeting/<id>/accept", methods=["PUT"])
+    def accept_route(id):
+        if request.method == "PUT":
+            return meeting_accept(request, id)
+
+    @app.route("/meeting/<id>/decline", methods=["PUT"])
+    def decline_route(id):
+        if request.method == "PUT":
+            return meeting_decline(request, id)
 
     return app
