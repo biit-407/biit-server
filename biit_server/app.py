@@ -50,6 +50,8 @@ def create_app():
 
         elif request.method == "DELETE":
             return account_delete(request)
+        else:
+            return http405(request.method)
 
     @app.route("/community", methods=["POST", "GET", "PUT", "DELETE"])
     def community_route():
