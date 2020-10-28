@@ -9,7 +9,7 @@ def http405(method: str = ""):
 
 
 def http400(description: str):
-    send_discord_message(f"bad request: {description}")
+    send_discord_message(f"http400: bad request: {description}")
     return f"Bad Request: {description}", 400
 
 
