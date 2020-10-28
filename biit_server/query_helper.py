@@ -73,7 +73,12 @@ class ValidateType(Enum):
     the token to authenticate with is located in the query
     parameters of the request
     """
-    NONE = 2
+    FORM = 2
+    """
+    the token to authenticate with is located in the body, 
+    under the form section within the request
+    """
+    NONE = 3
     """
     there is no authentication for this request
     """
@@ -109,6 +114,18 @@ def validate_fields(fields: List[str], type: ValidateType = ValidateType.NONE):
                 # check that body validation succeeded
                 if query_validation[1] != 200:
                     return query_validation
+
+            if type == ValidateType.FORM:
+                body = None
+                try:
+                    body = request.form
+                except:
+                    return http400("Missing body")
+
+                body_validation = validate_body(body, fields)
+                # check that body validation succeeded
+                if body_validation[1] != 200:
+                    return body_validation
 
             result = func(request)
             return result

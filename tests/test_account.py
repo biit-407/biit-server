@@ -1,10 +1,6 @@
-import json
-
 import pytest
-from biit_server import create_app, account_handler
+from biit_server import create_app
 from unittest.mock import patch
-from io import BytesIO
-import biit_server
 
 
 @pytest.fixture
@@ -29,18 +25,9 @@ def test_account_post(client):
 
 
     """
-
-    with patch.object(
-        account_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token, patch(
-        "biit_server.account_handler.Database"
-    ) as mock_database:
+    with patch("biit_server.account_handler.Database") as mock_database:
         instance = mock_database.return_value
         instance.add.return_value = True
-        mock_azure_refresh_token.return_value = (
-            "yessir a new access token",
-            "yes a new refresh token",
-        )
         rv = client.post(
             "/account",
             json={
@@ -52,7 +39,7 @@ def test_account_post(client):
             follow_redirects=True,
         )
         assert (
-            b'{"access_token":"yessir a new access token","email":"test@email.com","fname":"first","lname":"last","message":"Account Created","refresh_token":"yes a new refresh token","status_code":200}\n'
+            b'{"access_token":"AccessToken","email":"test@email.com","fname":"first","lname":"last","message":"Account Created","refresh_token":"RefreshToken","status_code":200}\n'
             == rv.data
         )
 
@@ -63,16 +50,11 @@ def test_account_get(client):
 
 
     """
-    with patch.object(
-        account_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token, patch(
-        "biit_server.account_handler.Database"
-    ) as mock_database:
+    with patch("biit_server.account_handler.Database") as mock_database:
 
         instance = mock_database.return_value
 
         query_data = {"email": "test@email.com", "token": "henlo"}
-        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
 
         instance.get.return_value = MockAccount(query_data["email"])
 
@@ -83,7 +65,7 @@ def test_account_get(client):
         )
 
         assert (
-            b'{"access_token":"RefreshToken","data":{"email":"test@email.com"},"message":"Account returned","refresh_token":"AccessToken","status_code":200}\n'
+            b'{"access_token":"AccessToken","data":{"email":"test@email.com"},"message":"Account returned","refresh_token":"RefreshToken","status_code":200}\n'
             == rv.data
         )
 
@@ -94,16 +76,11 @@ def test_account_put(client):
 
 
     """
-    with patch.object(
-        account_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token, patch(
-        "biit_server.account_handler.Database"
-    ) as mock_database:
+    with patch("biit_server.account_handler.Database") as mock_database:
         instance = mock_database.return_value
         instance.update.return_value = True
         query_data = {"email": "test@email.com"}
         instance.get.return_value = MockAccount(query_data["email"])
-        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.put(
             "/account",
             query_string={
@@ -114,7 +91,7 @@ def test_account_put(client):
             follow_redirects=True,
         )
         assert (
-            b'{"access_token":"RefreshToken","email":"test@email.com","message":"Account Updated","refresh_token":"AccessToken","status_code":200}\n'
+            b'{"access_token":"AccessToken","email":"test@email.com","message":"Account Updated","refresh_token":"RefreshToken","status_code":200}\n'
             == rv.data
         )
 
@@ -125,18 +102,13 @@ def test_account_delete(client):
 
 
     """
-    with patch.object(
-        account_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token, patch(
-        "biit_server.account_handler.Database"
-    ) as mock_database, patch(
+    with patch("biit_server.account_handler.Database") as mock_database, patch(
         "biit_server.account_handler.Storage"
     ) as mock_storage:
         instance = mock_database.return_value
         instance.delete.return_value = True
         inst_storage = mock_storage.return_value
         inst_storage.delete.return_value = True
-        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.delete(
             "/account",
             query_string={"email": "test@email.com", "token": "TestToken"},
@@ -151,14 +123,9 @@ def test_profile_post(client):
 
 
     """
-    with patch.object(
-        account_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token, patch(
-        "biit_server.account_handler.Storage"
-    ) as mock_storage:
+    with patch("biit_server.account_handler.Storage") as mock_storage:
         instance = mock_storage.return_value
         instance.add.return_value = True
-        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.post(
             "/profile",
             content_type="multipart/form-data",
@@ -171,7 +138,7 @@ def test_profile_post(client):
             follow_redirects=True,
         )
         assert (
-            b'{"access_token":"RefreshToken","message":"File Uploaded","refresh_token":"AccessToken","status_code":200}\n'
+            b'{"access_token":"AccessToken","message":"File Uploaded","refresh_token":"RefreshToken","status_code":200}\n'
             == rv.data
         )
 
@@ -182,14 +149,9 @@ def test_profile_get(client):
 
 
     """
-    with patch.object(
-        account_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token, patch(
-        "biit_server.account_handler.Storage"
-    ) as mock_storage:
+    with patch("biit_server.account_handler.Storage") as mock_storage:
         instance = mock_storage.return_value
         instance.get.return_value = "hello"
-        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.get(
             "/profile",
             query_string={
@@ -200,6 +162,6 @@ def test_profile_get(client):
             follow_redirects=True,
         )
         assert (
-            b'{"access_token":"RefreshToken","data":"hello","message":"File Received","refresh_token":"AccessToken","status_code":200}\n'
+            b'{"access_token":"AccessToken","data":"hello","message":"File Received","refresh_token":"RefreshToken","status_code":200}\n'
             == rv.data
         )

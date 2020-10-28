@@ -1,11 +1,16 @@
-from .http_responses import http200, http400, jsonHttp200
-from .query_helper import validate_query_params, validate_body
-from .azure import azure_refresh_token
+from biit_server.authentication import AuthenticatedType, authenticated
+from .http_responses import http400, jsonHttp200
+from .query_helper import (
+    ValidateType,
+    validate_fields,
+)
 from .database import Database
 from .rating import Rating, RatingAlreadySetException
 
 
-def rating_post(request):
+@validate_fields(["meeting_id", "user", "rating", "token"], ValidateType.BODY)
+@authenticated(AuthenticatedType.BODY)
+def rating_post(request, auth):
     """Handles the rating POST endpoint
     Validates the keys in the request then calls the database to create a commmunity
     Args:
@@ -17,22 +22,7 @@ def rating_post(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["meeting_id", "user", "rating", "token"]
-    body = None
-
-    try:
-        body = request.get_json()
-    except:
-        return http400("Missing body")
-
-    body_validation = validate_body(body, fields)
-    # check that body validation succeeded
-    if body_validation[1] != 200:
-        return body_validation
-
-    auth = azure_refresh_token(body["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
+    body = request.get_json()
 
     rating_db = Database("ratings")
 
@@ -70,7 +60,9 @@ def rating_post(request):
     return jsonHttp200("Rating created", response)
 
 
-def rating_get(request):
+@validate_fields(["meeting_id", "token"], ValidateType.QUERY)
+@authenticated(AuthenticatedType.QUERY)
+def rating_get(request, auth):
     """Handles the rating GET endpoint
         Validates the keys in the request then calls the database to get information about a commmunity
     Args:
@@ -82,18 +74,7 @@ def rating_get(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["meeting_id", "token"]
-
     args = request.args
-
-    query_validation = validate_query_params(args, fields)
-
-    if query_validation[1] != 200:
-        return query_validation
-
-    auth = azure_refresh_token(args["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
 
     rating_db = Database("ratings")
 

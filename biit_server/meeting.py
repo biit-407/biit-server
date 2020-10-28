@@ -25,7 +25,7 @@ class MeetingFunction(Enum):
 class Meeting:
     def __init__(
         self,
-        user_list=[],
+        user_list={},
         id=None,
         timestamp=None,
         duration=0,
@@ -48,14 +48,20 @@ class Meeting:
         self.location = location
         self.meeting_type = meeting_type
 
-    def add_user(self, user) -> List[str]:
-        self.user_list.append(user)
+    def add_user(self, user) -> Dict[str, bool]:
+        self.user_list[user] = None
 
-    def remove_user(self, target_user) -> List[str]:
-        if target_user not in self.user_list:
+    def accept_meeting(self, user) -> Dict[str, bool]:
+        self.user_list[user] = True
+
+    def decline_meeting(self, user) -> Dict[str, bool]:
+        self.user_list[user] = False
+
+    def remove_user(self, target_user) -> Dict[str, bool]:
+        if target_user not in self.user_list.keys():
             raise UserNotInMeetingException
 
-        self.user_list = [user for user in self.user_list if user != target_user]
+        self.user_list.pop(target_user)
 
         return self.user_list
 
