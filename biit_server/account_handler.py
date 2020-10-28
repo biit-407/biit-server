@@ -10,7 +10,7 @@ from .query_helper import (
 from .azure import azure_refresh_token
 from .database import Database
 from .storage import Storage
-from .utils import utcToInt
+from .utils import send_discord_message, utcToInt
 from flask import send_file
 import base64
 
@@ -28,6 +28,8 @@ def account_post(request):
     Raises:
         Http 400 when the json is missing a key
     """
+    send_discord_message('account post')
+
     fields = ["fname", "lname", "email", "token"]
     body = None
 

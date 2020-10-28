@@ -57,4 +57,7 @@ def send_discord_message(message:str):
         message (str): the text to send to the discord channel
     """
     __WEBHOOK = os.getenv('DISCORD_BOT', 'awwgeezenotgonnaworkiguess')
+    logging.critical(__WEBHOOK)
+    if __WEBHOOK == 'awwgeezenotgonnaworkiguess':
+        raise Exception('Failed to send discord message')
     requests.post(__WEBHOOK, json={'content': message})
