@@ -59,7 +59,7 @@ def test_meeting_post(client):
         test_json = {
             "timestamp": "noon",
             "location": "Mondstadt",
-            "user_list": ["paimon@purdue.edu", "traveller@purdue.edu"],
+            "user_list": {"paimon@purdue.edu": None, "traveller@purdue.edu": None},
             "meettype": "chance_meeting",
             "duration": 30,
             "token": "TestToken",
@@ -101,7 +101,7 @@ def test_meeting_get(client):
 
         test_json = {
             "id": query_data["id"],
-            "user_list": ["beidou@purdue.edu"],
+            "user_list": {"beidou@purdue.edu": None},
             "duration": 110,
             "location": "Li Yue",
             "meettype": "Gacha",
@@ -157,7 +157,7 @@ def test_meeting_put(client):
 
         test_json = {
             "id": query_data["id"],
-            "user_list": ["beidou@purdue.edu"],
+            "user_list": {"beidou@purdue.edu": None},
             "duration": query_data["updateFields"]["duration"],
             "location": "Li Yue",
             "meettype": "Gacha",
@@ -210,7 +210,7 @@ def test_community_delete(client):
 
         test_json = {
             "id": query_data["id"],
-            "user_list": ["amber@purdue.edu"],
+            "user_list": {"amber@purdue.edu": None},
             "duration": 110,
             "location": "Mondstatd",
             "meettype": "LicenseTest",
@@ -261,7 +261,7 @@ def test_meeting_user_put_join(client):
 
         test_json = {
             "id": query_data["id"],
-            "user_list": ["amber@purdue.edu"],
+            "user_list": {"amber@purdue.edu": None},
             "duration": 110,
             "location": "Mondstatd",
             "meettype": "LicenseTest",
@@ -318,7 +318,7 @@ def test_meeting_user_put_leave(client):
 
         test_json = {
             "id": query_data["id"],
-            "user_list": ["amber@purdue.edu", "traveller@purdue.edu"],
+            "user_list": {"amber@purdue.edu": None, "traveller@purdue.edu": None},
             "duration": 110,
             "location": "Mondstatd",
             "meettype": "LicenseTest",
@@ -348,8 +348,194 @@ def test_meeting_user_put_leave(client):
         assert return_data["data"]["timestamp"] == test_json["timestamp"]
         assert return_data["data"]["location"] == test_json["location"]
         assert return_data["data"]["meettype"] == test_json["meettype"]
-        assert return_data["data"]["user_list"] == ["amber@purdue.edu"]
+        assert return_data["data"]["user_list"] == {"amber@purdue.edu": None}
         assert return_data["data"]["duration"] == test_json["duration"]
         assert return_data["message"] == "User added"
         assert return_data["refresh_token"] == "RefreshToken"
+        assert return_data["status_code"] == 200
+
+
+def test_meeting_user_accept(client):
+    """
+    Tests that meeting acceptance works
+    """
+    with patch.object(
+        meeting_handler, "azure_refresh_token"
+    ) as mock_azure_refresh_token, patch(
+        "biit_server.meeting_handler.Database"
+    ) as mock_database, patch(
+        "biit_server.meeting_handler.Meeting"
+    ) as mock_meeting:
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
+
+        instance = mock_database.return_value
+        instance.get.return_value = True
+        instance.update.return_value = True
+
+        query_data = {
+            "email": "amber@purdue.edu",
+            "token": "dabonem",
+        }
+
+        test_json = {
+            "id": "TestMeeting",
+            "user_list": {"amber@purdue.edu": None},
+            "duration": 110,
+            "location": "Mondstatd",
+            "meettype": "LicenseTest",
+            "timestamp": "noon",
+        }
+
+        mocked_meeting = Meeting(
+            id=test_json["id"],
+            user_list=test_json["user_list"],
+            duration=test_json["duration"],
+            location=test_json["location"],
+            meeting_type=test_json["meettype"],
+            timestamp=test_json["timestamp"],
+        )
+
+        mock_meeting.return_value = mocked_meeting
+
+        rv = client.put(
+            f"/meeting/TestMeeting/accept",
+            query_string=query_data,
+            follow_redirects=True,
+        )
+
+        print(rv.data)
+        return_data = json.loads(rv.data.decode())
+
+        assert return_data["access_token"] == "RefreshToken"
+        assert return_data["data"]["timestamp"] == test_json["timestamp"]
+        assert return_data["data"]["location"] == test_json["location"]
+        assert return_data["data"]["meettype"] == test_json["meettype"]
+        assert return_data["data"]["user_list"] == {"amber@purdue.edu": True}
+        assert return_data["data"]["duration"] == test_json["duration"]
+        assert return_data["message"] == "User accepted the meeting!"
+        assert return_data["refresh_token"] == "AccessToken"
+        assert return_data["status_code"] == 200
+
+
+def test_meeting_user_decline(client):
+    """
+    Tests that meeting acceptance works
+    """
+    with patch.object(
+        meeting_handler, "azure_refresh_token"
+    ) as mock_azure_refresh_token, patch(
+        "biit_server.meeting_handler.Database"
+    ) as mock_database, patch(
+        "biit_server.meeting_handler.Meeting"
+    ) as mock_meeting:
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
+
+        instance = mock_database.return_value
+        instance.get.return_value = True
+        instance.update.return_value = True
+
+        query_data = {
+            "email": "amber@purdue.edu",
+            "token": "dabonem",
+        }
+
+        test_json = {
+            "id": "TestMeeting",
+            "user_list": {"amber@purdue.edu": None},
+            "duration": 110,
+            "location": "Mondstatd",
+            "meettype": "LicenseTest",
+            "timestamp": "noon",
+        }
+
+        mocked_meeting = Meeting(
+            id=test_json["id"],
+            user_list=test_json["user_list"],
+            duration=test_json["duration"],
+            location=test_json["location"],
+            meeting_type=test_json["meettype"],
+            timestamp=test_json["timestamp"],
+        )
+
+        mock_meeting.return_value = mocked_meeting
+
+        rv = client.put(
+            f"/meeting/TestMeeting/decline",
+            query_string=query_data,
+            follow_redirects=True,
+        )
+
+        return_data = json.loads(rv.data.decode())
+
+        assert return_data["access_token"] == "RefreshToken"
+        assert return_data["data"]["timestamp"] == test_json["timestamp"]
+        assert return_data["data"]["location"] == test_json["location"]
+        assert return_data["data"]["meettype"] == test_json["meettype"]
+        assert return_data["data"]["user_list"] == {"amber@purdue.edu": False}
+        assert return_data["data"]["duration"] == test_json["duration"]
+        assert return_data["message"] == "User declined the meeting!"
+        assert return_data["refresh_token"] == "AccessToken"
+        assert return_data["status_code"] == 200
+
+
+def test_meeting_set_venue(client):
+    """
+    Tests that meeting venues work
+    """
+    with patch.object(
+        meeting_handler, "azure_refresh_token"
+    ) as mock_azure_refresh_token, patch(
+        "biit_server.meeting_handler.Database"
+    ) as mock_database, patch(
+        "biit_server.meeting_handler.Meeting"
+    ) as mock_meeting:
+        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
+
+        instance = mock_database.return_value
+        instance.get.return_value = True
+        instance.update.return_value = True
+
+        query_data = {
+            "email": "amber@purdue.edu",
+            "token": "dabonem",
+            "venues": '["BellTower","Hicks"]',
+        }
+
+        test_json = {
+            "id": "TestMeeting",
+            "user_list": {"amber@purdue.edu": None},
+            "duration": 110,
+            "location": "",
+            "meettype": "LicenseTest",
+            "timestamp": "noon",
+        }
+
+        mocked_meeting = Meeting(
+            id=test_json["id"],
+            user_list=test_json["user_list"],
+            duration=test_json["duration"],
+            location=test_json["location"],
+            meeting_type=test_json["meettype"],
+            timestamp=test_json["timestamp"],
+        )
+
+        mock_meeting.return_value = mocked_meeting
+
+        rv = client.put(
+            f"/meeting/TestMeeting/venue",
+            query_string=query_data,
+            follow_redirects=True,
+        )
+
+        print(rv.data)
+        return_data = json.loads(rv.data.decode())
+
+        assert return_data["access_token"] == "RefreshToken"
+        assert return_data["data"]["timestamp"] == test_json["timestamp"]
+        assert return_data["data"]["location"] == "BellTower"
+        assert return_data["data"]["meettype"] == test_json["meettype"]
+        assert return_data["data"]["user_list"] == {"amber@purdue.edu": None}
+        assert return_data["data"]["duration"] == test_json["duration"]
+        assert return_data["message"] == "Venue has been set!"
+        assert return_data["refresh_token"] == "AccessToken"
         assert return_data["status_code"] == 200

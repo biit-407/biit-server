@@ -223,3 +223,138 @@ def meeting_user_put(request, auth):
         )
     except:
         return http400("Meeting update error")
+
+
+def meeting_accept(request, id):
+
+    fields = ["email", "token"]
+
+    # serializes the quert string to a dict (neeto)
+    args = request.args
+
+    query_validation = validate_query_params(args, fields)
+    # check that body validation succeeded
+    if query_validation[1] != 200:
+        return query_validation
+
+    auth = azure_refresh_token(args["token"])
+    if not auth[0]:
+        return http400("Not Authenticated")
+
+    meeting_db = Database("meetings")
+
+    meeting_snapshot = meeting_db.get(id)
+
+    if not meeting_snapshot:
+        return http400(
+            f"Error in retrieving meeting id {id} from the Firestore database."
+        )
+
+    meeting = Meeting(document_snapshot=meeting_snapshot)
+    accepted_user = meeting.accept_meeting(args["email"])
+    try:
+        meeting_db.update(id, {"user_list": accepted_user})
+        response = {
+            "access_token": auth[0],
+            "refresh_token": auth[1],
+            "data": meeting.to_dict(),
+        }
+        return jsonHttp200("User accepted the meeting!", response)
+    except:
+        return http400("Meeting update error")
+
+
+def meeting_decline(request, id):
+    fields = ["email", "token"]
+
+    # serializes the quert string to a dict (neeto)
+    args = request.args
+
+    query_validation = validate_query_params(args, fields)
+    # check that body validation succeeded
+    if query_validation[1] != 200:
+        return query_validation
+
+    auth = azure_refresh_token(args["token"])
+    if not auth[0]:
+        return http400("Not Authenticated")
+
+    meeting_db = Database("meetings")
+
+    meeting_snapshot = meeting_db.get(id)
+
+    if not meeting_snapshot:
+        return http400(
+            f"Error in retrieving meeting id {id} from the Firestore database."
+        )
+
+    meeting = Meeting(document_snapshot=meeting_snapshot)
+    declined_user = meeting.decline_meeting(args["email"])
+    try:
+        meeting_db.update(id, {"user_list": declined_user})
+        response = {
+            "access_token": auth[0],
+            "refresh_token": auth[1],
+            "data": meeting.to_dict(),
+        }
+        return jsonHttp200("User declined the meeting!", response)
+    except:
+        return http400("Meeting update error")
+
+
+def meeting_set_venue(request, id):
+    """Handles setting the venue of a meeting
+    Args:
+        request: A request object that contains a json object with keys: email, token, venue
+
+    Returns:
+        (json): Http 200 string response containing the refresh token and new token and meeting
+
+    Raises:
+        Http 400 when the json is missing a key
+    """
+    fields = ["email", "token", "venues"]
+
+    # serializes the quert string to a dict (neeto)
+    args = request.args
+
+    query_validation = validate_query_params(args, fields)
+    # check that body validation succeeded
+    if query_validation[1] != 200:
+        return query_validation
+
+    auth = azure_refresh_token(args["token"])
+    if not auth[0]:
+        return http400("Not Authenticated")
+
+    meeting_db = Database("meetings")
+
+    meeting_snapshot = meeting_db.get(id)
+
+    if not meeting_snapshot:
+        return http400(
+            f"Error in retrieving meeting id {id} from the Firestore database."
+        )
+    venues = json.loads(args["venues"])
+
+    meeting = Meeting(document_snapshot=meeting_snapshot)
+
+    venue = meeting.location
+
+    if meeting.location:
+        if meeting.location not in venues:
+            venues.append(meeting.location)
+            venue = random.choice(venues)
+    else:
+        venue = venues[0]
+    meeting.location = venue
+    try:
+        meeting_db.update(id, {"location": venue})
+        response = {
+            "access_token": auth[0],
+            "refresh_token": auth[1],
+            "data": meeting.to_dict(),
+        }
+        return jsonHttp200("Venue has been set!", response)
+    except:
+        return http400("Meeting update error")
