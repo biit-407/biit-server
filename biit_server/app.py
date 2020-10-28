@@ -1,3 +1,4 @@
+from biit_server.utils import send_discord_message
 from biit_server.http_responses import http405
 from flask import Flask, request
 import json
@@ -39,6 +40,7 @@ def create_app():
 
     @app.route("/account", methods=["POST", "GET", "PUT", "DELETE"])
     def account_route():
+        send_discord_message('please man i just want it to work')
         if request.method == "POST":
             return account_post(request)
 
