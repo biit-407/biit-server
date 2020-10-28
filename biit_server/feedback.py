@@ -52,3 +52,8 @@ class Feedback:
             "feedback_type": int(self.feedback_type.value),
             "feedback_status": int(self.feedback_status.value),
         }
+
+    def __str__(self):
+        return ", ".join(
+            f"[attr= {key}, value={value}]" for key, value in self.__dict__.items()
+        )

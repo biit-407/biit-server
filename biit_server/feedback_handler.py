@@ -1,3 +1,4 @@
+from biit_server.utils import send_discord_message
 from biit_server.http_responses import http400, http500, jsonHttp200
 from biit_server.feedback import Feedback
 from biit_server.database import Database
@@ -36,7 +37,10 @@ def feedback_post(request, auth):
     try:
         feedback_db.add(feedback, id=feedback_id)
     except:
-        return http500("An error occured while attempting to submit feedback")
+        return http500(
+            f"An error occured while attempting to submit feedback [{feedback}]",
+            "stephen",
+        )
 
     response = {
         "access_token": auth[0],

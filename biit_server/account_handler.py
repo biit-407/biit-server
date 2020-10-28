@@ -42,6 +42,9 @@ def account_post(request, auth):
 
         account_db.add(db_entry, id=body["email"])
     except:
+        send_discord_message(
+            f'Attempted to create an account with existing email: {body["email"]}'
+        )
         return http400("Email already taken")
 
     response = {
@@ -82,6 +85,7 @@ def account_get(request, auth):
         }
         return jsonHttp200("Account returned", response)
     except:
+        send_discord_message(f"Account with email [{args['email']}] does not exist")
         return http400("Account not found")
 
 
@@ -119,6 +123,9 @@ def account_put(request, auth):
 
     update_validation = validate_update_field(args, valid_updates)
     if update_validation[1] != 200:
+        send_discord_message(
+            f'Error updating account [{args["email"]}]: {update_validation[0]}'
+        )
         return update_validation
 
     if "schedule" in args["updateFields"]:
@@ -136,6 +143,7 @@ def account_put(request, auth):
 
         return jsonHttp200("Account Updated", response)
     except:
+        send_discord_message(f'unable to update account [{args["email"]}]')
         return http400("Account update error")
 
 
@@ -164,6 +172,7 @@ def account_delete(request, auth):
         storage.delete(args["email"] + ".jpg")
         return http200("Account deleted")
     except:
+        send_discord_message(f'Error deleting account [{args["email"]}]')
         return http400("Error in account deletion")
 
 
@@ -189,6 +198,9 @@ def profile_post(request, auth):
     try:
         profile_storage.add(file_decode, body["filename"])
     except:
+        send_discord_message(
+            f'Unable to upload file [{body["filename"]}] for account [{body["email"]}]'
+        )
         return http400("File was unable to be uploaded")
 
     response = {
@@ -226,4 +238,7 @@ def profile_get(request, auth):
 
         return jsonHttp200("File Received", response)
     except:
+        send_discord_message(
+            f'Profile image does not exist for account [{args["email"]}]'
+        )
         return http400("File not found")
