@@ -132,7 +132,6 @@ def account_put(request, auth):
         args["updateFields"]["schedule"] = utcToInt(args["updateFields"]["schedule"])
 
     account_db = Database("accounts")
-
     try:
         account_db.update(args["email"], ast.literal_eval(args["updateFields"]))
         response = {
@@ -143,7 +142,7 @@ def account_put(request, auth):
 
         return jsonHttp200("Account Updated", response)
     except:
-        send_discord_message(f'unable to update account [{args["email"]}]')
+        send_discord_message(f'`account_db.update` failed with account [{args["email"]}] and updateFields [{args["updateFields"]}]')
         return http400("Account update error")
 
 
