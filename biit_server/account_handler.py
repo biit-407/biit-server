@@ -9,6 +9,8 @@ from .query_helper import (
 )
 from .database import Database
 from .storage import Storage
+from .utils import send_discord_message, utcToInt
+from flask import send_file
 import base64
 
 
@@ -109,6 +111,7 @@ def account_put(request, auth):
         "meetType",
         "opt-in",
         "schedule",
+        "birthday",
     ]
 
     # serializes the quert string to a dict (neeto)
@@ -117,6 +120,9 @@ def account_put(request, auth):
     update_validation = validate_update_field(args, valid_updates)
     if update_validation[1] != 200:
         return update_validation
+
+    if "schedule" in args["updateFields"]:
+        args["updateFields"]["schedule"] = utcToInt(args["updateFields"]["schedule"])
 
     account_db = Database("accounts")
 

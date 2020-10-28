@@ -1,3 +1,5 @@
+from biit_server.utils import send_discord_message
+from biit_server.http_responses import http405
 from flask import Flask, request
 import json
 from .account_handler import (
@@ -28,12 +30,17 @@ from .meeting_handler import (
     meeting_user_put,
 )
 
+from .feedback_handler import feedback_delete, feedback_get, feedback_post
+
 # This runs on Firebase/Cloud Run!
+
+
 def create_app():
     app = Flask(__name__)
 
     @app.route("/account", methods=["POST", "GET", "PUT", "DELETE"])
     def account_route():
+        send_discord_message('please man i just want it to work')
         if request.method == "POST":
             return account_post(request)
 
@@ -45,6 +52,8 @@ def create_app():
 
         elif request.method == "DELETE":
             return account_delete(request)
+        else:
+            return http405(request.method)
 
     @app.route("/community", methods=["POST", "GET", "PUT", "DELETE"])
     def community_route():
@@ -112,5 +121,15 @@ def create_app():
     def meeting_user_update_route():
         if request.method == "PUT":
             return meeting_user_put(request)
+
+    @app.route("/feedback", methods=["POST", "GET", "DELETE"])
+    def feedback_route():
+        if request.method == "POST":
+            return feedback_post(request)
+        if request.method == "GET":
+            return feedback_get(request)
+        if request.method == "DELETE":
+            return feedback_delete(request)
+        return http405()
 
     return app

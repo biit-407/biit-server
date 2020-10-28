@@ -1,13 +1,19 @@
+from biit_server.utils import send_discord_message
 from flask import jsonify
 from typing import Dict, Any
 
 
-def http405():
+def http405(method: str = ""):
+    send_discord_message(f'The HTTP method {method} you just sent is not supported')
     return "Method not allowed", 405
 
 
 def http400(description: str):
     return f"Bad Request: {description}", 400
+
+
+def http500(description: str):
+    return f"Internal Server Error: {description}", 500
 
 
 def http200(description: str = ""):
