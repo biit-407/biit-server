@@ -49,18 +49,20 @@ def utcToInt(availability: List[List[str]]) -> List[List[int]]:
     return intTimes
 
 
-def send_discord_message(message:str):
+def send_discord_message(message: str):
     """
-    Sends a message to the discord 
+    Sends a message to the discord
 
     Args:
         message (str): the text to send to the discord channel
     """
-    webhook = os.getenv('DISCORD_BOT', None)
+    webhook = os.getenv("DISCORD_BOT", None)
     if webhook == None:
-        logging.critical('Unable to read webhook from environment variable')
-        
-    response = requests.post(webhook, json={'content': message})
-    
+        logging.critical("Unable to read webhook from environment variable")
+
+    response = requests.post(webhook, json={"content": message})
+
     if not response.ok:
-        logging.critical(f'Failed to send message to discord. Error Code [{response.status_code}]: {response.content}')
+        logging.critical(
+            f"Failed to send message to discord. Error Code [{response.status_code}]: {response.content}"
+        )

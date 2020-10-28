@@ -4,6 +4,7 @@ from biit_server import create_app
 from unittest.mock import patch
 
 from biit_server.meeting import Meeting
+from biit_server import meeting_handler
 
 
 @pytest.fixture

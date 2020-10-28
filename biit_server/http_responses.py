@@ -4,7 +4,7 @@ from typing import Dict, Any
 
 
 def http405(method: str = ""):
-    send_discord_message(f'The HTTP method {method} you just sent is not supported')
+    send_discord_message(f"The HTTP method {method} you just sent is not supported")
     return "Method not allowed", 405
 
 
