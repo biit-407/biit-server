@@ -56,8 +56,11 @@ def send_discord_message(message:str):
     Args:
         message (str): the text to send to the discord channel
     """
-    __WEBHOOK = os.getenv('DISCORD_BOT', 'awwgeezenotgonnaworkiguess')
-    logging.critical(__WEBHOOK)
-    if __WEBHOOK == 'awwgeezenotgonnaworkiguess':
-        raise Exception('Failed to send discord message')
-    requests.post(__WEBHOOK, json={'content': message})
+    webhook = os.getenv('DISCORD_BOT', None)
+    if webhook == None:
+        logging.critical('Unable to read webhook from environment variable')
+        
+    response = requests.post(webhook, json={'content': message})
+    
+    if not response.ok:
+        logging.critical(f'Failed to send message to discord. Error Code [{response.status_code}]: {response.content}')
