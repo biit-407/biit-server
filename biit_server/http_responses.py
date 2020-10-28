@@ -9,10 +9,14 @@ def http405(method: str = ""):
 
 
 def http400(description: str):
+    send_discord_message(f"bad request: {description}")
     return f"Bad Request: {description}", 400
 
 
-def http500(description: str):
+def http500(description: str, developer: str = ""):
+    send_discord_message(
+        f'Internal Server Error: {description}. {"" if not developer else f"Endpoint developer is @{developer}"}'
+    )
     return f"Internal Server Error: {description}", 500
 
 

@@ -1,4 +1,5 @@
 import ast
+from biit_server.utils import send_discord_message
 from biit_server.authentication import AuthenticatedType, authenticated
 
 from .http_responses import http400, jsonHttp200
@@ -37,6 +38,9 @@ def community_post(request, auth):
     try:
         community_db.add(body, id=body["name"])
     except:
+        send_discord_message(
+            f'Attempted to create a community with an existing name [{body["name"]}]'
+        )
         return http400("Community name already taken")
 
     response = {
@@ -73,6 +77,9 @@ def community_get(request, auth):
         }
         return jsonHttp200("Community Received", response)
     except:
+        send_discord_message(
+            f"The community with the name [{args['name']}] does not exist"
+        )
         return http400("Community not found")
 
 
@@ -126,7 +133,8 @@ def community_delete(request, auth):
         response = {"access_token": auth[0], "refresh_token": auth[1]}
         return jsonHttp200("Community Deleted", response)
     except:
-        return http400("Community update error")
+        send_discord_message(f"Unable to delete community [{args['name']}]")
+        return http400("Community delete error")
 
 
 def community_join_post(request, community_id):
@@ -147,21 +155,31 @@ def community_join_post(request, community_id):
     try:
         body = request.get_json()
     except:
+        send_discord_message(
+            f"unable to parse body for request handler [community_join_post]"
+        )
         return http400("Missing body")
 
     body_validation = validate_body(body, fields)
     # check that body validation succeeded
     if body_validation[1] != 200:
+        send_discord_message(
+            f"body validation failed for account {body['email']}. {body_validation[0]}"
+        )
         return body_validation
 
     auth = azure_refresh_token(body["token"])
     if not auth[0]:
+        send_discord_message(f"body authentication failed for account {body['email']}")
         return http400("Not Authenticated")
 
     community_db = Database("communities")
     community = community_db.get(community_id).to_dict()
 
     if body["email"] in community["Members"]:
+        send_discord_message(
+            f'Account [{body["email"]}] is already in community [{community_id}]'
+        )
         raise Exception
 
     community_db.update(
@@ -195,15 +213,22 @@ def community_leave_post(request, community_id):
     try:
         body = request.get_json()
     except:
+        send_discord_message(
+            f"unable to parse body for request handler [community_leave_post]"
+        )
         return http400("Missing body")
 
     body_validation = validate_body(body, fields)
     # check that body validation succeeded
     if body_validation[1] != 200:
+        send_discord_message(
+            f"body validation failed for account {body['email']}. {body_validation[0]}"
+        )
         return body_validation
 
     auth = azure_refresh_token(body["token"])
     if not auth[0]:
+        send_discord_message(f"body authentication failed for account {body['email']}")
         return http400("Not Authenticated")
 
     community_db = Database("communities")

@@ -1,3 +1,4 @@
+from biit_server.utils import send_discord_message
 from .http_responses import http200, http400
 import json
 import re
@@ -101,11 +102,17 @@ def validate_fields(fields: List[str], type: ValidateType = ValidateType.NONE):
                 try:
                     body = request.get_json()
                 except:
+                    send_discord_message(
+                        f"unable to parse body for request handler {func.__name__}"
+                    )
                     return http400("Missing body")
 
                 body_validation = validate_body(body, fields)
                 # check that body validation succeeded
                 if body_validation[1] != 200:
+                    send_discord_message(
+                        f"body validation failed for request handler {func.__name__}. {body_validation[0]}"
+                    )
                     return body_validation
 
             if type == ValidateType.QUERY:
@@ -113,6 +120,9 @@ def validate_fields(fields: List[str], type: ValidateType = ValidateType.NONE):
                 query_validation = validate_query_params(args, fields)
                 # check that body validation succeeded
                 if query_validation[1] != 200:
+                    send_discord_message(
+                        f"query validation failed for request handler {func.__name__}. {query_validation[0]}"
+                    )
                     return query_validation
 
             if type == ValidateType.FORM:
@@ -120,11 +130,17 @@ def validate_fields(fields: List[str], type: ValidateType = ValidateType.NONE):
                 try:
                     body = request.form
                 except:
+                    send_discord_message(
+                        f"unable to parse form for request handler {func.__name__}"
+                    )
                     return http400("Missing body")
 
                 body_validation = validate_body(body, fields)
                 # check that body validation succeeded
                 if body_validation[1] != 200:
+                    send_discord_message(
+                        f"form validation failed for request handler {func.__name__}. {body_validation[0]}"
+                    )
                     return body_validation
 
             result = func(request)

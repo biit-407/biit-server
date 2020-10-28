@@ -1,4 +1,5 @@
 import ast
+from biit_server.utils import send_discord_message
 import json
 from biit_server.authentication import AuthenticatedType, authenticated
 import random
@@ -54,6 +55,7 @@ def meeting_post(request, auth):
     try:
         meeting_db.add(meeting, id=random_id)
     except:
+        send_discord_message(f"Meeting with id [{random_id}] is already in use")
         return http400("Meeting id already taken")
 
     response = {
@@ -99,6 +101,7 @@ def meeting_get(request, auth):
         }
         return jsonHttp200("Meeting retrieved", response)
     except:
+        send_discord_message(f'Meeting with id [{args["id"]}] does not exist')
         return http400("Meeting not found")
 
 
@@ -164,6 +167,7 @@ def meeting_delete(request, auth):
         response = {"access_token": auth[0], "refresh_token": auth[1]}
         return jsonHttp200("Meeting deleted", response)
     except:
+        send_discord_message(f'Error deleting meeting with id [{args["id"]}]')
         return http400("Meeting deletion error")
 
 

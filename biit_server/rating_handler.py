@@ -1,5 +1,6 @@
+from biit_server.utils import send_discord_message
 from biit_server.authentication import AuthenticatedType, authenticated
-from .http_responses import http400, jsonHttp200
+from .http_responses import http400, http500, jsonHttp200
 from .query_helper import (
     ValidateType,
     validate_fields,
@@ -81,7 +82,7 @@ def rating_get(request, auth):
     rating_db_response = rating_db.get(args["meeting_id"])
 
     if not rating_db_response:
-        return http400(f"Error in retrieving rating from Firestore database.")
+        return http500(f"Error in retrieving rating from Firestore database.", "Lucas")
 
     rating = Rating(document_snapshot=rating_db_response)
 
@@ -93,4 +94,5 @@ def rating_get(request, auth):
         }
         return jsonHttp200("Rating Received", response)
     except:
+        send_discord_message(f'Rating with id [{args["meeting_id"]}] does not exist')
         return http400("Rating not found")
