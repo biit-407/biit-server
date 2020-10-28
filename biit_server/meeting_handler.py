@@ -1,23 +1,29 @@
 import ast
-import json
+from biit_server.authentication import AuthenticatedType, authenticated
 import random
 import string
 
-from .http_responses import http200, http400, jsonHttp200
-from .query_helper import validate_query_params, validate_body
-from .azure import azure_refresh_token
+from .http_responses import http400, jsonHttp200
+from .query_helper import (
+    ValidateType,
+    validate_fields,
+)
 from .database import Database
 
 from .meeting import (
     Meeting,
-    MeetingType,
     MeetingFunction,
     UserInMeetingException,
     UserNotInMeetingException,
 )
 
 
-def meeting_post(request):
+@validate_fields(
+    ["timestamp", "location", "user_list", "meettype", "duration", "token"],
+    ValidateType.BODY,
+)
+@authenticated(AuthenticatedType.BODY)
+def meeting_post(request, auth):
     """Handles the meeting POST endpoint
     Validates the keys in the request then calls the database to create a meeting
     Args:
@@ -29,22 +35,7 @@ def meeting_post(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["timestamp", "location", "user_list", "meettype", "duration", "token"]
-    body = None
-
-    try:
-        body = request.get_json()
-    except:
-        return http400("Missing body")
-
-    body_validation = validate_body(body, fields)
-    # check that body validation succeeded
-    if body_validation[1] != 200:
-        return body_validation
-
-    auth = azure_refresh_token(body["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
+    body = request.get_json()
 
     meeting_db = Database("meetings")
 
@@ -74,7 +65,9 @@ def meeting_post(request):
     return jsonHttp200("Meeting created", response)
 
 
-def meeting_get(request):
+@validate_fields(["id", "token"], ValidateType.QUERY)
+@authenticated(AuthenticatedType.QUERY)
+def meeting_get(request, auth):
     """Handles the meeting GET endpoint
         Validates the keys in the request then calls the database to get information about a meeting
     Args:
@@ -86,18 +79,7 @@ def meeting_get(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["id", "token"]
-
     args = request.args
-
-    query_validation = validate_query_params(args, fields)
-
-    if query_validation[1] != 200:
-        return query_validation
-
-    auth = azure_refresh_token(args["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
 
     meeting_db = Database("meetings")
 
@@ -121,7 +103,9 @@ def meeting_get(request):
         return http400("Meeting not found")
 
 
-def meeting_put(request):
+@validate_fields(["id", "token", "updateFields"], ValidateType.QUERY)
+@authenticated(AuthenticatedType.QUERY)
+def meeting_put(request, auth):
     """Handles the community PUT endpoint
         Validates the keys in the request then calls the database to update a commmunity
     Args:
@@ -133,19 +117,7 @@ def meeting_put(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["id", "token", "updateFields"]
-
-    # serializes the quert string to a dict (neeto)
     args = request.args
-
-    query_validation = validate_query_params(args, fields)
-    # check that body validation succeeded
-    if query_validation[1] != 200:
-        return query_validation
-
-    auth = azure_refresh_token(args["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
 
     meeting_db = Database("meetings")
 
@@ -169,7 +141,9 @@ def meeting_put(request):
     return jsonHttp200("Meeting updated", response)
 
 
-def meeting_delete(request):
+@validate_fields(["id", "token"], ValidateType.QUERY)
+@authenticated(AuthenticatedType.QUERY)
+def meeting_delete(request, auth):
     """Handles the meeting DELETE endpoint
     Validates the keys in the request then calls the database to delete the meeting.
     Args:
@@ -181,19 +155,7 @@ def meeting_delete(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["id", "token"]
-
-    # serializes the quert string to a dict (neeto)
     args = request.args
-
-    query_validation = validate_query_params(args, fields)
-    # check that body validation succeeded
-    if query_validation[1] != 200:
-        return query_validation
-
-    auth = azure_refresh_token(args["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
 
     # return community.delete(args)
     meeting_db = Database("meetings")
@@ -206,7 +168,9 @@ def meeting_delete(request):
         return http400("Meeting deletion error")
 
 
-def meeting_user_put(request):
+@validate_fields(["id", "email", "token", "function"], ValidateType.QUERY)
+@authenticated(AuthenticatedType.QUERY)
+def meeting_user_put(request, auth):
     """A handler function to join a meeting
     Validates the keys in the request then adds the user in the meeting.
     Args:
@@ -219,20 +183,7 @@ def meeting_user_put(request):
         Http 400 when the json is missing a key
         Http 400 if the user is already in the meeting
     """
-
-    fields = ["id", "email", "token", "function"]
-
-    # serializes the quert string to a dict (neeto)
     args = request.args
-
-    query_validation = validate_query_params(args, fields)
-    # check that body validation succeeded
-    if query_validation[1] != 200:
-        return query_validation
-
-    auth = azure_refresh_token(args["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
 
     meeting_db = Database("meetings")
 

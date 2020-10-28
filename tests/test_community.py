@@ -1,4 +1,3 @@
-import json
 import pytest
 from biit_server import create_app, community_handler
 from unittest.mock import patch
@@ -55,11 +54,8 @@ def test_community_post(client):
     """
     Tests that community post works correctly
     """
-    with patch.object(
-        community_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token, patch(
-        "biit_server.community_handler.Database"
-    ) as mock_database:
+
+    with patch("biit_server.community_handler.Database") as mock_database:
         instance = mock_database.return_value
         instance.add.return_value = True
         query_data = {
@@ -78,14 +74,13 @@ def test_community_post(client):
             "token": "TestToken",
         }
 
-        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.post(
             "/community",
             json=test_json,
             follow_redirects=True,
         )
         assert (
-            b'{"access_token":"RefreshToken","data":{"name":"TestCommunity"},"message":"Community created","refresh_token":"AccessToken","status_code":200}\n'
+            b'{"access_token":"AccessToken","data":{"name":"TestCommunity"},"message":"Community created","refresh_token":"RefreshToken","status_code":200}\n'
             == rv.data
         )
 
@@ -98,12 +93,7 @@ def test_community_get(client):
     """
     Tests that community get works correctly
     """
-    with patch.object(
-        community_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token, patch(
-        "biit_server.community_handler.Database"
-    ) as mock_database:
-        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
+    with patch("biit_server.community_handler.Database") as mock_database:
 
         instance = mock_database.return_value
 
@@ -120,7 +110,7 @@ def test_community_get(client):
         )
 
         assert (
-            b'{"access_token":"RefreshToken","data":{"name":"TestCommunity"},"message":"Community Received","refresh_token":"AccessToken","status_code":200}\n'
+            b'{"access_token":"AccessToken","data":{"name":"TestCommunity"},"message":"Community Received","refresh_token":"RefreshToken","status_code":200}\n'
             == rv.data
         )
 
@@ -131,11 +121,7 @@ def test_community_put(client):
     """
     Tests that community put works correctly
     """
-    with patch.object(
-        community_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token, patch(
-        "biit_server.community_handler.Database"
-    ) as mock_database:
+    with patch("biit_server.community_handler.Database") as mock_database:
         instance = mock_database.return_value
         instance.update.return_value = True
         query_data = {
@@ -150,14 +136,13 @@ def test_community_put(client):
             "updateFields": {"name": "lanes"},
         }
 
-        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.put(
             "/community",
             query_string=test_json,
             follow_redirects=True,
         )
         assert (
-            b'{"access_token":"RefreshToken","data":{"name":"TestCommunity"},"message":"Community Updated","refresh_token":"AccessToken","status_code":200}\n'
+            b'{"access_token":"AccessToken","data":{"name":"TestCommunity"},"message":"Community Updated","refresh_token":"RefreshToken","status_code":200}\n'
             == rv.data
         )
 
@@ -170,14 +155,9 @@ def test_community_delete(client):
     """
     Tests that community delete works correctly
     """
-    with patch.object(
-        community_handler, "azure_refresh_token"
-    ) as mock_azure_refresh_token, patch(
-        "biit_server.community_handler.Database"
-    ) as mock_database:
+    with patch("biit_server.community_handler.Database") as mock_database:
         instance = mock_database.return_value
         instance.delete.return_value = True
-        mock_azure_refresh_token.return_value = ("RefreshToken", "AccessToken")
         rv = client.delete(
             "/community",
             query_string={
@@ -188,7 +168,7 @@ def test_community_delete(client):
             follow_redirects=True,
         )
         assert (
-            b'{"access_token":"RefreshToken","message":"Community Deleted","refresh_token":"AccessToken","status_code":200}\n'
+            b'{"access_token":"AccessToken","message":"Community Deleted","refresh_token":"RefreshToken","status_code":200}\n'
             == rv.data
         )
 

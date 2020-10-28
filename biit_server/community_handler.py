@@ -1,13 +1,22 @@
 import ast
-import json
+from biit_server.authentication import AuthenticatedType, authenticated
 
-from .http_responses import http200, http400, jsonHttp200
-from .query_helper import validate_query_params, validate_body
+from .http_responses import http400, jsonHttp200
+from .query_helper import (
+    ValidateType,
+    validate_fields,
+    validate_body,
+)
 from .azure import azure_refresh_token
 from .database import Database
 
 
-def community_post(request):
+@validate_fields(
+    ["name", "codeofconduct", "Admins", "Members", "mpm", "meettype", "token"],
+    ValidateType.BODY,
+)
+@authenticated(AuthenticatedType.BODY)
+def community_post(request, auth):
     """Handles the community POST endpoint
     Validates the keys in the request then calls the database to create a commmunity
     Args:
@@ -19,22 +28,7 @@ def community_post(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["name", "codeofconduct", "Admins", "Members", "mpm", "meettype", "token"]
-    body = None
-
-    try:
-        body = request.get_json()
-    except:
-        return http400("Missing body")
-
-    body_validation = validate_body(body, fields)
-    # check that body validation succeeded
-    if body_validation[1] != 200:
-        return body_validation
-
-    auth = azure_refresh_token(body["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
+    body = request.get_json()
 
     community_db = Database("communities")
 
@@ -52,11 +46,10 @@ def community_post(request):
     }
     return jsonHttp200("Community created", response)
 
-    # this was commented out for testing purposes
-    # return http400("Failed to create community")
 
-
-def community_get(request):
+@validate_fields(["name", "token"], ValidateType.QUERY)
+@authenticated(AuthenticatedType.QUERY)
+def community_get(request, auth):
     """Handles the community GET endpoint
         Validates the keys in the request then calls the database to get information about a commmunity
     Args:
@@ -68,18 +61,7 @@ def community_get(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["name", "token"]
-
     args = request.args
-
-    query_validation = validate_query_params(args, fields)
-
-    if query_validation[1] != 200:
-        return query_validation
-
-    auth = azure_refresh_token(args["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
 
     community_db = Database("communities")
 
@@ -94,7 +76,9 @@ def community_get(request):
         return http400("Community not found")
 
 
-def community_put(request):
+@validate_fields(["name", "email", "token", "updateFields"], ValidateType.QUERY)
+@authenticated(AuthenticatedType.QUERY)
+def community_put(request, auth):
     """Handles the community PUT endpoint
         Validates the keys in the request then calls the database to update a commmunity
     Args:
@@ -106,19 +90,7 @@ def community_put(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["name", "email", "token", "updateFields"]
-
-    # serializes the quert string to a dict (neeto)
     args = request.args
-
-    query_validation = validate_query_params(args, fields)
-    # check that body validation succeeded
-    if query_validation[1] != 200:
-        return query_validation
-
-    auth = azure_refresh_token(args["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
 
     community_db = Database("communities")
 
@@ -131,7 +103,9 @@ def community_put(request):
     return jsonHttp200("Community Updated", response)
 
 
-def community_delete(request):
+@validate_fields(["email", "token", "name"], ValidateType.QUERY)
+@authenticated(AuthenticatedType.QUERY)
+def community_delete(request, auth):
     """Handles the community DELETE endpoint
     Validates the keys in the request then calls the database to delete the commmunity
     Args:
@@ -143,21 +117,8 @@ def community_delete(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["email", "token", "name"]
-
-    # serializes the quert string to a dict (neeto)
     args = request.args
 
-    query_validation = validate_query_params(args, fields)
-    # check that body validation succeeded
-    if query_validation[1] != 200:
-        return query_validation
-
-    auth = azure_refresh_token(args["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
-
-    # return community.delete(args)
     community_db = Database("communities")
 
     try:

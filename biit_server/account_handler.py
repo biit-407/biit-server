@@ -1,13 +1,12 @@
 import ast
+from biit_server.authentication import AuthenticatedType, authenticated
 
 from .http_responses import http200, http400, jsonHttp200
 from .query_helper import (
-    validate_body,
-    validate_query_params,
-    validate_photo,
+    ValidateType,
+    validate_fields,
     validate_update_field,
 )
-from .azure import azure_refresh_token
 from .database import Database
 from .storage import Storage
 from .utils import send_discord_message, utcToInt
@@ -15,7 +14,9 @@ from flask import send_file
 import base64
 
 
-def account_post(request):
+@validate_fields(["fname", "lname", "email", "token"], AuthenticatedType.BODY)
+@authenticated(AuthenticatedType.BODY)
+def account_post(request, auth):
     """Handles the account POST endpoint
     Validates data sent in a request then calls the database to add an account
 
@@ -28,24 +29,7 @@ def account_post(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    send_discord_message('account post')
-
-    fields = ["fname", "lname", "email", "token"]
-    body = None
-
-    try:
-        body = request.get_json()
-    except:
-        return http400("Missing body")
-
-    body_validation = validate_body(body, fields)
-    # check that body validation succeeded
-    if body_validation[1] != 200:
-        return body_validation
-
-    auth = azure_refresh_token(body["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
+    body = request.get_json()
 
     account_db = Database("accounts")
 
@@ -71,7 +55,9 @@ def account_post(request):
     return jsonHttp200("Account Created", response)
 
 
-def account_get(request):
+@validate_fields(["email", "token"], ValidateType.QUERY)
+@authenticated(AuthenticatedType.QUERY)
+def account_get(request, auth):
     """Handles the account GET endpoint
     Validates data sent in a request then calls the database to get the row of the associated account
 
@@ -84,19 +70,7 @@ def account_get(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["email", "token"]
-
-    # serializes the quert string to a dict (neeto)
     args = request.args
-
-    query_validation = validate_query_params(args, fields)
-    # check that body validation succeeded
-    if query_validation[1] != 200:
-        return query_validation
-
-    auth = azure_refresh_token(args["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
 
     account_db = Database("accounts")
 
@@ -111,7 +85,9 @@ def account_get(request):
         return http400("Account not found")
 
 
-def account_put(request):
+@validate_fields(["email", "token", "updateFields"], ValidateType.QUERY)
+@authenticated(AuthenticatedType.QUERY)
+def account_put(request, auth):
     """Handles the account POST endpoint
     Validates data sent in a request then calls the database to edit the row of the account
 
@@ -125,7 +101,6 @@ def account_put(request):
         Http 400 when the json is missing required keys: email, token
         or if the token is not valid
     """
-    fields = ["email", "token", "updateFields"]
     valid_updates = [
         "age",
         "agePref",
@@ -142,19 +117,9 @@ def account_put(request):
     # serializes the quert string to a dict (neeto)
     args = request.args
 
-    query_validation = validate_query_params(args, fields)
-    # check that body validation succeeded
-    if query_validation[1] != 200:
-        return query_validation
-
     update_validation = validate_update_field(args, valid_updates)
     if update_validation[1] != 200:
         return update_validation
-
-    auth = azure_refresh_token(args["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
-    #  Add tuple to response
 
     if "schedule" in args["updateFields"]:
         args["updateFields"]["schedule"] = utcToInt(args["updateFields"]["schedule"])
@@ -174,7 +139,9 @@ def account_put(request):
         return http400("Account update error")
 
 
-def account_delete(request):
+@validate_fields(["email", "token"], ValidateType.QUERY)
+@authenticated(AuthenticatedType.QUERY)
+def account_delete(request, auth):
     """Handles the account DELETE endpoint
     Validates data sent in a request then calls the database to remove the associated account
 
@@ -188,19 +155,7 @@ def account_delete(request):
         Http 400 when the json is missing required keys: email, token
         or if the token is not valid
     """
-    fields = ["email", "token"]
-
-    # serializes the quert string to a dict (neeto)
     args = request.args
-
-    query_validation = validate_query_params(args, fields)
-    # check that body validation succeeded
-    if query_validation[1] != 200:
-        return query_validation
-
-    auth = azure_refresh_token(args["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
 
     account_db = Database("accounts")
     storage = Storage("biit_profiles")
@@ -212,7 +167,9 @@ def account_delete(request):
         return http400("Error in account deletion")
 
 
-def profile_post(request):
+@validate_fields(["email", "token", "file", "filename"], ValidateType.FORM)
+@authenticated(AuthenticatedType.FORM)
+def profile_post(request, auth):
     """Handles the profile picture POST endpoint
     Validates data sent in a request then calls gcs to save photo
 
@@ -225,23 +182,7 @@ def profile_post(request):
     Raises:
         Http 400 when the json is missing a key
     """
-    fields = ["email", "token", "file", "filename"]
-    body = None
-
-    try:
-        body = request.form
-    except:
-        return http400("Missing body")
-
-    body_validation = validate_body(body, fields)
-
-    # check that body validation succeeded
-    if body_validation[1] != 200:
-        return http400("Problem Validating Request")
-
-    auth = azure_refresh_token(body["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
+    body = request.form
 
     profile_storage = Storage("biit_profiles")
     file_decode = base64.b64decode(body["file"])
@@ -257,7 +198,9 @@ def profile_post(request):
     return jsonHttp200("File Uploaded", response)
 
 
-def profile_get(request):
+@validate_fields(["email", "token", "filename"], ValidateType.QUERY)
+@authenticated(AuthenticatedType.QUERY)
+def profile_get(request, auth):
     """Handles the profile picture GET endpoint
     Validates data sent in a request then calls the gcs to get the photo
 
@@ -270,17 +213,7 @@ def profile_get(request):
     Raises:
         Http 400 when the json is missing a key or the fils is not found
     """
-    fields = ["email", "token", "filename"]
-
-    # serializes the quert string to a dict (neeto)
     args = request.args
-    auth = azure_refresh_token(args["token"])
-    if not auth[0]:
-        return http400("Not Authenticated")
-    query_validation = validate_query_params(args, fields)
-    # check that body validation succeeded
-    if query_validation[1] != 200 or not validate_photo(args["filename"]):
-        return query_validation
 
     profile_storage = Storage("biit_profiles")
 
