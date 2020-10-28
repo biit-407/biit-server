@@ -1,10 +1,10 @@
-from biit_server.utils import send_biit_frontend, send_biit_loggers
+from biit_server.utils import send_discord_message
 from flask import jsonify
 from typing import Dict, Any
 
 
 def http405(method: str = ""):
-    send_biit_loggers(f'The HTTP method {method} you just sent is not supported')
+    send_discord_message(f'The HTTP method {method} you just sent is not supported')
     return "Method not allowed", 405
 
 
