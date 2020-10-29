@@ -5,7 +5,7 @@ from biit_server.authentication import AuthenticatedType, authenticated
 import random
 import string
 
-from .http_responses import http400, jsonHttp200
+from .http_responses import http400, http500, jsonHttp200
 from .query_helper import ValidateType, validate_fields, validate_query_params
 from .database import Database
 
@@ -128,7 +128,7 @@ def meeting_put(request, auth):
     updated_meeting_snapshot = meeting_db.get(args["id"])
 
     if not updated_meeting_snapshot:
-        return http400(
+        return http500(
             f"Error retrieving updated meeting with id {args['id']} from the Firestore database."
         )
 
@@ -168,7 +168,7 @@ def meeting_delete(request, auth):
         return jsonHttp200("Meeting deleted", response)
     except:
         send_discord_message(f'Error deleting meeting with id [{args["id"]}]')
-        return http400("Meeting deletion error")
+        return http500("Meeting deletion error")
 
 
 @validate_fields(["id", "email", "token", "function"], ValidateType.QUERY)
@@ -225,7 +225,7 @@ def meeting_user_put(request, auth):
             f"User {'added' if args['function'] else 'removed'}", response
         )
     except:
-        return http400("Meeting update error")
+        return http500("Meeting update error")
 
 
 def meeting_accept(request, id):
@@ -242,7 +242,7 @@ def meeting_accept(request, id):
 
     auth = azure_refresh_token(args["token"])
     if not auth[0]:
-        return http400("Not Authenticated")
+        return http401("Not Authenticated")
 
     meeting_db = Database("meetings")
 
@@ -264,7 +264,7 @@ def meeting_accept(request, id):
         }
         return jsonHttp200("User accepted the meeting!", response)
     except:
-        return http400("Meeting update error")
+        return http500("Meeting update error")
 
 
 def meeting_decline(request, id):
@@ -280,7 +280,7 @@ def meeting_decline(request, id):
 
     auth = azure_refresh_token(args["token"])
     if not auth[0]:
-        return http400("Not Authenticated")
+        return http401("Not Authenticated")
 
     meeting_db = Database("meetings")
 
@@ -302,7 +302,7 @@ def meeting_decline(request, id):
         }
         return jsonHttp200("User declined the meeting!", response)
     except:
-        return http400("Meeting update error")
+        return http500("Meeting update error")
 
 
 def meeting_set_venue(request, id):
@@ -328,7 +328,7 @@ def meeting_set_venue(request, id):
 
     auth = azure_refresh_token(args["token"])
     if not auth[0]:
-        return http400("Not Authenticated")
+        return http401("Not Authenticated")
 
     meeting_db = Database("meetings")
 
@@ -360,4 +360,4 @@ def meeting_set_venue(request, id):
         }
         return jsonHttp200("Venue has been set!", response)
     except:
-        return http400("Meeting update error")
+        return http500("Meeting update error")

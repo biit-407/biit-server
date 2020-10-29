@@ -1,7 +1,7 @@
 import ast
 from biit_server.authentication import AuthenticatedType, authenticated
 
-from .http_responses import http200, http400, jsonHttp200
+from .http_responses import http200, http400, http500, jsonHttp200
 from .query_helper import (
     ValidateType,
     validate_fields,
@@ -43,7 +43,7 @@ def account_post(request, auth):
         account_db.add(db_entry, id=body["email"])
     except:
         send_discord_message(
-            f'Attempted to create an account with existing email: {body["email"]}'
+            f'Attempted to create an account with existing email: {body["email"]} with args [{body}]'
         )
         return http400("Email already taken")
 
@@ -142,8 +142,10 @@ def account_put(request, auth):
 
         return jsonHttp200("Account Updated", response)
     except:
-        send_discord_message(f'`account_db.update` failed with account [{args["email"]}] and updateFields [{args["updateFields"]}]')
-        return http400("Account update error")
+        send_discord_message(
+            f'`account_db.update` failed with account [{args["email"]}] and updateFields [{args["updateFields"]}]'
+        )
+        return http500("Account update error")
 
 
 @validate_fields(["email", "token"], ValidateType.QUERY)
@@ -171,8 +173,10 @@ def account_delete(request, auth):
         storage.delete(args["email"] + ".jpg")
         return http200("Account deleted")
     except:
-        send_discord_message(f'Error deleting account [{args["email"]}]')
-        return http400("Error in account deletion")
+        send_discord_message(
+            f'Error deleting account [{args["email"]}] with parameters [{args}]'
+        )
+        return http500("Error in account deletion")
 
 
 @validate_fields(["email", "token", "file", "filename"], ValidateType.FORM)
@@ -200,7 +204,7 @@ def profile_post(request, auth):
         send_discord_message(
             f'Unable to upload file [{body["filename"]}] for account [{body["email"]}]'
         )
-        return http400("File was unable to be uploaded")
+        return http500("File was unable to be uploaded")
 
     response = {
         "access_token": auth[0],

@@ -2,7 +2,7 @@ import ast
 from biit_server.utils import send_discord_message
 from biit_server.authentication import AuthenticatedType, authenticated
 
-from .http_responses import http400, jsonHttp200
+from .http_responses import http400, http401, http500, jsonHttp200
 from .query_helper import (
     ValidateType,
     validate_fields,
@@ -134,7 +134,7 @@ def community_delete(request, auth):
         return jsonHttp200("Community Deleted", response)
     except:
         send_discord_message(f"Unable to delete community [{args['name']}]")
-        return http400("Community delete error")
+        return http500("Community delete error")
 
 
 def community_join_post(request, community_id):
@@ -170,8 +170,9 @@ def community_join_post(request, community_id):
 
     auth = azure_refresh_token(body["token"])
     if not auth[0]:
-        send_discord_message(f"body authentication failed for account {body['email']}")
-        return http400("Not Authenticated")
+        send_discord_message(
+            f"body authentication failed for account {body['email']}")
+        return http401("Not Authenticated")
 
     community_db = Database("communities")
     community = community_db.get(community_id).to_dict()
@@ -228,14 +229,16 @@ def community_leave_post(request, community_id):
 
     auth = azure_refresh_token(body["token"])
     if not auth[0]:
-        send_discord_message(f"body authentication failed for account {body['email']}")
-        return http400("Not Authenticated")
+        send_discord_message(
+            f"body authentication failed for account {body['email']}")
+        return http401("Not Authenticated")
 
     community_db = Database("communities")
     community = community_db.get(community_id).to_dict()
     community_db.update(
         community_id,
-        {"Members": [user for user in community["Members"] if user != body["email"]]},
+        {"Members": [user for user in community["Members"]
+                     if user != body["email"]]},
     )
     response = {
         "access_token": auth[0],
