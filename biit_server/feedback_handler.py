@@ -77,7 +77,7 @@ def feedback_get(request, auth):
         }
         return jsonHttp200("Feedback retrieved", response)
     except:
-        return http400("Feedback not found")
+        return http500("Feedback not found")
 
 
 @validate_fields(["email", "token", "id"], ValidateType.QUERY)
@@ -98,4 +98,4 @@ def feedback_delete(request, auth):
         response = {"access_token": auth[0], "refresh_token": auth[1]}
         return jsonHttp200("Feedback deleted", response)
     except:
-        return http400("Feedback deletion error")
+        return http500("Feedback deletion error")

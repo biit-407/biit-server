@@ -7,6 +7,9 @@ def http405(method: str = ""):
     send_discord_message(f"The HTTP method {method} you just sent is not supported")
     return "Method not allowed", 405
 
+def http401(description: str):
+    send_discord_message(f"http401: UnAuthorized: {description}")
+    return f"UnAuthorized: {description}", 401
 
 def http400(description: str):
     send_discord_message(f"http400: bad request: {description}")

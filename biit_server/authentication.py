@@ -1,4 +1,4 @@
-from biit_server.http_responses import http400
+from biit_server.http_responses import http400, http401
 from biit_server.azure import azure_refresh_token
 from enum import Enum
 from biit_server.utils import send_discord_message
@@ -52,7 +52,7 @@ def authenticated(type: AuthenticatedType = AuthenticatedType.NONE):
                     send_discord_message(
                         f"body authentication failed for request handler {func.__name__}"
                     )
-                    return http400("Not Authenticated")
+                    return http401("Not Authenticated")
             if type == AuthenticatedType.QUERY:
                 args = request.args
                 auth = azure_refresh_token(args["token"])
@@ -60,7 +60,7 @@ def authenticated(type: AuthenticatedType = AuthenticatedType.NONE):
                     send_discord_message(
                         f"query authentication failed for request handler {func.__name__}"
                     )
-                    return http400("Not Authenticated")
+                    return http401("Not Authenticated")
             if type == AuthenticatedType.FORM:
                 body = None
                 try:
@@ -75,7 +75,7 @@ def authenticated(type: AuthenticatedType = AuthenticatedType.NONE):
                     send_discord_message(
                         f"form authentication failed for request handler {func.__name__}"
                     )
-                    return http400("Not Authenticated")
+                    return http401("Not Authenticated")
 
             result = func(request, auth)
             return result

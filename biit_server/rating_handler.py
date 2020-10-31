@@ -95,4 +95,4 @@ def rating_get(request, auth):
         return jsonHttp200("Rating Received", response)
     except:
         send_discord_message(f'Rating with id [{args["meeting_id"]}] does not exist')
-        return http400("Rating not found")
+        return http500("Rating not found")
