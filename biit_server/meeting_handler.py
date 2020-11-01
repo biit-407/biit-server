@@ -367,7 +367,7 @@ def meeting_set_venue(request, id):
 @authenticated(AuthenticatedType.QUERY)
 def meetings_get_all(request, auth):
     """Handles the meeting GET endpoint
-        Validates the keys in the request then calls the database to get information about a meeting
+        Validates the keys in the request then calls the database to get all meetings that the supplied email is a part of.
     Args:
         request: A request object that contains a json object with keys: id
 

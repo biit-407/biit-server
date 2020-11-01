@@ -544,7 +544,7 @@ def test_meeting_set_venue(client):
 
 def test_meeting_get_all(client):
     """
-    Tests that meeting get works correctly
+    Tests that getting all meetings works correctly
     """
     with patch("biit_server.meeting_handler.Database") as mock_database, patch(
         "biit_server.meeting_handler.Meeting"
