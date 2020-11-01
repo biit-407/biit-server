@@ -361,3 +361,41 @@ def meeting_set_venue(request, id):
         return jsonHttp200("Venue has been set!", response)
     except:
         return http500("Meeting update error")
+
+@validate_fields(["email", "token"], ValidateType.QUERY)
+@authenticated(AuthenticatedType.QUERY)
+def meetings_get_all(request, auth):
+    """Handles the meeting GET endpoint
+        Validates the keys in the request then calls the database to get information about a meeting
+    Args:
+        request: A request object that contains a json object with keys: id
+
+    Returns:
+        (str): Http 200 string response containing information about the searched meeting
+
+    Raises:
+        Http 400 when the json is missing a key
+    """
+    args = request.args
+
+    meeting_db = Database("meetings")
+
+    meeting_db_response = meeting_db.query(args["email"], "array_in", "user_list")
+
+    if not meeting_db_response:
+        return http400(
+            f"Meeting containing user email {args['email']} was not found in the Firestore database."
+        )
+
+    meetings = [Meeting(document_snapshot=meeting_snapshot).to_dict() for meeting_snapshot in meeting_db_response]
+
+    try:
+        response = {
+            "access_token": auth[0],
+            "refresh_token": auth[1],
+            "data": meetings,
+        }
+        return jsonHttp200("Meetings retrieved", response)
+    except:
+        send_discord_message(f'Meetings with id [{args["id"]}] do not exist')
+        return http400("Meetings not found")
