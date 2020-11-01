@@ -31,6 +31,7 @@ from .meeting_handler import (
     meeting_user_put,
     meeting_accept,
     meeting_decline,
+    meetings_get_all,
 )
 
 from .feedback_handler import feedback_delete, feedback_get, feedback_post
@@ -123,6 +124,11 @@ def create_app():
     def meeting_user_update_route():
         if request.method == "PUT":
             return meeting_user_put(request)
+
+    @app.route("/meeting/<user>", methods=["GET"])
+    def meeting_user_fetch_route(user):
+        if request.method == "GET":
+            return meetings_get_all(request)
 
     @app.route("/feedback", methods=["POST", "GET", "DELETE"])
     def feedback_route():
