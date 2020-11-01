@@ -381,23 +381,24 @@ def meetings_get_all(request, auth):
 
     meeting_db = Database("meetings")
 
-    meeting_db_response = meeting_db.query(args["email"], "array_in", "user_list")
-
-    if not meeting_db_response:
-        return http400(
-            f"Meeting containing user email {args['email']} was not found in the Firestore database."
-        )
+    meeting_db_response = meeting_db.collection_ref.stream()
 
     meetings = [
-        Meeting(document_snapshot=meeting_snapshot).to_dict()
+        Meeting(document_snapshot=meeting_snapshot)
         for meeting_snapshot in meeting_db_response
+    ]
+
+    print(args["email"])
+
+    filtered_meetings = [
+        meeting.to_dict() for meeting in meetings if args["email"] in meeting.user_list
     ]
 
     try:
         response = {
             "access_token": auth[0],
             "refresh_token": auth[1],
-            "data": meetings,
+            "data": filtered_meetings,
         }
         return jsonHttp200("Meetings retrieved", response)
     except:

@@ -550,12 +550,12 @@ def test_meeting_get_all(client):
         "biit_server.meeting_handler.Meeting"
     ) as mock_meeting:
         instance = mock_database.return_value
-        instance.query.return_value = True
+        instance.collection_ref.stream.return_value = [1]
 
-        query_data = {"email": "TestMeeting", "token": "dabonem"}
+        query_data = {"email": "beidou@purdue.edu", "token": "dabonem"}
 
         test_json = {
-            "id": query_data["id"],
+            "id": "random_meeting",
             "user_list": {"beidou@purdue.edu": None},
             "duration": 110,
             "location": "Li Yue",
@@ -563,14 +563,14 @@ def test_meeting_get_all(client):
             "timestamp": "noon",
         }
 
-        mock_meeting.return_value = [Meeting(
+        mock_meeting.return_value = Meeting(
             id=test_json["id"],
             user_list=test_json["user_list"],
             duration=test_json["duration"],
             location=test_json["location"],
             meeting_type=test_json["meettype"],
             timestamp=test_json["timestamp"],
-        )]
+        )
 
         rv = client.get(
             "/meeting/beidou@purdue.edu",
@@ -582,8 +582,12 @@ def test_meeting_get_all(client):
 
         assert return_data["access_token"] == "AccessToken"
         assert len(return_data["data"]) == 1
+        assert return_data["data"][0]["timestamp"] == test_json["timestamp"]
+        assert return_data["data"][0]["location"] == test_json["location"]
+        assert return_data["data"][0]["meettype"] == test_json["meettype"]
+        assert return_data["data"][0]["user_list"] == test_json["user_list"]
         assert return_data["message"] == "Meetings retrieved"
         assert return_data["refresh_token"] == "RefreshToken"
         assert return_data["status_code"] == 200
 
-        instance.query.assert_called_once_with(test_json["id"], "array_in", "user_list")
+        # instance.query.assert_called_once_with(test_json["id"], "array_in", "user_list")
