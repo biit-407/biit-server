@@ -34,12 +34,13 @@ class Meeting:
         document_snapshot=None,
     ):
         if document_snapshot != None:
-            user_list = document_snapshot.get("user_list")
-            id = document_snapshot.get("id")
-            timestamp = document_snapshot.get("timestamp")
-            duration = document_snapshot.get("duration")
-            location = document_snapshot.get("location")
-            meeting_type = document_snapshot.get("meeting_type")
+            document_dict = document_snapshot.to_dict()
+            user_list = document_dict["user_list"]
+            id = document_dict["id"]
+            timestamp = document_dict["timestamp"]
+            duration = document_dict["duration"]
+            location = document_dict["location"]
+            meeting_type = document_dict["meettype"]
 
         self.user_list = user_list
         self.id = id
