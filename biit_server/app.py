@@ -31,7 +31,7 @@ from .meeting_handler import (
     meeting_user_put,
     meeting_accept,
     meeting_decline,
-    meetings_get_all
+    meetings_get_all,
 )
 
 from .feedback_handler import feedback_delete, feedback_get, feedback_post

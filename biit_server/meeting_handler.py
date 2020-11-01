@@ -362,6 +362,7 @@ def meeting_set_venue(request, id):
     except:
         return http500("Meeting update error")
 
+
 @validate_fields(["email", "token"], ValidateType.QUERY)
 @authenticated(AuthenticatedType.QUERY)
 def meetings_get_all(request, auth):
@@ -387,7 +388,10 @@ def meetings_get_all(request, auth):
             f"Meeting containing user email {args['email']} was not found in the Firestore database."
         )
 
-    meetings = [Meeting(document_snapshot=meeting_snapshot).to_dict() for meeting_snapshot in meeting_db_response]
+    meetings = [
+        Meeting(document_snapshot=meeting_snapshot).to_dict()
+        for meeting_snapshot in meeting_db_response
+    ]
 
     try:
         response = {
