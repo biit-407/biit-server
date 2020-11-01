@@ -550,7 +550,7 @@ def test_meeting_get_all(client):
         "biit_server.meeting_handler.Meeting"
     ) as mock_meeting:
         instance = mock_database.return_value
-        instance.collection_ref.stream.return_value = [1]
+        instance.collection_ref.get.return_value = [1]
 
         query_data = {"email": "beidou@purdue.edu", "token": "dabonem"}
 
