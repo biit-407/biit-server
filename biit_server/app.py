@@ -126,8 +126,8 @@ def create_app():
             return meeting_user_put(request)
 
     @app.route("/meeting/<user>", methods=["GET"])
-    def meeting_user_fetch_route():
-        if request.method == "PUT":
+    def meeting_user_fetch_route(user):
+        if request.method == "GET":
             return meetings_get_all(request)
 
     @app.route("/feedback", methods=["POST", "GET", "DELETE"])
