@@ -381,14 +381,12 @@ def meetings_get_all(request, auth):
 
     meeting_db = Database("meetings")
 
-    meeting_db_response = meeting_db.collection_ref.stream()
+    meeting_db_response = meeting_db.collection_ref.get()
 
     meetings = [
         Meeting(document_snapshot=meeting_snapshot)
         for meeting_snapshot in meeting_db_response
     ]
-
-    print(args["email"])
 
     filtered_meetings = [
         meeting.to_dict() for meeting in meetings if args["email"] in meeting.user_list
