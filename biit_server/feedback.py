@@ -7,6 +7,7 @@ from datetime import datetime
 class FeedbackType(Enum):
     BUG = 0
     SUGESTION = 1
+    USER = 2
 
 
 class FeedbackStatus(Enum):
