@@ -1,4 +1,5 @@
 import ast
+from biit_server.rating import Rating
 from datetime import datetime
 from biit_server.utils import send_discord_message
 import json
@@ -58,6 +59,18 @@ def meeting_post(request, auth):
     except:
         send_discord_message(f"Meeting with id [{random_id}] is already in use")
         return http400("Meeting id already taken")
+
+    rating_db = Database("ratings")
+    rating = Rating(
+        meeting_id=random_id,
+        rating_dict=body["user_list"]
+    )
+
+    try:
+        rating_db.add(rating, id=random_id)
+    except:
+        send_discord_message(f"Rating with id [{random_id}] is already in use")
+        return http400("Rating id already taken")
 
     response = {
         "access_token": auth[0],
