@@ -18,8 +18,9 @@ class Rating:
 
         """
         if document_snapshot != None:
-            meeting_id = document_snapshot.get("meeting_id")
-            rating_dict = document_snapshot.get("rating_dict")
+            document_data = document_snapshot.to_dict()
+            meeting_id = document_data.get("meeting_id")
+            rating_dict = document_data.get("rating_dict")
 
         self.meeting_id = meeting_id
         self.rating_dict = {} if rating_dict == None else rating_dict
