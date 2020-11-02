@@ -1,13 +1,16 @@
 import ast
+from copy import deepcopy
 from biit_server.rating import Rating
-from datetime import datetime
+from datetime import datetime, timedelta
 from biit_server.utils import send_discord_message
 import json
 from biit_server.authentication import AuthenticatedType, authenticated
 import random
 import string
 
-from .http_responses import http400, http500, jsonHttp200
+import uuid
+
+from .http_responses import http400, http401, http500, jsonHttp200
 from .query_helper import ValidateType, validate_fields, validate_query_params
 from .database import Database
 
@@ -504,3 +507,75 @@ def meetings_get_upcoming(request, auth):
     except:
         send_discord_message(f'Meetings with id [{args["id"]}] do not exist')
         return http400("Meetings not found")
+
+
+@validate_fields(["email", "community", "token"], ValidateType.QUERY)
+@authenticated(AuthenticatedType.QUERY)
+def matchup(request, auth):
+    """Handles the meeting GET endpoint
+        Generates meetings for everyone in the community that is specified after validating
+        that the invokee has the correct permissions.
+    Args:
+        request: A request object that contains a json object with keys: email, community, token.
+
+    Returns:
+        (str): Http 200 string response containing information about the searched meeting
+
+    Raises:
+        Http 400 when the json is missing a key
+    """
+    args = request.args
+
+    community_db = Database("communities")
+
+    community = community_db.get(args["community"]).to_dict()
+
+    if args["email"] not in community["Admins"]:
+        return http401("User not authorized to start the matchup algorithm")
+
+    users = community["Members"]
+
+    random.shuffle(users)
+
+    matches = []
+    tmp = []
+
+    for index, user in enumerate(users):
+        tmp.append(user)
+
+        if index % 2:
+            matches.append(deepcopy(tmp))
+            tmp = []
+
+    meeting_list = []
+
+    now = datetime.now()
+    in_a_week = now + timedelta(hours=168)
+
+    meeting_db = Database("meetings")
+
+    for match in matches:
+        random_id = str(uuid.uuid4())
+        meeting = Meeting(
+            user_list={user: 0 for user in match},
+            id=random_id,
+            timestamp=in_a_week.timestamp(),
+            location="McDonalds",
+            meeting_type="In-Person",
+        )
+
+        try:
+            meeting_db.add(meeting.to_dict(), id=random_id)
+            meeting_list.append(meeting.to_dict())
+        except:
+            send_discord_message(
+                f"Generating meetup {random_id} with {match} has failed"
+            )
+
+    response = {
+        "access_token": auth[0],
+        "refresh_token": auth[1],
+        "data": meeting_list,
+    }
+
+    return jsonHttp200("Meetings created", response)
