@@ -60,7 +60,7 @@ def test_meeting_post(client):
         test_json = {
             "timestamp": "noon",
             "location": "Mondstadt",
-            "user_list": {"paimon@purdue.edu": None, "traveller@purdue.edu": None},
+            "user_list": {"paimon@purdue.edu": 0, "traveller@purdue.edu": 0},
             "meettype": "chance_meeting",
             "duration": 30,
             "token": "TestToken",
@@ -102,7 +102,7 @@ def test_meeting_get(client):
 
         test_json = {
             "id": query_data["id"],
-            "user_list": {"beidou@purdue.edu": None},
+            "user_list": {"beidou@purdue.edu": 0},
             "duration": 110,
             "location": "Li Yue",
             "meettype": "Gacha",
@@ -158,7 +158,7 @@ def test_meeting_put(client):
 
         test_json = {
             "id": query_data["id"],
-            "user_list": {"beidou@purdue.edu": None},
+            "user_list": {"beidou@purdue.edu": 0},
             "duration": query_data["updateFields"]["duration"],
             "location": "Li Yue",
             "meettype": "Gacha",
@@ -211,7 +211,7 @@ def test_community_delete(client):
 
         test_json = {
             "id": query_data["id"],
-            "user_list": {"amber@purdue.edu": None},
+            "user_list": {"amber@purdue.edu": 0},
             "duration": 110,
             "location": "Mondstatd",
             "meettype": "LicenseTest",
@@ -262,7 +262,7 @@ def test_meeting_user_put_join(client):
 
         test_json = {
             "id": query_data["id"],
-            "user_list": {"amber@purdue.edu": None},
+            "user_list": {"amber@purdue.edu": 0},
             "duration": 110,
             "location": "Mondstatd",
             "meettype": "LicenseTest",
@@ -319,7 +319,7 @@ def test_meeting_user_put_leave(client):
 
         test_json = {
             "id": query_data["id"],
-            "user_list": {"amber@purdue.edu": None, "traveller@purdue.edu": None},
+            "user_list": {"amber@purdue.edu": 0, "traveller@purdue.edu": 0},
             "duration": 110,
             "location": "Mondstatd",
             "meettype": "LicenseTest",
@@ -349,7 +349,7 @@ def test_meeting_user_put_leave(client):
         assert return_data["data"]["timestamp"] == test_json["timestamp"]
         assert return_data["data"]["location"] == test_json["location"]
         assert return_data["data"]["meettype"] == test_json["meettype"]
-        assert return_data["data"]["user_list"] == {"amber@purdue.edu": None}
+        assert return_data["data"]["user_list"] == {"amber@purdue.edu": 0}
         assert return_data["data"]["duration"] == test_json["duration"]
         assert return_data["message"] == "User added"
         assert return_data["refresh_token"] == "RefreshToken"
@@ -380,7 +380,7 @@ def test_meeting_user_accept(client):
 
         test_json = {
             "id": "TestMeeting",
-            "user_list": {"amber@purdue.edu": None},
+            "user_list": {"amber@purdue.edu": 0},
             "duration": 110,
             "location": "Mondstatd",
             "meettype": "LicenseTest",
@@ -411,7 +411,7 @@ def test_meeting_user_accept(client):
         assert return_data["data"]["timestamp"] == test_json["timestamp"]
         assert return_data["data"]["location"] == test_json["location"]
         assert return_data["data"]["meettype"] == test_json["meettype"]
-        assert return_data["data"]["user_list"] == {"amber@purdue.edu": True}
+        assert return_data["data"]["user_list"] == {"amber@purdue.edu": 1}
         assert return_data["data"]["duration"] == test_json["duration"]
         assert return_data["message"] == "User accepted the meeting!"
         assert return_data["refresh_token"] == "AccessToken"
@@ -442,7 +442,7 @@ def test_meeting_user_decline(client):
 
         test_json = {
             "id": "TestMeeting",
-            "user_list": {"amber@purdue.edu": None},
+            "user_list": {"amber@purdue.edu": 0},
             "duration": 110,
             "location": "Mondstatd",
             "meettype": "LicenseTest",
@@ -472,7 +472,7 @@ def test_meeting_user_decline(client):
         assert return_data["data"]["timestamp"] == test_json["timestamp"]
         assert return_data["data"]["location"] == test_json["location"]
         assert return_data["data"]["meettype"] == test_json["meettype"]
-        assert return_data["data"]["user_list"] == {"amber@purdue.edu": False}
+        assert return_data["data"]["user_list"] == {"amber@purdue.edu": -1}
         assert return_data["data"]["duration"] == test_json["duration"]
         assert return_data["message"] == "User declined the meeting!"
         assert return_data["refresh_token"] == "AccessToken"
@@ -504,7 +504,7 @@ def test_meeting_set_venue(client):
 
         test_json = {
             "id": "TestMeeting",
-            "user_list": {"amber@purdue.edu": None},
+            "user_list": {"amber@purdue.edu": 0},
             "duration": 110,
             "location": "",
             "meettype": "LicenseTest",
@@ -535,7 +535,7 @@ def test_meeting_set_venue(client):
         assert return_data["data"]["timestamp"] == test_json["timestamp"]
         assert return_data["data"]["location"] == "BellTower"
         assert return_data["data"]["meettype"] == test_json["meettype"]
-        assert return_data["data"]["user_list"] == {"amber@purdue.edu": None}
+        assert return_data["data"]["user_list"] == {"amber@purdue.edu": 0}
         assert return_data["data"]["duration"] == test_json["duration"]
         assert return_data["message"] == "Venue has been set!"
         assert return_data["refresh_token"] == "AccessToken"
@@ -556,7 +556,7 @@ def test_meeting_get_all(client):
 
         test_json = {
             "id": "random_meeting",
-            "user_list": {"beidou@purdue.edu": None},
+            "user_list": {"beidou@purdue.edu": 0},
             "duration": 110,
             "location": "Li Yue",
             "meettype": "Gacha",
