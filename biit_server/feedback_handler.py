@@ -99,3 +99,53 @@ def feedback_delete(request, auth):
         return jsonHttp200("Feedback deleted", response)
     except:
         return http500("Feedback deletion error")
+
+
+@validate_fields(
+    ["email", "title", "text", "feedback_type", "feedback_status", "token"],
+    ValidateType.QUERY,
+)
+@authenticated(AuthenticatedType.QUERY)
+def report_user(request, auth):
+    """Handles reporting a user per user request
+    Validates data sent in a request then calls firestore to add the report
+
+    Args:
+        request: A request object that contains args with keys: email and file
+
+    Returns:
+        Http 200 returns success on submition
+
+    Raises:
+        Http 400 when the json is missing a key or the fils is not found
+    """
+    args = request.args
+
+    feedback_db = Database("feedback")
+
+    feedback_id = uuid.uuid4()
+
+    feedback = Feedback(
+        id=feedback_id,
+        email=args["email"],
+        timestamp=args["timestamp"],
+        title=args["title"],
+        text=args["text"],
+        feedback_type=args["feedback_type"],
+        feedback_status=args["feedback_status"],
+    )
+
+    try:
+        feedback_db.add(feedback, id=feedback_id)
+    except:
+        return http500(
+            f"An error occured while attempting to submit a report [{feedback}]",
+            "sotails",
+        )
+
+    response = {
+        "access_token": auth[0],
+        "refresh_token": auth[1],
+        "data": feedback.to_dict(),
+    }
+    return jsonHttp200("User Reported", response)

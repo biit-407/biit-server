@@ -159,3 +159,44 @@ def test_feedback_delete(client):
         assert return_data["status_code"] == 200
 
         instance.delete.assert_called_once_with(query_data["id"])
+
+
+def test_report_user(client):
+    """
+    Tests that feedback post works correctly
+    """
+    with patch("biit_server.feedback_handler.Database") as mock_database:
+        timestamp = datetime.now()
+
+        test_json = {
+            "email": "email@email.com",
+            "timestamp": timestamp.isoformat(),
+            "title": "Reporting Test@test.com",
+            "text": "He spilt coffee on me",
+            "feedback_type": 2,
+            "feedback_status": 4,
+            "token": "TestToken",
+        }
+
+        instance = mock_database.return_value
+        instance.add.return_value = True
+
+        rv = client.post(
+            "/feedback",
+            json=test_json,
+            follow_redirects=True,
+        )
+
+        return_data = json.loads(rv.data.decode())
+
+        assert return_data["access_token"] == "AccessToken"
+        assert return_data["data"]["id"]
+        assert return_data["data"]["email"] == test_json["email"]
+        assert return_data["data"]["timestamp"] == test_json["timestamp"]
+        assert return_data["data"]["title"] == test_json["title"]
+        assert return_data["data"]["text"] == test_json["text"]
+        assert return_data["data"]["feedback_type"] == test_json["feedback_type"]
+        assert return_data["data"]["feedback_status"] == test_json["feedback_status"]
+        assert return_data["message"] == "Feedback created"
+        assert return_data["refresh_token"] == "RefreshToken"
+        assert return_data["status_code"] == 200
