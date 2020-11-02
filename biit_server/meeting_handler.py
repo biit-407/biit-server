@@ -55,7 +55,8 @@ def meeting_post(request, auth):
     )
 
     try:
-        meeting_db.add(meeting, id=random_id)
+        meeting_db.add(meeting.to_dict(), id=random_id)
+        print(random_id)
     except:
         send_discord_message(f"Meeting with id [{random_id}] is already in use")
         return http400("Meeting id already taken")
@@ -67,7 +68,8 @@ def meeting_post(request, auth):
     )
 
     try:
-        rating_db.add(rating, id=random_id)
+        rating_db.add(rating.to_dict(), id=random_id)
+        print("success")
     except:
         send_discord_message(f"Rating with id [{random_id}] is already in use")
         return http400("Rating id already taken")
