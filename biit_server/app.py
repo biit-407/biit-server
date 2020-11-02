@@ -107,7 +107,7 @@ def create_app():
 
         elif request.method == "GET":
             return rating_get(request)
-    
+
     @app.route("/rating/pending", methods=["GET"])
     def rating_pending_route():
         if request.method == "GET":

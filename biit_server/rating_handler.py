@@ -61,6 +61,7 @@ def rating_post(request, auth):
 
     return jsonHttp200("Rating created", response)
 
+
 @validate_fields(["user", "token"], ValidateType.BODY)
 @authenticated(AuthenticatedType.BODY)
 def rating_post(request, auth):
@@ -149,6 +150,7 @@ def rating_get(request, auth):
         send_discord_message(f'Rating with id [{args["meeting_id"]}] does not exist')
         return http500("Rating not found")
 
+
 @validate_fields(["email", "token"], ValidateType.QUERY)
 @authenticated(AuthenticatedType.QUERY)
 def rating_get_pending(request, auth):
@@ -175,14 +177,14 @@ def rating_get_pending(request, auth):
         Rating(document_snapshot=rating_snapshot)
         for rating_snapshot in rating_db_response
     ]
-    
 
     # Identifies the ratings the user is a part of
     # and checks if the user has reviewed it.
-    ratings  = [
-        rating.to_dict() for rating in ratings
-        if args["email"] in rating.rating_dict and
-        rating.rating_dict[args["email"]] == -1
+    ratings = [
+        rating.to_dict()
+        for rating in ratings
+        if args["email"] in rating.rating_dict
+        and rating.rating_dict[args["email"]] == -1
     ]
 
     if not rating_db_response:

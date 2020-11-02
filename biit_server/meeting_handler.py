@@ -62,8 +62,7 @@ def meeting_post(request, auth):
 
     rating_db = Database("ratings")
     rating = Rating(
-        meeting_id=random_id,
-        rating_dict={user: -1 for user in body["user_list"]}
+        meeting_id=random_id, rating_dict={user: -1 for user in body["user_list"]}
     )
 
     try:
