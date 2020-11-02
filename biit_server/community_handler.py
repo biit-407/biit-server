@@ -235,7 +235,8 @@ def community_leave_post(request, community_id):
     community = community_db.get(community_id).to_dict()
     community_db.update(
         community_id,
-        {"Members": [user for user in community["Members"] if user != body["email"]]},
+        {"Members": [user for user in community["Members"]
+                     if user != body["email"]]},
     )
     response = {
         "access_token": auth[0],
