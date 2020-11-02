@@ -50,13 +50,13 @@ class Meeting:
         self.meeting_type = meeting_type
 
     def add_user(self, user) -> Dict[str, bool]:
-        self.user_list[user] = None
+        self.user_list[user] = 0
 
     def accept_meeting(self, user) -> Dict[str, bool]:
-        self.user_list[user] = True
+        self.user_list[user] = 1
 
     def decline_meeting(self, user) -> Dict[str, bool]:
-        self.user_list[user] = False
+        self.user_list[user] = -1
 
     def remove_user(self, target_user) -> Dict[str, bool]:
         if target_user not in self.user_list.keys():
