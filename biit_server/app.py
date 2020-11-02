@@ -130,6 +130,16 @@ def create_app():
         if request.method == "GET":
             return meetings_get_all(request)
 
+    @app.route("/meeting/pending", methods=["GET"])
+    def meeting_user_pending_fetch_route():
+        if request.method == "GET":
+            return meetings_get_pending(request)
+    
+     @app.route("/meeting/upcoming", methods=["GET"])
+    def meeting_user_pending_fetch_route():
+        if request.method == "GET":
+            return meetings_get_upcoming(request)
+
     @app.route("/feedback", methods=["POST", "GET", "DELETE"])
     def feedback_route():
         if request.method == "POST":
