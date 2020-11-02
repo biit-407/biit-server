@@ -177,8 +177,12 @@ def rating_get_pending(request, auth):
     ]
     
 
+    # Identifies the ratings the user is a part of
+    # and checks if the user has reviewed it.
     ratings  = [
-        rating.to_dict() for rating in ratings if args["email"] in rating.rating_dict and rating.rating_dict[args["email"]] == -1
+        rating.to_dict() for rating in ratings
+        if args["email"] in rating.rating_dict and
+        rating.rating_dict[args["email"]] == -1
     ]
 
     if not rating_db_response:
