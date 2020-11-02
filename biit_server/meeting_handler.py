@@ -1,4 +1,5 @@
 import ast
+from datetime import datetime
 from biit_server.utils import send_discord_message
 import json
 from biit_server.authentication import AuthenticatedType, authenticated
@@ -475,7 +476,9 @@ def meetings_get_upcoming(request, auth):
     filtered_meetings = [
         meeting.to_dict()
         for meeting in meetings
-        if args["email"] in meeting.user_list and meeting.user_list[args["email"]] == 0
+        if args["email"] in meeting.user_list
+        and meeting.user_list[args["email"]] == 0
+        and datetime.utcfromtimestamp(meeting.timestamp) > datetime.now()
     ]
 
     try:
