@@ -20,7 +20,7 @@ from .community_handler import (
     community_leave_post,
 )
 
-from .rating_handler import rating_get, rating_post
+from .rating_handler import rating_get, rating_get_pending, rating_post
 
 from .meeting_handler import (
     meeting_get,
@@ -107,6 +107,11 @@ def create_app():
 
         elif request.method == "GET":
             return rating_get(request)
+
+    @app.route("/rating/pending", methods=["GET"])
+    def rating_pending_route():
+        if request.method == "GET":
+            return rating_get_pending(request)
 
     @app.route("/meeting", methods=["POST", "GET", "PUT", "DELETE"])
     def meeting_route():
