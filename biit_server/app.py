@@ -31,7 +31,9 @@ from .meeting_handler import (
     meeting_user_put,
     meeting_accept,
     meeting_decline,
-    meetings_get_all, meetings_get_pending, meetings_get_upcoming,
+    meetings_get_all,
+    meetings_get_pending,
+    meetings_get_upcoming,
 )
 
 from .feedback_handler import feedback_delete, feedback_get, feedback_post
@@ -134,9 +136,9 @@ def create_app():
     def meeting_user_pending_fetch_route():
         if request.method == "GET":
             return meetings_get_pending(request)
-    
-     @app.route("/meeting/upcoming", methods=["GET"])
-    def meeting_user_pending_fetch_route():
+
+    @app.route("/meeting/upcoming", methods=["GET"])
+    def meeting_user_upcoming_fetch_route():
         if request.method == "GET":
             return meetings_get_upcoming(request)
 
