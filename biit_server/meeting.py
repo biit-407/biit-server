@@ -54,9 +54,11 @@ class Meeting:
 
     def accept_meeting(self, user) -> Dict[str, bool]:
         self.user_list[user] = 1
+        return self.user_list
 
     def decline_meeting(self, user) -> Dict[str, bool]:
         self.user_list[user] = -1
+        return self.user_list
 
     def remove_user(self, target_user) -> Dict[str, bool]:
         if target_user not in self.user_list.keys():
