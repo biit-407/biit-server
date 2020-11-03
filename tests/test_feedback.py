@@ -20,11 +20,9 @@ def test_feedback_post(client):
     Tests that feedback post works correctly
     """
     with patch("biit_server.feedback_handler.Database") as mock_database:
-        timestamp = datetime.now()
 
         test_json = {
             "email": "email@email.com",
-            "timestamp": timestamp.isoformat(),
             "title": "feedback-title",
             "text": "feedback-text",
             "feedback_type": 1,
@@ -46,7 +44,7 @@ def test_feedback_post(client):
         assert return_data["access_token"] == "AccessToken"
         assert return_data["data"]["id"]
         assert return_data["data"]["email"] == test_json["email"]
-        assert return_data["data"]["timestamp"] == test_json["timestamp"]
+        assert return_data["data"]["timestamp"]
         assert return_data["data"]["title"] == test_json["title"]
         assert return_data["data"]["text"] == test_json["text"]
         assert return_data["data"]["feedback_type"] == test_json["feedback_type"]
