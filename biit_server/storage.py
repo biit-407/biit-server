@@ -45,7 +45,9 @@ class Storage:
         try:
             blob = self.bucket.get_blob(name)
             if blob == None:
-                send_discord_message(f"Could not find profile picture for filename {name}")
+                send_discord_message(
+                    f"Could not find profile picture for filename {name}"
+                )
             file_obj = blob.download_as_string()
             byte_file = base64.b64encode(file_obj)
             return byte_file.decode("ascii")

@@ -23,6 +23,7 @@ from .community_handler import (
 from .rating_handler import rating_get, rating_get_pending, rating_post
 
 from .meeting_handler import (
+    matchup,
     meeting_get,
     meeting_post,
     meeting_put,
@@ -171,5 +172,10 @@ def create_app():
     def decline_route(id):
         if request.method == "PUT":
             return meeting_decline(request, id)
+
+    @app.route("/matchup", methods=["GET"])
+    def meeting_matching():
+        if request.method == "GET":
+            return matchup(request)
 
     return app
