@@ -29,9 +29,6 @@ class Rating:
         return {"meeting_id": self.meeting_id, "rating_dict": self.rating_dict}
 
     def set_rating(self, user: str, rating: int) -> Dict[str, int]:
-        if user in self.rating_dict:
-            raise RatingAlreadySetException
-
         self.rating_dict[user] = rating
 
         return self.rating_dict
