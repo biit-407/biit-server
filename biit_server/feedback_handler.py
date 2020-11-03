@@ -27,7 +27,7 @@ def feedback_post(request, auth):
     feedback = Feedback(
         id=feedback_id,
         email=body["email"],
-        timestamp=body["timestamp"],
+        timestamp=datetime.now().isoformat(),
         title=body["title"],
         text=body["text"],
         feedback_type=body["feedback_type"],
