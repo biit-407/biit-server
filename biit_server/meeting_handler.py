@@ -493,7 +493,7 @@ def meetings_get_upcoming(request, auth):
         meeting.to_dict()
         for meeting in meetings
         if args["email"] in meeting.user_list
-        and meeting.user_list[args["email"]] == 0
+        and meeting.user_list[args["email"]] == 1
         and datetime.utcfromtimestamp(meeting.timestamp) > datetime.now()
     ]
 
