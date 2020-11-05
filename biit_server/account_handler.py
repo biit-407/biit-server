@@ -136,8 +136,8 @@ def account_put(request, auth):
             [int(item[0]), int(item[1])]
             for item in ast.literal_eval(args["updateFields"])["schedule"]
         ]
-        schedule = utcToInt(temp_schedule)
-        account_db.update(args["email"], {"schedule": schedule})
+        
+        account_db.update(args["email"], {"schedule": temp_schedule})
 
     try:
         account_db.update(args["email"], ast.literal_eval(args["updateFields"]))
