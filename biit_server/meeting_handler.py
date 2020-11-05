@@ -605,7 +605,7 @@ def matchup(request, auth):
             user_list={user: 0 for user in match},
             id=random_id,
             timestamp=in_a_week.timestamp(),
-            location="McDonalds",
+            location="WALC",
             meeting_type="In-Person",
         )
 
