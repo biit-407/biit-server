@@ -499,7 +499,7 @@ def meetings_get_upcoming(request, auth):
 
     meeting_dict = {meeting.id: meeting for meeting in filtered_meetings}
     meeting_times = {meeting.id: meeting.timestamp for meeting in filtered_meetings}
-    sorted_meeting_times = sorted(meeting_times.items(), key = lambda kv:(kv[1], kv[0]))
+    sorted_meeting_times = sorted(meeting_times.items(), key=lambda kv: (kv[1], kv[0]))
 
     return_meetings = [meeting_dict[key[0]].to_dict() for key in sorted_meeting_times]
 
