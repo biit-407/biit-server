@@ -135,7 +135,7 @@ def rating_get_pending(request, auth):
         and meeting.user_list[args["email"]] == 1
         and datetime.utcfromtimestamp(meeting.timestamp) < datetime.now()
     ]
-    
+
     rating_db = Database("ratings")
 
     rating_db_response = rating_db.collection_ref.get()

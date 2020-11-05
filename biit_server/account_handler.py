@@ -12,6 +12,7 @@ from .storage import Storage
 from .utils import send_discord_message, utcToInt
 from flask import send_file
 import base64
+import json
 
 
 @validate_fields(["fname", "lname", "email", "token"], AuthenticatedType.BODY)
@@ -128,10 +129,16 @@ def account_put(request, auth):
         )
         return update_validation
 
-    if "schedule" in args["updateFields"]:
-        args["updateFields"]["schedule"] = utcToInt(args["updateFields"]["schedule"])
-
     account_db = Database("accounts")
+
+    if "schedule" in args["updateFields"]:
+        temp_schedule = [
+            [int(item[0]), int(item[1])]
+            for item in ast.literal_eval(args["updateFields"])["schedule"]
+        ]
+        schedule = utcToInt(temp_schedule)
+        account_db.update(args["email"], {"schedule": schedule})
+
     try:
         account_db.update(args["email"], ast.literal_eval(args["updateFields"]))
         response = {
