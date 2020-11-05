@@ -1,3 +1,4 @@
+from biit_server.meeting import Meeting
 import json
 import pytest
 from biit_server import create_app
@@ -169,3 +170,46 @@ def test_rating_get(client):
         assert return_data["status_code"] == 200
 
         instance.get.assert_called_once_with(query_data["meeting_id"])
+
+
+def test_rating_get_past(client):
+    """
+    Tests that getting past ratings works correctly
+    """
+    with patch("biit_server.rating_handler.Database") as mock_database, patch(
+        "biit_server.rating_handler.Rating"
+    ) as mock_rating, patch("biit_server.rating_handler.Meeting") as mock_meeting:
+        query_data = {
+            "email": "paimon@purdue.edu",
+            "meeting_id": "test_meeting",
+            "token": "dabonem",
+        }
+
+        mock_rating.return_value = Rating(
+            meeting_id=query_data["meeting_id"], rating_dict={"paimon@purdue.edu": -1}
+        )
+        mock_meeting.return_value = Meeting(
+            user_list={"paimon@purdue.edu": 1},
+            id=query_data["meeting_id"],
+            timestamp=0,
+            duration=60,
+            location="WALC",
+            meeting_type="in-person",
+        )
+
+        instance = mock_database.return_value
+        instance.collection_ref.get.return_value = [1, 1, 1]
+
+        rv = client.get(
+            "/rating/pending",
+            query_string=query_data,
+            follow_redirects=True,
+        )
+
+        return_data = json.loads(rv.data.decode())
+
+        assert return_data["access_token"] == "AccessToken"
+        assert len(return_data["data"])
+        assert return_data["message"] == "Rating Received"
+        assert return_data["refresh_token"] == "RefreshToken"
+        assert return_data["status_code"] == 200
