@@ -136,11 +136,8 @@ def account_put(request, auth):
             [int(item[0]), int(item[1])]
             for item in ast.literal_eval(args["updateFields"])["schedule"]
         ]
-        account = account_db.get(args["email"]).to_dict()
-        schedule = []
-        if "schedule" in account:
-            schedule = account["schedule"]
-        account_db.update(args["email"], {"schedule": schedule + temp_schedule})
+        
+        account_db.update(args["email"], {"schedule": temp_schedule})
 
     try:
         account_db.update(args["email"], ast.literal_eval(args["updateFields"]))
