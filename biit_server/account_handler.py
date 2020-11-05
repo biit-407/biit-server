@@ -133,11 +133,13 @@ def account_put(request, auth):
 
     if "schedule" in args["updateFields"]:
         temp_schedule = [
-            [int(item[0]), int(item[1])]
-            for item in ast.literal_eval(args["updateFields"])["schedule"]
+            int(item)
+            for tup in ast.literal_eval(args["updateFields"])["schedule"]
+            for item in tup
         ]
-        
-        account_db.update(args["email"], {"schedule": temp_schedule})
+
+        if not account_db.update(args["email"], {"schedule": temp_schedule}):
+            send_discord_message(f"Error updating account schedule {temp_schedule}")
 
     try:
         account_db.update(args["email"], ast.literal_eval(args["updateFields"]))
