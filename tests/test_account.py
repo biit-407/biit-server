@@ -194,3 +194,27 @@ def test_account_put_schedule(client):
             b'{"access_token":"AccessToken","email":"test@email.com","message":"Account Updated","refresh_token":"RefreshToken","status_code":200}\n'
             == rv.data
         )
+
+
+def test_account_put_optIn(client):
+    """
+    Tests that account put works correctly
+    """
+    with patch("biit_server.account_handler.Database") as mock_database:
+        instance = mock_database.return_value
+        instance.update.return_value = True
+        query_data = {"email": "test@email.com"}
+        instance.get.return_value = MockAccount(query_data["email"])
+        rv = client.put(
+            "/account",
+            query_string={
+                "email": "test@email.com",
+                "token": "TestToken",
+                "updateFields": {"optIn": 0},
+            },
+            follow_redirects=True,
+        )
+        assert (
+            b'{"access_token":"AccessToken","email":"test@email.com","message":"Account Updated","refresh_token":"RefreshToken","status_code":200}\n'
+            == rv.data
+        )
