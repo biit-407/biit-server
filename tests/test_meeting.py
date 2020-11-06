@@ -725,7 +725,7 @@ def test_meeting_get_upcoming_all(client):
         return_data = json.loads(rv.data.decode())
 
         assert return_data["access_token"] == "AccessToken"
-        assert len(return_data["data"]) == 3
+        assert len(return_data["data"]) == 1
         assert return_data["data"][0]["timestamp"] == test_json["timestamp"]
         assert return_data["data"][0]["location"] == test_json["location"]
         assert return_data["data"][0]["meettype"] == test_json["meettype"]

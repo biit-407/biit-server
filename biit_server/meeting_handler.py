@@ -490,18 +490,25 @@ def meetings_get_upcoming(request, auth):
     ]
 
     filtered_meetings = [
-        meeting.to_dict()
+        meeting
         for meeting in meetings
         if args["email"] in meeting.user_list
         and meeting.user_list[args["email"]] == 1
         and datetime.utcfromtimestamp(meeting.timestamp) > datetime.now()
     ]
 
+    # This sorts by the time of the meeting
+    meeting_dict = {meeting.id: meeting for meeting in filtered_meetings}
+    meeting_times = {meeting.id: meeting.timestamp for meeting in filtered_meetings}
+    sorted_meeting_times = sorted(meeting_times.items(), key=lambda kv: (kv[1], kv[0]))
+
+    return_meetings = [meeting_dict[key[0]].to_dict() for key in sorted_meeting_times]
+
     try:
         response = {
             "access_token": auth[0],
             "refresh_token": auth[1],
-            "data": filtered_meetings,
+            "data": return_meetings,
         }
         return jsonHttp200("Meetings retrieved", response)
     except:
