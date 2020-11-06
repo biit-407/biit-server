@@ -30,14 +30,15 @@ class Feedback:
         feedback_status: FeedbackStatus = FeedbackStatus.NOT_RESOLVED,
         document_snapshot=None,
     ):
-        if document_snapshot:
-            self.id = document_snapshot.get("id")
-            self.email = document_snapshot.get("email")
-            self.timestamp = document_snapshot.get("timestamp")
-            self.title = document_snapshot.get("title")
-            self.text = document_snapshot.get("text")
-            self.feedback_type = document_snapshot.get("feedback_type")
-            self.feedback_status = document_snapshot.get("feedback_status")
+        if document_snapshot != None:
+            document_data = document_snapshot.to_dict()
+            self.id = document_data.get("id")
+            self.email = document_data.get("email")
+            self.timestamp = document_data.get("timestamp")
+            self.title = document_data.get("title")
+            self.text = document_data.get("text")
+            self.feedback_type = document_data.get("feedback_type")
+            self.feedback_status = document_data.get("feedback_status")
         else:
             store_attr(
                 "id,email,timestamp,title,text,feedback_type,feedback_status", cast=True
