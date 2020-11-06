@@ -603,6 +603,8 @@ def matchup(request, auth):
 
     now = datetime.now()
     in_a_week = now + timedelta(hours=168)
+        
+    rating_db = Database("ratings")
 
     meeting_db = Database("meetings")
 
@@ -623,6 +625,16 @@ def matchup(request, auth):
             send_discord_message(
                 f"Generating meetup {random_id} with {match} has failed"
             )
+        
+        rating = Rating(
+            meeting_id=random_id, rating_dict={user: -1 for user in match}
+        )
+
+        try:
+            rating_db.add(rating.to_dict(), id=random_id)
+        except:
+            send_discord_message(f"Rating with id [{random_id}] is already in use")
+            return http400("Rating id already taken")
 
     response = {
         "access_token": auth[0],
