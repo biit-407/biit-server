@@ -23,10 +23,10 @@ def feedback_post(request, auth):
 
     feedback_db = Database("feedback")
 
-    feedback_id = uuid.uuid4()
+    feedback_id = str(uuid.uuid4())
 
     feedback = Feedback(
-        id=str(feedback_id),
+        id=feedback_id,
         email=body["email"],
         timestamp=datetime.now().isoformat(),
         title=body["title"],
@@ -37,6 +37,7 @@ def feedback_post(request, auth):
 
     try:
         result = feedback_db.add(feedback.to_dict(), id=feedback_id)
+        logging.critical(feedback.to_dict())
         logging.critical("feedback was added") if result else logging.critical(
             "you don goofed aaron"
         )
