@@ -35,7 +35,7 @@ def feedback_post(request, auth):
     )
 
     try:
-        feedback_db.add(feedback, id=feedback_id)
+        feedback_db.add(feedback.to_dict(), id=feedback_id)
     except:
         return http500(
             f"An error occured while attempting to submit feedback [{feedback}]",
