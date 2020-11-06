@@ -114,7 +114,7 @@ def account_put(request, auth):
         "fname",
         "lname",
         "meetType",
-        "opt-in",
+        "optIn",
         "schedule",
         "birthday",
     ]

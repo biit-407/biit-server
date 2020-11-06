@@ -46,13 +46,13 @@ class Storage:
         try:
             blob = self.bucket.get_blob(name)
             if blob == None:
-                logging.critical(f'resource {name} was not found')
+                logging.critical(f"resource {name} was not found")
                 return False
             file_obj = blob.download_as_string()
             byte_file = base64.b64encode(file_obj)
             return byte_file.decode("ascii")
         except Exception:
-            logging.critical(f'there was an error decoding the resource {name}')
+            logging.critical(f"there was an error decoding the resource {name}")
             return False
 
     def delete(self, name):
