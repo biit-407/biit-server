@@ -26,7 +26,7 @@ def feedback_post(request, auth):
     feedback_id = uuid.uuid4()
 
     feedback = Feedback(
-        id=feedback_id,
+        id=str(feedback_id),
         email=body["email"],
         timestamp=datetime.now().isoformat(),
         title=body["title"],
