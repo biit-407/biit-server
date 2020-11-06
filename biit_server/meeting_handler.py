@@ -616,6 +616,7 @@ def matchup(request, auth):
             timestamp=in_a_week.timestamp(),
             location="WALC",
             meeting_type="In-Person",
+            duration=30
         )
 
         try:
