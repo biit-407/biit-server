@@ -1,3 +1,4 @@
+import logging
 from biit_server.utils import send_discord_message
 from biit_server.http_responses import http400, http500, jsonHttp200
 from biit_server.feedback import Feedback
@@ -35,7 +36,10 @@ def feedback_post(request, auth):
     )
 
     try:
-        feedback_db.add(feedback.to_dict(), id=feedback_id)
+        result = feedback_db.add(feedback.to_dict(), id=feedback_id)
+        logging.critical("feedback was added") if result else logging.critical(
+            "you don goofed aaron"
+        )
     except:
         return http500(
             f"An error occured while attempting to submit feedback [{feedback}]",
