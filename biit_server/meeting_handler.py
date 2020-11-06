@@ -603,7 +603,7 @@ def matchup(request, auth):
 
     now = datetime.now()
     in_a_week = now + timedelta(hours=168)
-        
+
     rating_db = Database("ratings")
 
     meeting_db = Database("meetings")
@@ -616,7 +616,7 @@ def matchup(request, auth):
             timestamp=in_a_week.timestamp(),
             location="WALC",
             meeting_type="In-Person",
-            duration=30
+            duration=30,
         )
 
         try:
@@ -626,10 +626,8 @@ def matchup(request, auth):
             send_discord_message(
                 f"Generating meetup {random_id} with {match} has failed"
             )
-        
-        rating = Rating(
-            meeting_id=random_id, rating_dict={user: -1 for user in match}
-        )
+
+        rating = Rating(meeting_id=random_id, rating_dict={user: -1 for user in match})
 
         try:
             rating_db.add(rating.to_dict(), id=random_id)
