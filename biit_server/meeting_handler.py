@@ -497,6 +497,7 @@ def meetings_get_upcoming(request, auth):
         and datetime.utcfromtimestamp(meeting.timestamp) > datetime.now()
     ]
 
+    # This sorts by the time of the meeting
     meeting_dict = {meeting.id: meeting for meeting in filtered_meetings}
     meeting_times = {meeting.id: meeting.timestamp for meeting in filtered_meetings}
     sorted_meeting_times = sorted(meeting_times.items(), key=lambda kv: (kv[1], kv[0]))
