@@ -12,11 +12,11 @@ def client():
 
 
 class MockAccount:
-    def __init__(self, email):
-        self.email = email
+    def __init__(self, data):
+        self.data = data
 
     def to_dict(self):
-        return {"email": self.email}
+        return self.data
 
 
 def test_account_post(client):
@@ -55,8 +55,8 @@ def test_account_get(client):
         instance = mock_database.return_value
 
         query_data = {"email": "test@email.com", "token": "henlo"}
-
-        instance.get.return_value = MockAccount(query_data["email"])
+        query_response = {"email": "test@email.com"}
+        instance.get.return_value = MockAccount(query_response)
 
         rv = client.get(
             "/account",
@@ -79,19 +79,19 @@ def test_account_put(client):
     with patch("biit_server.account_handler.Database") as mock_database:
         instance = mock_database.return_value
         instance.update.return_value = True
-        query_data = {"email": "test@email.com"}
-        instance.get.return_value = MockAccount(query_data["email"])
+        query_data = {"email": "test@email.com", "meetLength": 30}
+        instance.get.return_value = MockAccount(query_data)
         rv = client.put(
             "/account",
             query_string={
                 "email": "test@email.com",
                 "token": "TestToken",
-                "updateFields": {"email": "e@mail.in.gov"},
+                "updateFields": {"email": "e@mail.in.gov", "meetLength": 30},
             },
             follow_redirects=True,
         )
         assert (
-            b'{"access_token":"AccessToken","email":"test@email.com","message":"Account Updated","refresh_token":"RefreshToken","status_code":200}\n'
+            b'{"access_token":"AccessToken","email":"test@email.com","meetLength":30,"message":"Account Updated","refresh_token":"RefreshToken","status_code":200}\n'
             == rv.data
         )
 
@@ -175,7 +175,7 @@ def test_account_put_schedule(client):
         instance = mock_database.return_value
         instance.update.return_value = True
         query_data = {"email": "test@email.com"}
-        instance.get.return_value = MockAccount(query_data["email"])
+        instance.get.return_value = MockAccount(query_data)
         rv = client.put(
             "/account",
             query_string={
