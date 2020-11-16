@@ -174,8 +174,7 @@ def community_join_post(request, community_id):
 
     auth = azure_refresh_token(body["token"])
     if not auth[0]:
-        send_discord_message(
-            f"body authentication failed for account {body['email']}")
+        send_discord_message(f"body authentication failed for account {body['email']}")
         return http401("Not Authenticated")
 
     community_db = Database("communities")
@@ -233,16 +232,14 @@ def community_leave_post(request, community_id):
 
     auth = azure_refresh_token(body["token"])
     if not auth[0]:
-        send_discord_message(
-            f"body authentication failed for account {body['email']}")
+        send_discord_message(f"body authentication failed for account {body['email']}")
         return http401("Not Authenticated")
 
     community_db = Database("communities")
     community = community_db.get(community_id).to_dict()
     community_db.update(
         community_id,
-        {"Members": [user for user in community["Members"]
-                     if user != body["email"]]},
+        {"Members": [user for user in community["Members"] if user != body["email"]]},
     )
     response = {
         "access_token": auth[0],
