@@ -86,8 +86,7 @@ def account_get(request, auth):
         }
         return jsonHttp200("Account returned", response)
     except:
-        send_discord_message(
-            f"Account with email [{args['email']}] does not exist")
+        send_discord_message(f"Account with email [{args['email']}] does not exist")
         return http400("Account not found")
 
 
@@ -141,12 +140,10 @@ def account_put(request, auth):
         ]
 
         if not account_db.update(args["email"], {"schedule": temp_schedule}):
-            send_discord_message(
-                f"Error updating account schedule {temp_schedule}")
+            send_discord_message(f"Error updating account schedule {temp_schedule}")
 
     try:
-        account_db.update(
-            args["email"], ast.literal_eval(args["updateFields"]))
+        account_db.update(args["email"], ast.literal_eval(args["updateFields"]))
         response = {
             "access_token": auth[0],
             "refresh_token": auth[1],
