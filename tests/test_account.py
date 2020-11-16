@@ -204,7 +204,7 @@ def test_account_put_optIn(client):
         instance = mock_database.return_value
         instance.update.return_value = True
         query_data = {"email": "test@email.com"}
-        instance.get.return_value = MockAccount(query_data["email"])
+        instance.get.return_value = MockAccount(query_data)
         rv = client.put(
             "/account",
             query_string={
