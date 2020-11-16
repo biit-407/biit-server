@@ -100,6 +100,10 @@ def community_put(request, auth):
     args = request.args
 
     community_db = Database("communities")
+    community = community_db.get(args["name"]).to_dict()
+
+    if args["email"] not in community["Admins"]:
+        return http401(f'{args["email"]} is not an admin of {args["name"]}')
 
     community_db.update(args["name"], ast.literal_eval(args["updateFields"]))
     response = {

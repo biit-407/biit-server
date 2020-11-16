@@ -43,11 +43,11 @@ class MockCollectionLeave:
 
 
 class MockCommunity:
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, data):
+        self.data = data
 
     def to_dict(self):
-        return {"name": self.name}
+        return self.data
 
 
 def test_community_post(client):
@@ -62,7 +62,7 @@ def test_community_post(client):
             "name": "TestCommunity",
         }
 
-        instance.get.return_value = MockCommunity(query_data["name"])
+        instance.get.return_value = MockCommunity(query_data)
 
         test_json = {
             "name": "Cool Community",
@@ -101,7 +101,7 @@ def test_community_get(client):
             "name": "TestCommunity",
         }
 
-        instance.get.return_value = MockCommunity(query_data["name"])
+        instance.get.return_value = MockCommunity(query_data)
 
         rv = client.get(
             "/community",
@@ -124,11 +124,9 @@ def test_community_put(client):
     with patch("biit_server.community_handler.Database") as mock_database:
         instance = mock_database.return_value
         instance.update.return_value = True
-        query_data = {
-            "name": "TestCommunity",
-        }
+        query_data = {"name": "TestCommunity", "Admins": ["Testemail@gmail.com"]}
 
-        instance.get.return_value = MockCommunity(query_data["name"])
+        instance.get.return_value = MockCommunity(query_data)
         test_json = {
             "name": "TestCommunity",
             "token": "TestToken",
@@ -142,7 +140,7 @@ def test_community_put(client):
             follow_redirects=True,
         )
         assert (
-            b'{"access_token":"AccessToken","data":{"name":"TestCommunity"},"message":"Community Updated","refresh_token":"RefreshToken","status_code":200}\n'
+            b'{"access_token":"AccessToken","data":{"Admins":["Testemail@gmail.com"],"name":"TestCommunity"},"message":"Community Updated","refresh_token":"RefreshToken","status_code":200}\n'
             == rv.data
         )
 
@@ -238,3 +236,31 @@ def test_community_leave_post(client):
 
         instance.get.assert_called_with(test_id)
         instance.update.assert_called_once_with(test_id, {"Members": []})
+
+
+def test_community_put_badadmin(client):
+    """
+    Tests that community put works correctly
+    """
+    with patch("biit_server.community_handler.Database") as mock_database:
+        instance = mock_database.return_value
+        instance.update.return_value = True
+        query_data = {"name": "TestCommunity", "Admins": ["Badmin@admin.com"]}
+
+        instance.get.return_value = MockCommunity(query_data)
+        test_json = {
+            "name": "TestCommunity",
+            "token": "TestToken",
+            "email": "Testemail@gmail.com",
+            "updateFields": {"name": "lanes"},
+        }
+
+        rv = client.put(
+            "/community",
+            query_string=test_json,
+            follow_redirects=True,
+        )
+        assert (
+            b"UnAuthorized: Testemail@gmail.com is not an admin of TestCommunity"
+            == rv.data
+        )
