@@ -24,7 +24,15 @@ from .azure import azure_refresh_token
 
 
 @validate_fields(
-    ["timestamp", "location", "user_list", "meettype", "duration", "token"],
+    [
+        "timestamp",
+        "location",
+        "user_list",
+        "meettype",
+        "duration",
+        "community",
+        "token",
+    ],
     ValidateType.BODY,
 )
 @authenticated(AuthenticatedType.BODY)
@@ -43,6 +51,8 @@ def meeting_post(request, auth):
     body = request.get_json()
 
     meeting_db = Database("meetings")
+    community_db = Database("communities")
+    community = community_db.get(body["community"]).to_dict()
 
     random_id = "".join(
         random.choice(string.ascii_letters + string.digits) for i in range(64)
@@ -54,6 +64,7 @@ def meeting_post(request, auth):
         duration=body["duration"],
         meeting_type=body["meettype"],
         location=body["location"],
+        community=community["id"],
         id=random_id,
     )
 
@@ -65,7 +76,9 @@ def meeting_post(request, auth):
 
     rating_db = Database("ratings")
     rating = Rating(
-        meeting_id=random_id, rating_dict={user: -1 for user in body["user_list"]}
+        meeting_id=random_id,
+        rating_dict={user: -1 for user in body["user_list"]},
+        community=community["id"],
     )
 
     try:
@@ -617,6 +630,7 @@ def matchup(request, auth):
             location="WALC",
             meeting_type="In-Person",
             duration=30,
+            community=community["id"],
         )
 
         try:
@@ -627,7 +641,11 @@ def matchup(request, auth):
                 f"Generating meetup {random_id} with {match} has failed"
             )
 
-        rating = Rating(meeting_id=random_id, rating_dict={user: -1 for user in match})
+        rating = Rating(
+            meeting_id=random_id,
+            rating_dict={user: -1 for user in match},
+            community=community["id"],
+        )
 
         try:
             rating_db.add(rating.to_dict(), id=random_id)
