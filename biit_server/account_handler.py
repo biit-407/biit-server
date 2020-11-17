@@ -109,14 +109,15 @@ def account_put(request, auth):
     valid_updates = [
         "age",
         "agePref",
+        "birthday",
         "covid",
         "email",
         "fname",
         "lname",
+        "meetLength",
         "meetType",
         "optIn",
         "schedule",
-        "birthday",
     ]
 
     # serializes the quert string to a dict (neeto)
