@@ -39,6 +39,7 @@ from .meeting_handler import (
 )
 
 from .feedback_handler import feedback_delete, feedback_get, feedback_post
+from .community_stats_handler import community_stats_get
 
 # This runs on Firebase/Cloud Run!
 
@@ -85,6 +86,11 @@ def create_app():
     def leave_route(id):
         if request.method == "POST":
             return community_leave_post(request, id)
+
+    @app.route("/community/<id>/stats", methods=["GET"])
+    def stat_route(id):
+        if request.method == "GET":
+            return community_stats_get(request, id)
 
     @app.route("/ban", methods=["POST", "PUT"])
     def ban_route():
