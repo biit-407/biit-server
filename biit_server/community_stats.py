@@ -6,6 +6,7 @@ class CommunityStats:
     def __init__(
         self,
         user_list={},
+        # this is the community id
         community=None,
         # this is defined as a meetup where at least
         # 2 of the participants accepted.
