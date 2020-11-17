@@ -286,7 +286,36 @@ def meeting_accept(request, id):
     meeting = Meeting(document_snapshot=meeting_snapshot)
     accepted_user = meeting.accept_meeting(args["email"])
     try:
-        meeting_db.update(id, {"user_list": accepted_user})
+        result = meeting_db.update(id, {"user_list": accepted_user})
+
+        if not result:
+            return http500("Error updating meeting")
+
+        user_count = 0
+        for _, status in accepted_user.items():
+            # user has accepted
+            if status == 1:
+                user_count += 1
+
+        # check if meetup is fully accepted
+        # we can only update if this person
+        # accepting the meetup brings the total
+        # count to 2 people (any more is a no op)
+        if user_count == 2:
+            # update the community stats to have
+            # one more accepted meetup
+            try:
+                community_stat_db = Database("community_stats")
+                community_stats = community_stat_db.get(meeting.community).to_dict()
+                community_stat_db.update(
+                    community_stats["community"],
+                    {"accepted_meetups": community_stats["accepted_meetups"] - 1},
+                )
+            except:
+                send_discord_message(
+                    f"Failed to update community stats. The meetup was still successfully accepted"
+                )
+
         response = {
             "access_token": auth[0],
             "refresh_token": auth[1],
@@ -324,7 +353,32 @@ def meeting_decline(request, id):
     meeting = Meeting(document_snapshot=meeting_snapshot)
     declined_user = meeting.decline_meeting(args["email"])
     try:
-        meeting_db.update(id, {"user_list": declined_user})
+        result = meeting_db.update(id, {"user_list": declined_user})
+        if not result:
+            return http500("Error updating meeting")
+
+        user_count = 0
+        for _, status in declined_user.items():
+            # user has accepted
+            if status == 1:
+                user_count += 1
+
+        # check if meetup is no longer fully accepted
+        if user_count < 2:
+            # update the community stats to have
+            # one less accepted meetup
+            try:
+                community_stat_db = Database("community_stats")
+                community_stats = community_stat_db.get(meeting.community).to_dict()
+                community_stat_db.update(
+                    community_stats["community"],
+                    {"accepted_meetups": community_stats["accepted_meetups"] - 1},
+                )
+            except:
+                send_discord_message(
+                    f"Failed to update community stats. The meetup was still successfully declined"
+                )
+
         response = {
             "access_token": auth[0],
             "refresh_token": auth[1],
