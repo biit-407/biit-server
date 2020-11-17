@@ -592,8 +592,10 @@ def matchup(request, auth):
     args = request.args
 
     community_db = Database("communities")
+    community_stat_db = Database("community_stats")
 
     community = community_db.get(args["community"]).to_dict()
+    community_stats = community_stat_db.get(args["community"]).to_dict()
 
     if args["email"] not in community["Admins"]:
         return http401("User not authorized to start the matchup algorithm")
@@ -620,6 +622,7 @@ def matchup(request, auth):
     rating_db = Database("ratings")
 
     meeting_db = Database("meetings")
+    failed_meetup_count = 0
 
     for match in matches:
         random_id = str(uuid.uuid4())
@@ -640,6 +643,7 @@ def matchup(request, auth):
             send_discord_message(
                 f"Generating meetup {random_id} with {match} has failed"
             )
+            failed_meetup_count += 1
 
         rating = Rating(
             meeting_id=random_id,
@@ -652,6 +656,22 @@ def matchup(request, auth):
         except:
             send_discord_message(f"Rating with id [{random_id}] is already in use")
             return http400("Rating id already taken")
+
+    try:
+        community_stat_db.update(
+            community["id"],
+            {
+                "total_meetups": community_stats["total_meetups"]
+                + len(matches)
+                - failed_meetup_count,
+                "total_sessions": community_stats["total_sessions"] + 1,
+            },
+        )
+    except:
+        send_discord_message(
+            f"Error updating community stats for community [{community['id']}]"
+        )
+        #! No error message is generated because the community still has the meetups generated properly
 
     response = {
         "access_token": auth[0],
