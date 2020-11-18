@@ -6,7 +6,7 @@ from biit_server.http_responses import http401, jsonHttp200
 
 def community_stats_get(request, community_id):
     """"""
-    fields = ["email", "token"]
+    fields = ["token"]
 
     # serializes the quert string to a dict (neeto)
     args = request.args
