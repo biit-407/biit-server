@@ -577,7 +577,7 @@ def matchup(request, auth):
         Http 400 when the json is missing a key
     """
     args = request.args
-    
+
     account_db = Database("accounts")
     community_db = Database("communities")
 
@@ -588,7 +588,7 @@ def matchup(request, auth):
 
     users = community["Members"]
 
-    user_dicts = []
+    user_dicts = {}
     potential_matches = {}
 
     for index, user in enumerate(users):
@@ -598,14 +598,10 @@ def matchup(request, auth):
             # Only get the users that opt in. This is not a universal trait
             # (since we have no model), so we're setting the default to be 0.
             if user_as_dict.get("optIn", 0):
-                user_dicts.append({
-                    user: user_as_dict
-                })
+                user_dicts[user] = user_as_dict
                 potential_matches[user] = []
         except:
             print(f"User {user} not found")
-
-    
 
     meeting_list = []
 
@@ -618,22 +614,35 @@ def matchup(request, auth):
         # filter for group preference
         # filtered_group = [u for u in user_dicts if user_dicts[u]["meetGroup"] == user_dicts[user_id]["meetGroup"] and u != user_id]
         filtered_group = []
-        filtered_covid = [u for u in user_dicts if user_dicts[u]["covid"] == user_dicts[user_id]["covid"] and u != user_id]
-        filtered_meet_type = [u for u in user_dicts if user_dicts[u]["meetType"] == user_dicts[user_id]["meetType"] and u != user_id]
+        filtered_covid = [
+            u
+            for u in user_dicts
+            if user_dicts[u]["covid"] == user_dicts[user_id]["covid"] and u != user_id
+        ]
+        filtered_meet_type = [
+            u
+            for u in user_dicts
+            if user_dicts[u]["meetType"] == user_dicts[user_id]["meetType"]
+            and u != user_id
+        ]
 
         potential_matches[user_id] = {
-            "potentials": list(set(filtered_group + filtered_covid + filtered_meet_type)),
-            "number": len(list(set(filtered_group + filtered_covid + filtered_meet_type)))
+            "potentials": list(
+                set(filtered_group + filtered_covid + filtered_meet_type)
+            ),
+            "number": len(
+                list(set(filtered_group + filtered_covid + filtered_meet_type))
+            ),
         }
 
     rating_db = Database("ratings")
     meeting_db = Database("meetings")
 
     zero_matches = []
-    
-    while len(potential_matches > 0):
+
+    while len(potential_matches) > 0:
         # find the node with the least number of edges
-        min_edges = float('inf')
+        min_edges = float("inf")
         min_user_id = ""
         for user in potential_matches:
             if potential_matches[user]["number"] < min_edges:
@@ -643,7 +652,7 @@ def matchup(request, auth):
         if min_edges == 0:
             zero_matches.append(min_user_id)
             continue
-        
+
         # find the connected nodes
         potentials = potential_matches[min_user_id]["potentials"]
 
@@ -654,7 +663,7 @@ def matchup(request, auth):
             if potential_matches[user]["number"] < min_potential_edges:
                 min_potential_edges = potential_matches[user]["number"]
                 min_potential_id = user
-        
+
         # drop both nodes from the potential_matches
         potential_matches.pop(min_user_id)
         potential_matches.pop(min_potential_id)
@@ -687,31 +696,34 @@ def matchup(request, auth):
             send_discord_message(f"Rating with id [{random_id}] is already in use")
             return http400("Rating id already taken")
 
-    random_id = str(uuid.uuid4())
-    meeting = Meeting(
-        user_list={user: 0 for user in zero_matches},
-        id=random_id,
-        timestamp=in_a_week.timestamp(),
-        location="WALC",
-        meeting_type="In-Person",
-        duration=30,
-    )
-
-    try:
-        meeting_db.add(meeting.to_dict(), id=random_id)
-        meeting_list.append(meeting.to_dict())
-    except:
-        send_discord_message(
-            f"Generating meetup {random_id} with {zero_matches} has failed"
+    if len(zero_matches) > 1:
+        random_id = str(uuid.uuid4())
+        meeting = Meeting(
+            user_list={user: 0 for user in zero_matches},
+            id=random_id,
+            timestamp=in_a_week.timestamp(),
+            location="WALC",
+            meeting_type="In-Person",
+            duration=30,
         )
 
-    rating = Rating(meeting_id=random_id, rating_dict={user: -1 for user in zero_matches})
+        try:
+            meeting_db.add(meeting.to_dict(), id=random_id)
+            meeting_list.append(meeting.to_dict())
+        except:
+            send_discord_message(
+                f"Generating meetup {random_id} with {zero_matches} has failed"
+            )
 
-    try:
-        rating_db.add(rating.to_dict(), id=random_id)
-    except:
-        send_discord_message(f"Rating with id [{random_id}] is already in use")
-        return http400("Rating id already taken")
+        rating = Rating(
+            meeting_id=random_id, rating_dict={user: -1 for user in zero_matches}
+        )
+
+        try:
+            rating_db.add(rating.to_dict(), id=random_id)
+        except:
+            send_discord_message(f"Rating with id [{random_id}] is already in use")
+            return http400("Rating id already taken")
 
     response = {
         "access_token": auth[0],
