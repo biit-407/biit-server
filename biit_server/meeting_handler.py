@@ -588,6 +588,11 @@ def matchup(request, auth):
 
     users = community["Members"]
 
+    if len(users) <= 1:
+        return http500(
+            f"Not enough users in this community: {len(users)}. Need at least two."
+        )
+
     user_dicts = {}
     potential_matches = {}
 
@@ -641,6 +646,7 @@ def matchup(request, auth):
     zero_matches = []
 
     while len(potential_matches) > 0:
+        print(potential_matches)
         # find the node with the least number of edges
         min_edges = float("inf")
         min_user_id = ""
@@ -725,6 +731,7 @@ def matchup(request, auth):
             send_discord_message(f"Rating with id [{random_id}] is already in use")
             return http400("Rating id already taken")
 
+    print(meeting_list)
     response = {
         "access_token": auth[0],
         "refresh_token": auth[1],

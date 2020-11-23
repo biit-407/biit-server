@@ -175,7 +175,12 @@ def test_meeting_algo_filter_opt_out(client):
             "Purdue Exponent": MockCommunity(
                 {
                     "Admins": ["ryan@purdue.edu"],
-                    "Members": ["ryan@purdue.edu", "alisa@purdue.edu"],
+                    "Members": [
+                        "ryan@purdue.edu",
+                        "alisa@purdue.edu",
+                        "alex@purdue.edu",
+                        "jordan@purdue.edu",
+                    ],
                 }
             ),
         }
@@ -197,3 +202,168 @@ def test_meeting_algo_filter_opt_out(client):
         print(return_data.get("data"))
         assert return_data["access_token"] == "AccessToken"
         assert len(return_data.get("data")) == 1
+
+
+def test_meeting_algo_different_preferences(client):
+    """
+    Tests that meeting algorithm works correctly
+    """
+    with patch("biit_server.meeting_handler.Database") as mock_database:
+        test_json = {
+            "email": "ryan@purdue.edu",
+            "community": "Purdue Exponent",
+            "token": "weareanewspaper",
+        }
+
+        mock_json_db = {
+            "ryan@purdue.edu": MockUser(
+                {
+                    "optIn": 1,
+                    "covid": "gloves",
+                    "meetType": "inperson",
+                    "fname": "ryan",
+                    "lname": "chen",
+                    "email": "ryan@purdue.edu",
+                }
+            ),
+            "alisa@purdue.edu": MockUser(
+                {
+                    "optIn": 1,
+                    "covid": "gloves",
+                    "meetType": "inperson",
+                    "fname": "alisa",
+                    "lname": "reynya",
+                    "email": "alisa@purdue.edu",
+                }
+            ),
+            "alex@purdue.edu": MockUser(
+                {
+                    "optIn": 1,
+                    "covid": "mask",
+                    "meetType": "zoom",
+                    "fname": "alex",
+                    "lname": "weliever",
+                    "email": "alex@purdue.edu",
+                }
+            ),
+            "jordan@purdue.edu": MockUser(
+                {
+                    "optIn": 1,
+                    "covid": "mask",
+                    "meetType": "zoom",
+                    "fname": "jordan",
+                    "lname": "smith",
+                    "email": "jordan@purdue.edu",
+                }
+            ),
+            "Purdue Exponent": MockCommunity(
+                {
+                    "Admins": ["ryan@purdue.edu"],
+                    "Members": [
+                        "ryan@purdue.edu",
+                        "alisa@purdue.edu",
+                        "alex@purdue.edu",
+                        "jordan@purdue.edu",
+                    ],
+                }
+            ),
+        }
+
+        def mock_get(key):
+            return mock_json_db.get(key)
+
+        instance = mock_database.return_value
+        instance.add.return_value = True
+        instance.get = mock_get
+
+        rv = client.get(
+            "/matchup",
+            query_string=test_json,
+            follow_redirects=True,
+        )
+
+        return_data = json.loads(rv.data.decode())
+        print(return_data.get("data"))
+        assert return_data["access_token"] == "AccessToken"
+        assert len(return_data.get("data")) == 2
+
+
+def test_meeting_algo_not_enough_users(client):
+    """
+    Tests that meeting algorithm works correctly
+    """
+    with patch("biit_server.meeting_handler.Database") as mock_database:
+        test_json = {
+            "email": "ryan@purdue.edu",
+            "community": "Purdue Exponent",
+            "token": "weareanewspaper",
+        }
+
+        mock_json_db = {
+            "ryan@purdue.edu": MockUser(
+                {
+                    "optIn": 1,
+                    "covid": "gloves",
+                    "meetType": "inperson",
+                    "fname": "ryan",
+                    "lname": "chen",
+                    "email": "ryan@purdue.edu",
+                }
+            ),
+            "alisa@purdue.edu": MockUser(
+                {
+                    "optIn": 1,
+                    "covid": "gloves",
+                    "meetType": "inperson",
+                    "fname": "alisa",
+                    "lname": "reynya",
+                    "email": "alisa@purdue.edu",
+                }
+            ),
+            "alex@purdue.edu": MockUser(
+                {
+                    "optIn": 1,
+                    "covid": "mask",
+                    "meetType": "zoom",
+                    "fname": "alex",
+                    "lname": "weliever",
+                    "email": "alex@purdue.edu",
+                }
+            ),
+            "jordan@purdue.edu": MockUser(
+                {
+                    "optIn": 1,
+                    "covid": "mask",
+                    "meetType": "zoom",
+                    "fname": "jordan",
+                    "lname": "smith",
+                    "email": "jordan@purdue.edu",
+                }
+            ),
+            "Purdue Exponent": MockCommunity(
+                {
+                    "Admins": ["ryan@purdue.edu"],
+                    "Members": [
+                        "ryan@purdue.edu",
+                    ],
+                }
+            ),
+        }
+
+        def mock_get(key):
+            return mock_json_db.get(key)
+
+        instance = mock_database.return_value
+        instance.add.return_value = True
+        instance.get = mock_get
+
+        rv = client.get(
+            "/matchup",
+            query_string=test_json,
+            follow_redirects=True,
+        )
+
+        assert (
+            rv.data.decode()
+            == "Internal Server Error: Not enough users in this community: 1. Need at least two."
+        )
