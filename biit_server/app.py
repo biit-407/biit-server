@@ -14,6 +14,7 @@ from .ban_handler import ban_post, ban_put
 from .community_handler import (
     community_delete,
     community_get,
+    community_get_all,
     community_post,
     community_put,
     community_join_post,
@@ -85,6 +86,11 @@ def create_app():
     def leave_route(id):
         if request.method == "POST":
             return community_leave_post(request, id)
+
+    @app.route("/community/all", methods=["GET"])
+    def community_all():
+        if request.method == "GET":
+            return community_get_all(request)
 
     @app.route("/ban", methods=["POST", "PUT"])
     def ban_route():

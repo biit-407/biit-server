@@ -1,7 +1,7 @@
 import ast
 from biit_server.utils import send_discord_message
 from biit_server.authentication import AuthenticatedType, authenticated
-
+from .community import community
 from .http_responses import http400, http401, http500, jsonHttp200
 from .query_helper import (
     ValidateType,
@@ -248,3 +248,38 @@ def community_leave_post(request, community_id):
     }
 
     return jsonHttp200("Community Left", response)
+
+
+@validate_fields(["email", "token"], ValidateType.QUERY)
+@authenticated(AuthenticatedType.QUERY)
+def community_get_all(request, auth):
+    """Gets all available communities
+        Validates the keys in the request then calls the database to get all communities
+    Args:
+        request: A request object
+
+    Returns:
+        (str): Http 200 string response containing all active communities
+
+    Raises:
+        Http 400 when the json is missing a key
+    """
+    args = request.args
+
+    community_db = Database("communities")
+    community_db_response = community_db.collection_ref.get()
+
+    communities = [community(document_snapshot=com) for com in community_db_response]
+
+    all_coms = [com.to_dict() for com in communities]
+
+    try:
+        response = {
+            "access_token": auth[0],
+            "refresh_token": auth[1],
+            "data": all_coms,
+        }
+        return jsonHttp200("Communities Received", response)
+    except:
+        send_discord_message(f"Error retreiving all communities")
+        return http400("Communities Error")
