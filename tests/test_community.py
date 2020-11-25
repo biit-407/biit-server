@@ -1,6 +1,8 @@
+from biit_server.community import community
 import pytest
 from biit_server import create_app, community_handler
 from unittest.mock import call, patch
+import json
 
 # Waiting on DB before adding tests
 
@@ -277,3 +279,52 @@ def test_community_put_badadmin(client):
             b"UnAuthorized: Testemail@gmail.com is not an admin of TestCommunity"
             == rv.data
         )
+
+
+def test_community_get_all(client):
+    """
+    Tests that getting all communities works correctly
+    """
+    with patch("biit_server.community_handler.Database") as mock_database, patch(
+        "biit_server.community_handler.community"
+    ) as mock_community:
+        instance = mock_database.return_value
+        example_community = {
+            "name": "Test_community",
+            "Admins": [],
+            "Members": [],
+            "bans": [],
+            "meettype": "",
+            "codeofconduct": "",
+            "mpm": 1,
+        }
+        instance.collection_ref.get.return_value = [
+            example_community,
+            example_community,
+            example_community,
+        ]
+        mock_community.return_value = community(
+            name=example_community["name"],
+            Admins=example_community["Admins"],
+            Members=example_community["Members"],
+            bans=example_community["bans"],
+            meettype=example_community["meettype"],
+            codeofconduct=example_community["codeofconduct"],
+            mpm=example_community["mpm"],
+        )
+        query_data = {"email": "purdue@purdue.edu", "token": "dabonem"}
+
+        # print(type(test_json["timestamp"]))
+
+        rv = client.get(
+            "/community/all",
+            query_string=query_data,
+            follow_redirects=True,
+        )
+
+        return_data = json.loads(rv.data.decode())
+        assert return_data["access_token"] == "AccessToken"
+        assert len(return_data["data"]) == 3
+        assert return_data["message"] == "Communities Received"
+        assert return_data["refresh_token"] == "RefreshToken"
+        assert return_data["status_code"] == 200
