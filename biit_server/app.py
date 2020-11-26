@@ -92,7 +92,7 @@ def create_app():
     def stat_route(id):
         if request.method == "GET":
             return community_stats_get(request, id)
-          
+
     @app.route("/community/all", methods=["GET"])
     def community_all():
         if request.method == "GET":

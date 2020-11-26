@@ -824,8 +824,7 @@ def matchup(request, auth):
             f"Error updating community stats for community [{community['id']}]"
         )
         #! No error message is generated because the community still has the meetups generated properly
-                             
-                             
+
     response = {
         "access_token": auth[0],
         "refresh_token": auth[1],
