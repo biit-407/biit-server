@@ -1,5 +1,6 @@
 from typing import Any, Dict, List
 
+from .utils import send_discord_message, utcToInt
 
 class community:
     def __init__(
@@ -22,6 +23,12 @@ class community:
             meettype = document_dict["meettype"]
             mpm = document_dict["mpm"]
             name = document_dict["name"]
+
+        if  self.Admins == None or \
+            self.name == None or \
+            self.bans == None or \
+            self.codeofconduct == None:
+            send_discord_message(f"Slightly concerning: Admins, name, bans and/or codeofconduct in community {self.Name} is set to None.")
 
         self.Admins = Admins
         self.Members = Members
