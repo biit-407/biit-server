@@ -54,6 +54,14 @@ class MockCommunity:
         return {"name": self.name, "id": self.id}
 
 
+class MockMeeting:
+    def __init__(self, data):
+        self.data = data
+
+    def to_dict(self):
+        return self.data
+
+
 def test_meeting_post(client):
     """
     Tests that meeting post works correctly
@@ -930,3 +938,97 @@ def test_meeting_get_past_none(client):
         assert return_data["message"] == "Meetings retrieved"
         assert return_data["refresh_token"] == "RefreshToken"
         assert return_data["status_code"] == 200
+
+
+def test_meeting_reschedule(client):
+    """
+    Tests that reschduling a meeting works correctly
+    """
+    with patch("biit_server.meeting_handler.Database") as mock_database, patch(
+        "biit_server.meeting_handler.Meeting"
+    ) as mock_meeting:
+        instance = mock_database.return_value
+        instance.get.return_value = MockMeeting(
+            {
+                "meeting_id": "test_meeting",
+                "meeting_time": "old_time",
+                "user_list": {"beidou@purdue.edu", "xiangling@purdue.edu"},
+            }
+        )
+
+        query_data = {"email": "beidou@purdue.edu", "token": "dabonem"}
+
+        test_json = {
+            "meeting_id": "test_meeting",
+            "email": "xiangling@purdue.edu",
+            "meeting_time": "new time",
+            "token": "token",
+        }
+
+        mock_meeting.return_value = Meeting(
+            id="test_meeting",
+            user_list={"beidou@purdue.edu": 0, "xiangling@purdue.edu": 0},
+            duration=30,
+            location="McDonalds",
+            meeting_type="type",
+            timestamp="old time",
+            community="Old Thermometers",
+        )
+
+        rv = client.post(
+            "/meeting/reschedule",
+            json=test_json,
+            follow_redirects=True,
+        )
+
+        return_data = json.loads(rv.data.decode())
+
+        assert return_data["access_token"] == "AccessToken"
+        assert return_data["message"] == "Meeting updated"
+        assert return_data["refresh_token"] == "RefreshToken"
+        assert return_data["status_code"] == 200
+        assert return_data["data"].get("timestamp") == test_json["meeting_time"]
+
+
+def test_meeting_reschedule_unauthorized(client):
+    """
+    Tests that reschduling a meeting works correctly
+    """
+    with patch("biit_server.meeting_handler.Database") as mock_database, patch(
+        "biit_server.meeting_handler.Meeting"
+    ) as mock_meeting:
+        instance = mock_database.return_value
+        instance.get.return_value = MockMeeting(
+            {
+                "meeting_id": "test_meeting",
+                "meeting_time": "old_time",
+                "user_list": {"beidou@purdue.edu", "xiangling@purdue.edu"},
+            }
+        )
+
+        query_data = {"email": "beidou@purdue.edu", "token": "dabonem"}
+
+        test_json = {
+            "meeting_id": "test_meeting",
+            "email": "ryan@purdue.edu",
+            "meeting_time": "new time",
+            "token": "token",
+        }
+
+        mock_meeting.return_value = Meeting(
+            id="test_meeting",
+            user_list={"beidou@purdue.edu": 0, "xiangling@purdue.edu": 0},
+            duration=30,
+            location="McDonalds",
+            meeting_type="type",
+            timestamp="old time",
+            community="Old Thermometers",
+        )
+
+        rv = client.post(
+            "/meeting/reschedule",
+            json=test_json,
+            follow_redirects=True,
+        )
+
+        assert rv.data.decode() == "UnAuthorized: User not authorized to reschedule"
