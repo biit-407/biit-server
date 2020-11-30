@@ -833,7 +833,7 @@ def matchup(request, auth):
     return jsonHttp200("Meetings created", response)
 
 
-@validate_fields(["meeting_id", "time", "email", "token"], ValidateType.QUERY)
+@validate_fields(["meeting_id", "time", "email", "token"], ValidateType.BODY)
 @authenticated(AuthenticatedType.QUERY)
 def reschedule(request, auth):
     """Handles the rescheduling POST endpoint
