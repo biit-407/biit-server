@@ -11,7 +11,9 @@ from .database import Database
 from .rating import Rating, RatingAlreadySetException
 
 
-@validate_fields(["meeting_id", "user", "rating", "token"], ValidateType.BODY)
+@validate_fields(
+    ["meeting_id", "user", "rating", "community", "token"], ValidateType.BODY
+)
 @authenticated(AuthenticatedType.BODY)
 def rating_post(request, auth):
     """Handles the rating POST endpoint
@@ -28,12 +30,16 @@ def rating_post(request, auth):
     body = request.get_json()
 
     rating_db = Database("ratings")
+    community_db = Database("communities")
+    community = community_db.get(body["community"]).to_dict()
 
     rating_snapshot = rating_db.get(body["meeting_id"])
 
     if rating_snapshot == False:
         rating = Rating(
-            meeting_id=body["meeting_id"], rating_dict={body["user"]: body["rating"]}
+            meeting_id=body["meeting_id"],
+            rating_dict={body["user"]: body["rating"]},
+            community=community["id"],
         )
 
         success = rating_db.add(rating.to_dict(), id=body["meeting_id"])

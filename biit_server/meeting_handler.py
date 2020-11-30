@@ -24,7 +24,15 @@ from .azure import azure_refresh_token
 
 
 @validate_fields(
-    ["timestamp", "location", "user_list", "meettype", "duration", "token"],
+    [
+        "timestamp",
+        "location",
+        "user_list",
+        "meettype",
+        "duration",
+        "community",
+        "token",
+    ],
     ValidateType.BODY,
 )
 @authenticated(AuthenticatedType.BODY)
@@ -43,6 +51,8 @@ def meeting_post(request, auth):
     body = request.get_json()
 
     meeting_db = Database("meetings")
+    community_db = Database("communities")
+    community = community_db.get(body["community"]).to_dict()
 
     random_id = "".join(
         random.choice(string.ascii_letters + string.digits) for i in range(64)
@@ -54,6 +64,7 @@ def meeting_post(request, auth):
         duration=body["duration"],
         meeting_type=body["meettype"],
         location=body["location"],
+        community=community["id"],
         id=random_id,
     )
 
@@ -65,7 +76,9 @@ def meeting_post(request, auth):
 
     rating_db = Database("ratings")
     rating = Rating(
-        meeting_id=random_id, rating_dict={user: -1 for user in body["user_list"]}
+        meeting_id=random_id,
+        rating_dict={user: -1 for user in body["user_list"]},
+        community=community["id"],
     )
 
     try:
@@ -273,7 +286,36 @@ def meeting_accept(request, id):
     meeting = Meeting(document_snapshot=meeting_snapshot)
     accepted_user = meeting.accept_meeting(args["email"])
     try:
-        meeting_db.update(id, {"user_list": accepted_user})
+        result = meeting_db.update(id, {"user_list": accepted_user})
+
+        if not result:
+            return http500("Error updating meeting")
+
+        user_count = 0
+        for _, status in accepted_user.items():
+            # user has accepted
+            if status == 1:
+                user_count += 1
+
+        # check if meetup is fully accepted
+        # we can only update if this person
+        # accepting the meetup brings the total
+        # count to 2 people (any more is a no op)
+        if user_count == 2:
+            # update the community stats to have
+            # one more accepted meetup
+            try:
+                community_stat_db = Database("community_stats")
+                community_stats = community_stat_db.get(meeting.community).to_dict()
+                community_stat_db.update(
+                    community_stats["community"],
+                    {"accepted_meetups": community_stats["accepted_meetups"] - 1},
+                )
+            except:
+                send_discord_message(
+                    f"Failed to update community stats. The meetup was still successfully accepted"
+                )
+
         response = {
             "access_token": auth[0],
             "refresh_token": auth[1],
@@ -311,7 +353,32 @@ def meeting_decline(request, id):
     meeting = Meeting(document_snapshot=meeting_snapshot)
     declined_user = meeting.decline_meeting(args["email"])
     try:
-        meeting_db.update(id, {"user_list": declined_user})
+        result = meeting_db.update(id, {"user_list": declined_user})
+        if not result:
+            return http500("Error updating meeting")
+
+        user_count = 0
+        for _, status in declined_user.items():
+            # user has accepted
+            if status == 1:
+                user_count += 1
+
+        # check if meetup is no longer fully accepted
+        if user_count < 2:
+            # update the community stats to have
+            # one less accepted meetup
+            try:
+                community_stat_db = Database("community_stats")
+                community_stats = community_stat_db.get(meeting.community).to_dict()
+                community_stat_db.update(
+                    community_stats["community"],
+                    {"accepted_meetups": community_stats["accepted_meetups"] - 1},
+                )
+            except:
+                send_discord_message(
+                    f"Failed to update community stats. The meetup was still successfully declined"
+                )
+
         response = {
             "access_token": auth[0],
             "refresh_token": auth[1],
@@ -580,8 +647,10 @@ def matchup(request, auth):
 
     account_db = Database("accounts")
     community_db = Database("communities")
+    community_stat_db = Database("community_stats")
 
     community = community_db.get(args["community"]).to_dict()
+    community_stats = community_stat_db.get(args["community"]).to_dict()
 
     if args["email"] not in community["Admins"]:
         return http401("User not authorized to start the matchup algorithm")
@@ -642,6 +711,7 @@ def matchup(request, auth):
 
     rating_db = Database("ratings")
     meeting_db = Database("meetings")
+    failed_meetup_count = 0
 
     zero_matches = []
 
@@ -684,6 +754,7 @@ def matchup(request, auth):
             location="WALC",
             meeting_type="In-Person",
             duration=30,
+            community=community["id"],
         )
 
         try:
@@ -693,8 +764,13 @@ def matchup(request, auth):
             send_discord_message(
                 f"Generating meetup {random_id} with {match} has failed"
             )
+            failed_meetup_count += 1
 
-        rating = Rating(meeting_id=random_id, rating_dict={user: -1 for user in match})
+        rating = Rating(
+            meeting_id=random_id,
+            rating_dict={user: -1 for user in match},
+            community=community["id"],
+        )
 
         try:
             rating_db.add(rating.to_dict(), id=random_id)
@@ -731,7 +807,23 @@ def matchup(request, auth):
             send_discord_message(f"Rating with id [{random_id}] is already in use")
             return http400("Rating id already taken")
 
-    print(meeting_list)
+
+    try:
+        community_stat_db.update(
+            community["id"],
+            {
+                "total_meetups": community_stats["total_meetups"]
+                + len(matches)
+                - failed_meetup_count,
+                "total_sessions": community_stats["total_sessions"] + 1,
+            },
+        )
+    except:
+        send_discord_message(
+            f"Error updating community stats for community [{community['id']}]"
+        )
+        #! No error message is generated because the community still has the meetups generated properly
+
     response = {
         "access_token": auth[0],
         "refresh_token": auth[1],

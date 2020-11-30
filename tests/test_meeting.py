@@ -48,9 +48,10 @@ class MockCollectionLeave:
 class MockCommunity:
     def __init__(self, name):
         self.name = name
+        self.id = "communityid"
 
     def to_dict(self):
-        return {"name": self.name}
+        return {"name": self.name, "id": self.id}
 
 
 def test_meeting_post(client):
@@ -64,11 +65,15 @@ def test_meeting_post(client):
             "user_list": {"paimon@purdue.edu": 0, "traveller@purdue.edu": 0},
             "meettype": "chance_meeting",
             "duration": 30,
+            "community": "jahnsens",
             "token": "TestToken",
         }
 
         instance = mock_database.return_value
         instance.add.return_value = True
+        instance.get.side_effect = (
+            lambda x: MockCommunity("jahnsens") if x == "jahnsens" else True
+        )
 
         rv = client.post(
             "/meeting",
@@ -84,6 +89,7 @@ def test_meeting_post(client):
         assert return_data["data"]["location"] == test_json["location"]
         assert return_data["data"]["meettype"] == test_json["meettype"]
         assert return_data["data"]["user_list"] == test_json["user_list"]
+        assert return_data["data"]["community"] == "communityid"
         assert return_data["message"] == "Meeting created"
         assert return_data["refresh_token"] == "RefreshToken"
         assert return_data["status_code"] == 200
@@ -896,6 +902,7 @@ def test_meeting_get_past_none(client):
             "location": "Li Yue",
             "meettype": "Gacha",
             "timestamp": datetime.now().replace(tzinfo=timezone.utc).timestamp() + 100,
+            "community": "jahnsens",
         }
 
         # print(type(test_json["timestamp"]))
@@ -907,6 +914,7 @@ def test_meeting_get_past_none(client):
             location=test_json["location"],
             meeting_type=test_json["meettype"],
             timestamp=test_json["timestamp"],
+            community=test_json["community"],
         )
 
         rv = client.get(

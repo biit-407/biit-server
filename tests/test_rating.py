@@ -3,7 +3,7 @@ import json
 import pytest
 from biit_server import create_app
 from biit_server.rating import Rating
-from unittest.mock import patch
+from unittest.mock import call, patch
 
 # Waiting on DB before adding tests
 
@@ -14,6 +14,18 @@ def client():
     cli.config["TESTING"] = True
     with cli.test_client() as client:
         yield client
+
+
+class MockCommunity:
+    def __init__(self):
+        """
+        Helper class to simulate a community
+        """
+        self.id = "communityid"
+
+    def to_dict(self):
+        """"""
+        return {"id": self.id}
 
 
 class MockCollection:
@@ -48,12 +60,15 @@ def test_rating_post_empty(client):
             "meeting_id": "random_string",
             "user": "steve@apple.com",
             "rating": 5,
+            "community": "jahnsens",
             "token": "token",
         }
 
         instance = mock_database.return_value
         instance.add.return_value = True
-        instance.get.return_value = False
+        instance.get.side_effect = (
+            lambda x: MockCommunity() if x == "jahnsens" else False
+        )
 
         rv = client.post(
             "/rating",
@@ -67,16 +82,20 @@ def test_rating_post_empty(client):
         assert return_data["data"] == {
             "meeting_id": test_json["meeting_id"],
             "rating_dict": {test_json["user"]: test_json["rating"]},
+            "community": "communityid",
         }
         assert return_data["message"] == "Rating created"
         assert return_data["refresh_token"] == "RefreshToken"
         assert return_data["status_code"] == 200
 
-        instance.get.assert_called_once_with(test_json["meeting_id"])
+        instance.get.assert_has_calls(
+            [call(test_json["meeting_id"]), call("jahnsens")], any_order=True
+        )
         instance.add.assert_called_once_with(
             {
                 "meeting_id": test_json["meeting_id"],
                 "rating_dict": {test_json["user"]: test_json["rating"]},
+                "community": "communityid",
             },
             id=test_json["meeting_id"],
         )
@@ -93,15 +112,20 @@ def test_rating_post_not_empty(client):
             "meeting_id": "random_string",
             "user": "steve@apple.com",
             "rating": 5,
+            "community": "jahnsens",
             "token": "token",
         }
 
         mock_rating.return_value = Rating(
-            meeting_id=test_json["meeting_id"], rating_dict={"grr@purdue.edu": 3}
+            meeting_id=test_json["meeting_id"],
+            rating_dict={"grr@purdue.edu": 3},
+            community="communityid",
         )
 
         instance = mock_database.return_value
-        instance.get.return_value = True
+        instance.get.side_effect = (
+            lambda x: MockCommunity() if x == "jahnsens" else True
+        )
         instance.update.return_value = True
 
         rv = client.post(
@@ -119,12 +143,15 @@ def test_rating_post_not_empty(client):
                 test_json["user"]: test_json["rating"],
                 "grr@purdue.edu": 3,
             },
+            "community": "communityid",
         }
         assert return_data["message"] == "Rating created"
         assert return_data["refresh_token"] == "RefreshToken"
         assert return_data["status_code"] == 200
 
-        instance.get.assert_called_once_with(test_json["meeting_id"])
+        instance.get.assert_has_calls(
+            [call(test_json["meeting_id"]), call("jahnsens")], any_order=True
+        )
         instance.update.assert_called_once_with(
             test_json["meeting_id"],
             {
@@ -145,7 +172,7 @@ def test_rating_get(client):
     ) as mock_rating:
         query_data = {"meeting_id": "test_meeting", "token": "dabonem"}
 
-        test_rating = Rating(meeting_id=query_data["meeting_id"])
+        test_rating = Rating(meeting_id=query_data["meeting_id"], community="jahnsens")
 
         mock_rating.return_value = test_rating
 
@@ -164,6 +191,7 @@ def test_rating_get(client):
         assert return_data["data"] == {
             "meeting_id": query_data["meeting_id"],
             "rating_dict": {},
+            "community": "jahnsens",
         }
         assert return_data["message"] == "Rating Received"
         assert return_data["refresh_token"] == "RefreshToken"

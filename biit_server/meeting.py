@@ -31,6 +31,7 @@ class Meeting:
         duration=0,
         location=None,
         meeting_type=None,
+        community=None,
         document_snapshot=None,
     ):
         if document_snapshot != None:
@@ -41,6 +42,7 @@ class Meeting:
             duration = document_dict["duration"]
             location = document_dict["location"]
             meeting_type = document_dict["meettype"]
+            community = document_dict["community"]
 
         self.user_list = user_list
         self.id = id
@@ -48,6 +50,7 @@ class Meeting:
         self.duration = duration
         self.location = location
         self.meeting_type = meeting_type
+        self.community = community
 
     def add_user(self, user) -> Dict[str, bool]:
         self.user_list[user] = 0
@@ -76,4 +79,5 @@ class Meeting:
             "user_list": self.user_list,
             "location": self.location,
             "meettype": self.meeting_type,
+            "community": self.community,
         }

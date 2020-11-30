@@ -1,7 +1,7 @@
 from biit_server.community import community
 import pytest
 from biit_server import create_app, community_handler
-from unittest.mock import patch
+from unittest.mock import call, patch
 import json
 
 # Waiting on DB before adding tests
@@ -76,6 +76,13 @@ def test_community_post(client):
             "token": "TestToken",
         }
 
+        stat_json = {
+            "community": "Cool Community",
+            "accepted_meetups": 0,
+            "total_meetups": 0,
+            "total_sessions": 0,
+        }
+
         rv = client.post(
             "/community",
             json=test_json,
@@ -88,7 +95,13 @@ def test_community_post(client):
 
         test_json["bans"] = []
 
-        instance.add.assert_called_once_with(test_json, id=test_json["name"])
+        instance.add.assert_has_calls(
+            [
+                call(test_json, id=test_json["name"]),
+                call(stat_json, id=stat_json["community"]),
+            ],
+            any_order=True,
+        )
 
 
 def test_community_get(client):

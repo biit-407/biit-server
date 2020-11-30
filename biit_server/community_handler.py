@@ -32,11 +32,21 @@ def community_post(request, auth):
     body = request.get_json()
 
     community_db = Database("communities")
+    community_stat_db = Database("community_stats")
 
     body["bans"] = []
 
     try:
         community_db.add(body, id=body["name"])
+        community_stat_db.add(
+            {
+                "accepted_meetups": 0,
+                "total_meetups": 0,
+                "total_sessions": 0,
+                "community": body["name"],
+            },
+            id=body["name"],
+        )
     except:
         send_discord_message(
             f'Attempted to create a community with an existing name [{body["name"]}]'
