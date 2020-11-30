@@ -831,3 +831,44 @@ def matchup(request, auth):
     }
 
     return jsonHttp200("Meetings created", response)
+
+
+@validate_fields(["meeting_id", "time", "email", "token"], ValidateType.QUERY)
+@authenticated(AuthenticatedType.QUERY)
+def reschedule(request, auth):
+    """Handles the rescheduling POST endpoint
+        Reschedules the meeting to the time as long as the user is one of the people in the meaning
+    Args:
+        request: A request object that contains a json object with keys: meeting_id, time, email, token
+
+    Returns:
+        (str): Http 200 string response containing information about the reschedule meeting
+
+    Raises:
+        Http 400 when the json is missing a key
+    """
+    body = request.get_json()
+
+    meeting_db = Database("meetings")
+
+    meeting_snapshot = meeting_db.get(body.get("meeting_id"))
+
+    if not meeting_snapshot:
+        return http400(
+            f"Error in retrieving meeting id {body.get('meeting_id')} from the Firestore database."
+        )
+
+    meeting = Meeting(document_snapshot=meeting_snapshot)
+    try:
+        meeting_db.update(body.get("meeting_id"), {"timestamp": body.get("meeting_time")})
+        meeting.timestamp = body.get("meeting_time")
+    except:
+        return http500(f"Error updating meeting time for meeting {body.get('meeting_id')} to {body.get('meeting_time')}")
+    
+    response = {
+        "access_token": auth[0],
+        "refresh_token": auth[1],
+        "data": meeting.to_dict(),
+    }
+
+    return jsonHttp200("Meeting updated", response)
