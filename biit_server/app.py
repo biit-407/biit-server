@@ -24,6 +24,7 @@ from .community_handler import (
 from .rating_handler import rating_get, rating_get_pending, rating_post
 
 from .meeting_handler import (
+    generate_reconnect_meeting,
     matchup,
     meeting_get,
     meeting_post,
@@ -208,5 +209,10 @@ def create_app():
     def meeting_matching():
         if request.method == "GET":
             return matchup(request)
+
+    @app.route("/meeting/reconnect", methods=["POST"])
+    def meeting_reconnect():
+        if request.method == "POST":
+            return generate_reconnect_meeting(request)
 
     return app
