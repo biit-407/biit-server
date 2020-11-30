@@ -7,6 +7,8 @@ from .query_helper import (
     validate_fields,
     validate_update_field,
 )
+
+from .account import Account
 from .database import Database
 from .storage import Storage
 from .utils import send_discord_message, utcToInt
@@ -35,13 +37,11 @@ def account_post(request, auth):
     account_db = Database("accounts")
 
     try:
-        db_entry = {
-            "fname": body["fname"],
-            "lname": body["lname"],
-            "email": body["email"],
-        }
+        account = Account(
+            fname=body.get("fname"), lname=body.get("lname"), email=body.get("email")
+        )
 
-        account_db.add(db_entry, id=body["email"])
+        account_db.add(account.to_dict(), id=body["email"])
     except:
         send_discord_message(
             f'Attempted to create an account with existing email: {body["email"]} with args [{body}]'
@@ -79,10 +79,11 @@ def account_get(request, auth):
     account_db = Database("accounts")
 
     try:
+        document_snapshot = account_db.get(args["email"])
         response = {
             "access_token": auth[0],
             "refresh_token": auth[1],
-            "data": account_db.get(args["email"]).to_dict(),
+            "data": Account(document_snapshot=document_snapshot).to_dict(),
         }
         return jsonHttp200("Account returned", response)
     except:

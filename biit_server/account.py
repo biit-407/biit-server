@@ -1,5 +1,6 @@
 from typing import Any, Dict
 
+
 class Account:
     def __init__(
         self,
@@ -14,8 +15,7 @@ class Account:
         meetType=None,
         optIn=None,
         schedule=None,
-        document_snapshot=None
-
+        document_snapshot=None,
     ):
         if document_snapshot != None:
             data = document_snapshot.to_dict()
@@ -29,7 +29,8 @@ class Account:
             self.meetLength = data.get("covid")
             self.meetType = data.get("covid")
             self.optIn = data.get("optIn", 0)
-            self.schedule = data.get("schedule")           
+            self.schedule = data.get("schedule")
+            return
 
         self.email = email
         self.fname = fname
@@ -40,11 +41,11 @@ class Account:
         self.covid = covid
         self.meetLength = meetLength
         self.meetType = meetType
-        self.optIn = optIn,
+        self.optIn = (optIn,)
         self.schedule = schedule
 
     def set_property(self, property, value):
-        value  = self.__dict__.get("property")
+        value = self.__dict__.get("property")
 
         if value != None:
             self.__dict__[property] = value
@@ -61,6 +62,5 @@ class Account:
             "meetLength": self.meetLength,
             "meetType": self.meetType,
             "optIn": self.optIn,
-            "schedule": self.schedule
+            "schedule": self.schedule,
         }
-
