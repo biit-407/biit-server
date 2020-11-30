@@ -1,4 +1,6 @@
 import ast
+import logging
+from biit_server.storage import Storage
 from copy import deepcopy
 from biit_server.rating import Rating
 from datetime import datetime, timedelta
@@ -880,3 +882,80 @@ def reschedule(request, auth):
     }
 
     return jsonHttp200("Meeting updated", response)
+
+
+@validate_fields(["email", "token"], ValidateType.QUERY)
+@authenticated(AuthenticatedType.QUERY)
+def meetings_get_past_users(request, auth):
+    """
+    Gets all past users the calling user has met with
+
+    Args:
+        request (Object): the request object sent from flask
+
+    Returns:
+        http200: response with users in data field
+        http400:
+    """
+    args = request.args
+
+    meeting_db = Database("meetings")
+
+    meeting_db_response = meeting_db.collection_ref.get()
+
+    meetings = [
+        Meeting(document_snapshot=meeting_snapshot)
+        for meeting_snapshot in meeting_db_response
+    ]
+
+    filtered_meetings = [
+        meeting.to_dict()
+        for meeting in meetings
+        if args["email"] in meeting.user_list
+        and meeting.user_list[args["email"]] == 1
+        and datetime.utcfromtimestamp(meeting.timestamp) <= datetime.now()
+    ]
+
+    other_users = {}
+    for meeting in filtered_meetings:
+        for user in meeting["user_list"]:
+            if user == args["email"]:
+                continue
+            if user not in other_users:
+                other_users[user] = [meeting]
+            elif meeting not in other_users[user]:
+                other_users[user].append(meeting)
+
+    accounts_db = Database("accounts")
+
+    full_previous_user = []
+    for key, item in other_users.items():
+        user_data = accounts_db.get(key).to_dict()
+
+        profile_storage = Storage("biit_profiles")
+        profile_data = ""
+        try:
+            profile_data = profile_storage.get(f"{key}.jpg")
+        except:
+            logging.warn(f"User [{key}] does not have a profile picture")
+
+        full_previous_user.append(
+            {
+                "fname": user_data["fname"],
+                "lname": user_data["lname"],
+                "email": user_data["email"],
+                "profileImage": profile_data,
+                "commonMeetups": item,
+            }
+        )
+
+    try:
+        response = {
+            "access_token": auth[0],
+            "refresh_token": auth[1],
+            "data": full_previous_user,
+        }
+        return jsonHttp200("Past Users retrieved", response)
+    except:
+        send_discord_message(f'Unable to find past users for [{args["email"]}]')
+        return http400("Past Users not found")

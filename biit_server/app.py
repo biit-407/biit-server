@@ -34,6 +34,7 @@ from .meeting_handler import (
     meeting_accept,
     meeting_decline,
     meetings_get_all,
+    meetings_get_past_users,
     meetings_get_pending,
     meetings_get_upcoming,
     meetings_get_past,
@@ -167,6 +168,11 @@ def create_app():
     def meeting_user_past_fetch_route():
         if request.method == "GET":
             return meetings_get_past(request)
+
+    @app.route("/meeting/past/users", methods=["GET"])
+    def meeting_get_past_users_route():
+        if request.method == "GET":
+            return meetings_get_past_users(request)
 
     @app.route("/meeting/reschedule", methods=["POST"])
     def meeting_reschedule_route():
