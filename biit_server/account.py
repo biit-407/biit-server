@@ -15,6 +15,7 @@ class Account:
         meetType=None,
         optIn=None,
         schedule=None,
+        meetGroup=None,
         document_snapshot=None,
     ):
         if document_snapshot != None:
@@ -30,6 +31,7 @@ class Account:
             self.meetType = data.get("covid")
             self.optIn = data.get("optIn", 0)
             self.schedule = data.get("schedule")
+            self.meetGroup = data.get("meetGroup")
             return
 
         self.email = email
@@ -43,6 +45,7 @@ class Account:
         self.meetType = meetType
         self.optIn = (optIn,)
         self.schedule = schedule
+        self.meetGroup = meetGroup
 
     def set_property(self, property, value):
         value = self.__dict__.get("property")
@@ -63,4 +66,5 @@ class Account:
             "meetType": self.meetType,
             "optIn": self.optIn,
             "schedule": self.schedule,
+            "meetGroup": self.meetGroup,
         }
