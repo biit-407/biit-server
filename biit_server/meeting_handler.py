@@ -807,7 +807,6 @@ def matchup(request, auth):
             send_discord_message(f"Rating with id [{random_id}] is already in use")
             return http400("Rating id already taken")
 
-
     try:
         community_stat_db.update(
             community["id"],
@@ -833,8 +832,8 @@ def matchup(request, auth):
     return jsonHttp200("Meetings created", response)
 
 
-@validate_fields(["meeting_id", "time", "email", "token"], ValidateType.BODY)
-@authenticated(AuthenticatedType.QUERY)
+@validate_fields(["meeting_id", "meeting_time", "email", "token"], ValidateType.BODY)
+@authenticated(AuthenticatedType.BODY)
 def reschedule(request, auth):
     """Handles the rescheduling POST endpoint
         Reschedules the meeting to the time as long as the user is one of the people in the meaning
@@ -848,6 +847,7 @@ def reschedule(request, auth):
         Http 400 when the json is missing a key
     """
     body = request.get_json()
+    print("test")
 
     meeting_db = Database("meetings")
 
@@ -859,12 +859,20 @@ def reschedule(request, auth):
         )
 
     meeting = Meeting(document_snapshot=meeting_snapshot)
+
+    if body.get("email") not in meeting.user_list:
+        return http401("User not authorized to reschedule")
+
     try:
-        meeting_db.update(body.get("meeting_id"), {"timestamp": body.get("meeting_time")})
+        meeting_db.update(
+            body.get("meeting_id"), {"timestamp": body.get("meeting_time")}
+        )
         meeting.timestamp = body.get("meeting_time")
     except:
-        return http500(f"Error updating meeting time for meeting {body.get('meeting_id')} to {body.get('meeting_time')}")
-    
+        return http500(
+            f"Error updating meeting time for meeting {body.get('meeting_id')} to {body.get('meeting_time')}"
+        )
+
     response = {
         "access_token": auth[0],
         "refresh_token": auth[1],
