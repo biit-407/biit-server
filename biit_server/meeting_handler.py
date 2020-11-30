@@ -807,7 +807,6 @@ def matchup(request, auth):
             send_discord_message(f"Rating with id [{random_id}] is already in use")
             return http400("Rating id already taken")
 
-    print(meeting_list)
 
     try:
         community_stat_db.update(
