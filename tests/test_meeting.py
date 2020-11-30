@@ -1,3 +1,4 @@
+from biit_server.account import Account
 from datetime import timezone, datetime
 import json
 import pytest
@@ -1032,3 +1033,72 @@ def test_meeting_reschedule_unauthorized(client):
         )
 
         assert rv.data.decode() == "UnAuthorized: User not authorized to reschedule"
+
+
+def test_meeting_get_past_users(client):
+    """
+    Tests that meeting get past users works correctly
+    """
+    with patch("biit_server.meeting_handler.Database") as mock_database, patch(
+        "biit_server.meeting_handler.Meeting"
+    ) as mock_meeting, patch("biit_server.meeting_handler.Storage") as mock_storage:
+        instance = mock_database.return_value
+        instance.collection_ref.get.side_effect = [
+            [
+                1,
+                1,
+                1,
+            ],
+        ]
+        instance.get.return_value = Account("beidou@purdue.edu", "f", "l")
+
+        mock_storage_instance = mock_storage.return_value
+        mock_storage_instance.get.return_value = "hello"
+
+        query_data = {"email": "me@purdue.edu", "token": "dabonem"}
+
+        test_json = {
+            "id": "TestMeeting",
+            "user_list": {"beidou@purdue.edu": 1, "me@purdue.edu": 1},
+            "duration": 110,
+            "location": "Li Yue",
+            "meettype": "Gacha",
+            "timestamp": datetime.now().replace(tzinfo=timezone.utc).timestamp() - 100,
+        }
+
+        mock_meeting.return_value = Meeting(
+            id=test_json["id"],
+            user_list=test_json["user_list"],
+            duration=test_json["duration"],
+            location=test_json["location"],
+            meeting_type=test_json["meettype"],
+            timestamp=test_json["timestamp"],
+        )
+
+        rv = client.get(
+            "/meeting/past/users",
+            query_string=query_data,
+            follow_redirects=True,
+        )
+
+        return_data = json.loads(rv.data.decode())
+
+        assert return_data["access_token"] == "AccessToken"
+        assert len(return_data["data"]) == 1
+        assert return_data["data"][0]["email"] == "beidou@purdue.edu"
+        assert return_data["data"][0]["fname"] == "f"
+        assert return_data["data"][0]["lname"] == "l"
+        assert return_data["data"][0]["profileImage"] == "hello"
+        assert return_data["data"][0]["commonMeetups"] == [
+            Meeting(
+                id=test_json["id"],
+                user_list=test_json["user_list"],
+                duration=test_json["duration"],
+                location=test_json["location"],
+                meeting_type=test_json["meettype"],
+                timestamp=test_json["timestamp"],
+            ).to_dict()
+        ]
+        assert return_data["message"] == "Past Users retrieved"
+        assert return_data["refresh_token"] == "RefreshToken"
+        assert return_data["status_code"] == 200
