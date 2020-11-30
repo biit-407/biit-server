@@ -1,3 +1,4 @@
+import json
 import pytest
 from biit_server import create_app
 from unittest.mock import patch
@@ -64,10 +65,14 @@ def test_account_get(client):
             follow_redirects=True,
         )
 
-        assert (
-            b'{"access_token":"AccessToken","data":{"email":"test@email.com"},"message":"Account returned","refresh_token":"RefreshToken","status_code":200}\n'
-            == rv.data
-        )
+        return_data = json.loads(rv.data.decode())
+
+        assert return_data["access_token"] == "AccessToken"
+        print(return_data["data"])
+        assert return_data["data"].get("email") == "test@email.com"
+        assert return_data["message"] == "Account returned"
+        assert return_data["refresh_token"] == "RefreshToken"
+        assert return_data["status_code"] == 200
 
 
 def test_account_put(client):
