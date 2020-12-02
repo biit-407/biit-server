@@ -43,7 +43,7 @@ class community:
             "name": self.name,
             "Admins": self.Admins,
             "Members": self.Members,
-            "CodeofConduct": self.codeofconduct,
+            "codeofconduct": self.codeofconduct,
             "mpm": self.mpm,
             "meettype": self.meettype,
         }

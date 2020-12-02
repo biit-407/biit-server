@@ -325,6 +325,7 @@ def test_community_get_all(client):
         return_data = json.loads(rv.data.decode())
         assert return_data["access_token"] == "AccessToken"
         assert len(return_data["data"]) == 3
+        assert "codeofconduct" in return_data["data"][0]
         assert return_data["message"] == "Communities Received"
         assert return_data["refresh_token"] == "RefreshToken"
         assert return_data["status_code"] == 200
