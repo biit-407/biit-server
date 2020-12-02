@@ -12,7 +12,7 @@ import string
 
 import uuid
 
-from .http_responses import http400, http401, http500, jsonHttp200
+from .http_responses import http200, http400, http401, http500, jsonHttp200
 from .query_helper import ValidateType, validate_fields, validate_query_params
 from .database import Database
 
@@ -959,3 +959,72 @@ def meetings_get_past_users(request, auth):
     except:
         send_discord_message(f'Unable to find past users for [{args["email"]}]')
         return http400("Past Users not found")
+
+
+@validate_fields(["email", "token", "user", "community"], ValidateType.BODY)
+@authenticated(AuthenticatedType.BODY)
+def generate_reconnect_meeting(request, auth):
+    """"""
+    body = request.get_json()
+
+    community_db = Database("communities")
+    community_stat_db = Database("community_stats")
+
+    community = community_db.get(body["community"]).to_dict()
+    community_stats = community_stat_db.get(body["community"]).to_dict()
+
+    rating_db = Database("ratings")
+    meeting_db = Database("meetings")
+
+    now = datetime.now()
+    in_a_week = now + timedelta(hours=168)
+
+    users = [body["email"], body["user"]]
+
+    random_id = str(uuid.uuid4())
+    meeting = Meeting(
+        user_list={body["email"]: 0, body["user"]: 0},
+        id=random_id,
+        timestamp=in_a_week.timestamp(),
+        location="WALC",
+        meeting_type="In-Person",
+        duration=30,
+        community=body["community"],
+    )
+
+    try:
+        meeting_db.add(meeting.to_dict(), id=random_id)
+    except:
+        send_discord_message(f"Generating meetup {random_id} with {users} has failed")
+
+    rating = Rating(
+        meeting_id=random_id,
+        rating_dict={user: -1 for user in users},
+        community=body["community"],
+    )
+
+    try:
+        rating_db.add(rating.to_dict(), id=random_id)
+    except:
+        send_discord_message(f"Rating with id [{random_id}] is already in use")
+        return http400("Rating id already taken")
+
+    try:
+        community_stat_db.update(
+            community["id"],
+            {
+                "total_meetups": community_stats["total_meetups"] + 1,
+            },
+        )
+    except:
+        send_discord_message(
+            f"Error updating community stats for community [{community['id']}]"
+        )
+
+    response = {
+        "access_token": auth[0],
+        "refresh_token": auth[1],
+        "data": meeting.to_dict(),
+    }
+
+    return jsonHttp200("Successfully generated meetup", response)
