@@ -70,7 +70,7 @@ def test_meeting_reconnect(client):
             "email": "ryan@purdue.edu",
             "community": "Purdue Exponent",
             "token": "weareanewspaper",
-            "user": "stephen@purdue.edu",
+            "users": ["stephen@purdue.edu"],
         }
 
         mock_json_db = {
@@ -122,4 +122,83 @@ def test_meeting_reconnect(client):
         assert return_data["data"]["user_list"] == {
             "ryan@purdue.edu": 0,
             "stephen@purdue.edu": 0,
+        }
+
+
+def test_meeting_reconnect_3(client):
+    """
+    Tests that meeting reconnect works correctly
+    """
+    with patch("biit_server.meeting_handler.Database") as mock_database:
+        test_json = {
+            "email": "ryan@purdue.edu",
+            "community": "Purdue Exponent",
+            "token": "weareanewspaper",
+            "users": ["stephen@purdue.edu", "uwu@puwudue.edu"],
+        }
+
+        mock_json_db = {
+            "ryan@purdue.edu": MockUser(
+                {
+                    "optIn": 1,
+                    "covid": "gloves",
+                    "meetType": "inperson",
+                    "fname": "ryan",
+                    "lname": "chen",
+                    "email": "ryan@purdue.edu",
+                }
+            ),
+            "stephen@purdue.edu": MockUser(
+                {
+                    "optIn": 1,
+                    "covid": "gloves",
+                    "meetType": "inperson",
+                    "fname": "alisa",
+                    "lname": "reynya",
+                    "email": "stephen@purdue.edu",
+                }
+            ),
+            "uwu@puwudue.edu": MockUser(
+                {
+                    "optIn": 1,
+                    "covid": "gloves",
+                    "meetType": "inperson",
+                    "fname": "alisa",
+                    "lname": "reynya",
+                    "email": "uwu@puwudue.edu",
+                }
+            ),
+            "Purdue Exponent": MockCommunity(
+                {
+                    "id": "Purdue Exponent",
+                    "Admins": ["ryan@purdue.edu"],
+                    "Members": [
+                        "ryan@purdue.edu",
+                        "stephen@purdue.edu",
+                        "uwu@puwudue.edu",
+                    ],
+                }
+            ),
+        }
+
+        def mock_get(key):
+            return mock_json_db.get(key)
+
+        instance = mock_database.return_value
+        instance.add.return_value = True
+        instance.get = mock_get
+
+        rv = client.post(
+            "/meeting/reconnect",
+            json=test_json,
+            follow_redirects=True,
+        )
+
+        return_data = json.loads(rv.data.decode())
+        assert return_data["access_token"] == "AccessToken"
+        assert return_data["data"]["community"] == "Purdue Exponent"
+        assert return_data["data"]["user_list"] == {
+            "ryan@purdue.edu": 0,
+            "stephen@purdue.edu": 0,
+            "uwu@puwudue.edu": 0,
         }
