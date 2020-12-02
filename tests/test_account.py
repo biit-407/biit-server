@@ -84,19 +84,23 @@ def test_account_put(client):
     with patch("biit_server.account_handler.Database") as mock_database:
         instance = mock_database.return_value
         instance.update.return_value = True
-        query_data = {"email": "test@email.com", "meetLength": 30}
+        query_data = {"email": "test@email.com", "meetLength": 30, "meetGroup": 8}
         instance.get.return_value = MockAccount(query_data)
         rv = client.put(
             "/account",
             query_string={
                 "email": "test@email.com",
                 "token": "TestToken",
-                "updateFields": {"email": "e@mail.in.gov", "meetLength": 30},
+                "updateFields": {
+                    "email": "e@mail.in.gov",
+                    "meetLength": 30,
+                    "meetGroup": 8,
+                },
             },
             follow_redirects=True,
         )
         assert (
-            b'{"access_token":"AccessToken","email":"test@email.com","meetLength":30,"message":"Account Updated","refresh_token":"RefreshToken","status_code":200}\n'
+            b'{"access_token":"AccessToken","email":"test@email.com","meetGroup":8,"meetLength":30,"message":"Account Updated","refresh_token":"RefreshToken","status_code":200}\n'
             == rv.data
         )
 
