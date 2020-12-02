@@ -204,9 +204,9 @@ def test_rating_get_past(client):
     """
     Tests that getting past ratings works correctly
     """
-    with patch("biit_server.rating_handler.Database") as mock_database, patch(
-        "biit_server.rating_handler.Rating"
-    ) as mock_rating, patch("biit_server.rating_handler.Meeting") as mock_meeting:
+    with patch("biit_server.db_accessor.Database") as mock_database, patch(
+        "biit_server.db_accessor.Rating"
+    ) as mock_rating, patch("biit_server.db_accessor.Meeting") as mock_meeting:
         query_data = {
             "email": "paimon@purdue.edu",
             "meeting_id": "test_meeting",

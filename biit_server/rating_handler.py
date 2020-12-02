@@ -1,3 +1,4 @@
+from biit_server.db_accessor import get_past_unrated_meetups, get_past_unrated_ratings
 from datetime import datetime
 from biit_server.meeting import Meeting
 from biit_server.utils import send_discord_message
@@ -122,47 +123,7 @@ def rating_get_pending(request, auth):
     """
     args = request.args
 
-    meeting_db = Database("meetings")
-
-    meeting_db_response = meeting_db.collection_ref.get()
-
-    meetings = [
-        Meeting(document_snapshot=meeting_snapshot)
-        for meeting_snapshot in meeting_db_response
-    ]
-
-    for meeting in meetings:
-        print(meeting.timestamp)
-
-    past_meeting_ids = [
-        meeting.id
-        for meeting in meetings
-        if args["email"] in meeting.user_list
-        and meeting.user_list[args["email"]] == 1
-        and datetime.utcfromtimestamp(meeting.timestamp) < datetime.now()
-    ]
-
-    rating_db = Database("ratings")
-
-    rating_db_response = rating_db.collection_ref.get()
-
-    ratings = [
-        Rating(document_snapshot=rating_snapshot)
-        for rating_snapshot in rating_db_response
-    ]
-
-    # Identifies the ratings the user is a part of
-    # and checks if the user has reviewed it.
-    ratings = [
-        rating.to_dict()
-        for rating in ratings
-        if args["email"] in rating.rating_dict
-        and rating.rating_dict[args["email"]] == -1
-        and rating.meeting_id in past_meeting_ids
-    ]
-
-    if not rating_db_response:
-        return http500(f"Error in retrieving rating from Firestore database.", "Lucas")
+    ratings = get_past_unrated_ratings(args["email"])
 
     try:
         response = {

@@ -1,3 +1,4 @@
+from biit_server.notification_handler import notification_get, notification_post
 from biit_server.utils import send_discord_message
 from biit_server.http_responses import http405
 from flask import Flask, request
@@ -208,5 +209,12 @@ def create_app():
     def meeting_matching():
         if request.method == "GET":
             return matchup(request)
+
+    @app.route("/notifications", methods=["GET", "POST"])
+    def notifications_route():
+        if request.method == "GET":
+            return notification_get(request)
+        if request.method == "POST":
+            return notification_post(request)
 
     return app
