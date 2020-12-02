@@ -24,7 +24,6 @@ class community:
             meettype = document_dict["meettype"]
             mpm = document_dict["mpm"]
             name = document_dict["name"]
-            return
 
         if Admins == None or name == None or bans == None or codeofconduct == None:
             send_discord_message(
