@@ -61,11 +61,17 @@ class MockUser:
         return self.data
 
 
+MOCK_ZOOM = {"zoom_id": "12312", "zoom_url": "https://ryanjchen.com"}
+
+
 def test_meeting_algo(client):
     """
     Tests that meeting algorithm works correctly
     """
-    with patch("biit_server.meeting_handler.Database") as mock_database:
+    with patch("biit_server.meeting_handler.Database") as mock_database, patch(
+        "biit_server.meeting_handler.create_meeting"
+    ) as mock_create_meeting:
+        mock_create_meeting.return_value = MOCK_ZOOM
         test_json = {
             "email": "ryan@purdue.edu",
             "community": "Purdue Exponent",
@@ -125,7 +131,10 @@ def test_meeting_algo_filter_opt_out(client):
     """
     Tests that meeting algorithm works correctly
     """
-    with patch("biit_server.meeting_handler.Database") as mock_database:
+    with patch("biit_server.meeting_handler.Database") as mock_database, patch(
+        "biit_server.meeting_handler.create_meeting"
+    ) as mock_create_meeting:
+        mock_create_meeting.return_value = MOCK_ZOOM
         test_json = {
             "email": "ryan@purdue.edu",
             "community": "Purdue Exponent",
@@ -210,7 +219,10 @@ def test_meeting_algo_different_preferences(client):
     """
     Tests that meeting algorithm works correctly
     """
-    with patch("biit_server.meeting_handler.Database") as mock_database:
+    with patch("biit_server.meeting_handler.Database") as mock_database, patch(
+        "biit_server.meeting_handler.create_meeting"
+    ) as mock_create_meeting:
+        mock_create_meeting.return_value = MOCK_ZOOM
         test_json = {
             "email": "ryan@purdue.edu",
             "community": "Purdue Exponent",
@@ -295,7 +307,11 @@ def test_meeting_algo_not_enough_users(client):
     """
     Tests that meeting algorithm works correctly
     """
-    with patch("biit_server.meeting_handler.Database") as mock_database:
+    with patch("biit_server.meeting_handler.Database") as mock_database, patch(
+        "biit_server.meeting_handler.create_meeting"
+    ) as mock_create_meeting:
+        mock_create_meeting.return_value = MOCK_ZOOM
+
         test_json = {
             "email": "ryan@purdue.edu",
             "community": "Purdue Exponent",
