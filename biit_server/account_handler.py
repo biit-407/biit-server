@@ -119,6 +119,7 @@ def account_put(request, auth):
         "meetType",
         "optIn",
         "schedule",
+        "meetGroup",
     ]
 
     # serializes the quert string to a dict (neeto)
