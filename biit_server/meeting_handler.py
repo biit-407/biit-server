@@ -961,7 +961,7 @@ def meetings_get_past_users(request, auth):
         return http400("Past Users not found")
 
 
-@validate_fields(["email", "token", "user", "community"], ValidateType.BODY)
+@validate_fields(["email", "token", "users", "community"], ValidateType.BODY)
 @authenticated(AuthenticatedType.BODY)
 def generate_reconnect_meeting(request, auth):
     """"""
@@ -979,11 +979,11 @@ def generate_reconnect_meeting(request, auth):
     now = datetime.now()
     in_a_week = now + timedelta(hours=168)
 
-    users = [body["email"], body["user"]]
+    users = [body["email"], *body["users"]]
 
     random_id = str(uuid.uuid4())
     meeting = Meeting(
-        user_list={body["email"]: 0, body["user"]: 0},
+        user_list={user: 0 for user in users},
         id=random_id,
         timestamp=in_a_week.timestamp(),
         location="WALC",
@@ -995,7 +995,9 @@ def generate_reconnect_meeting(request, auth):
     try:
         meeting_db.add(meeting.to_dict(), id=random_id)
     except:
-        send_discord_message(f"Generating meetup {random_id} with {users} has failed")
+        send_discord_message(
+            f"Generating meetup {random_id} with {','.join(users)} has failed"
+        )
 
     rating = Rating(
         meeting_id=random_id,
