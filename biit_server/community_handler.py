@@ -278,8 +278,14 @@ def community_get_all(request, auth):
 
     community_db = Database("communities")
     community_db_response = community_db.collection_ref.get()
-
     communities = [community(document_snapshot=com) for com in community_db_response]
+
+    if not communities:
+        response = {
+            "access_token": auth[0],
+            "refresh_token": auth[1],
+        }
+        return jsonHttp200("No Communities found", response)
 
     all_coms = [com.to_dict() for com in communities]
 
