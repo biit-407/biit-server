@@ -63,11 +63,16 @@ class MockMeeting:
         return self.data
 
 
+MOCK_ZOOM = {"zoom_id": "12312", "zoom_url": "https://ryanjchen.com"}
+
+
 def test_meeting_post(client):
     """
     Tests that meeting post works correctly
     """
-    with patch("biit_server.meeting_handler.Database") as mock_database:
+    with patch("biit_server.meeting_handler.Database") as mock_database, patch(
+        "biit_server.meeting_handler.create_meeting"
+    ) as mock_create_meeting:
         test_json = {
             "timestamp": "noon",
             "location": "Mondstadt",
@@ -83,6 +88,8 @@ def test_meeting_post(client):
         instance.get.side_effect = (
             lambda x: MockCommunity("jahnsens") if x == "jahnsens" else True
         )
+
+        mock_create_meeting.return_value = MOCK_ZOOM
 
         rv = client.post(
             "/meeting",
@@ -947,7 +954,11 @@ def test_meeting_reschedule(client):
     """
     with patch("biit_server.meeting_handler.Database") as mock_database, patch(
         "biit_server.meeting_handler.Meeting"
-    ) as mock_meeting:
+    ) as mock_meeting, patch(
+        "biit_server.meeting_handler.reschedule_meeting"
+    ) as mock_reschedule_meeting:
+        mock_reschedule_meeting.return_value = True
+
         instance = mock_database.return_value
         instance.get.return_value = MockMeeting(
             {
@@ -997,7 +1008,11 @@ def test_meeting_reschedule_unauthorized(client):
     """
     with patch("biit_server.meeting_handler.Database") as mock_database, patch(
         "biit_server.meeting_handler.Meeting"
-    ) as mock_meeting:
+    ) as mock_meeting, patch(
+        "biit_server.meeting_handler.reschedule_meeting"
+    ) as mock_reschedule_meeting:
+        mock_reschedule_meeting.return_value = True
+
         instance = mock_database.return_value
         instance.get.return_value = MockMeeting(
             {

@@ -23,6 +23,7 @@ from .meeting import (
     UserNotInMeetingException,
 )
 from .azure import azure_refresh_token
+from .zoom_handler import create_meeting, reschedule_meeting
 
 
 @validate_fields(
@@ -60,6 +61,8 @@ def meeting_post(request, auth):
         random.choice(string.ascii_letters + string.digits) for i in range(64)
     )
 
+    zoom_info = create_meeting(body["timestamp"], body["duration"], body["user_list"])
+
     meeting = Meeting(
         user_list=body["user_list"],
         timestamp=body["timestamp"],
@@ -68,6 +71,8 @@ def meeting_post(request, auth):
         location=body["location"],
         community=community["id"],
         id=random_id,
+        zoom_id=zoom_info.get("zoom_id"),
+        zoom_link=zoom_info.get("zoom_link"),
     )
 
     try:
@@ -749,6 +754,9 @@ def matchup(request, auth):
         match = [min_potential_id, min_user_id]
 
         random_id = str(uuid.uuid4())
+
+        zoom_info = create_meeting(in_a_week.timestamp(), 30, match)
+
         meeting = Meeting(
             user_list={user: 0 for user in match},
             id=random_id,
@@ -756,6 +764,8 @@ def matchup(request, auth):
             location="WALC",
             meeting_type="In-Person",
             duration=30,
+            zoom_id=zoom_info.get("zoom_id"),
+            zoom_link=zoom_info.get("zoom_link"),
             community=community["name"],
         )
 
@@ -782,6 +792,7 @@ def matchup(request, auth):
 
     if len(zero_matches) > 1:
         random_id = str(uuid.uuid4())
+        zoom_info = create_meeting(in_a_week.timestamp(), 30, zero_matches)
         meeting = Meeting(
             user_list={user: 0 for user in zero_matches},
             id=random_id,
@@ -789,6 +800,8 @@ def matchup(request, auth):
             location="WALC",
             meeting_type="In-Person",
             duration=30,
+            zoom_id=zoom_info.get("zoom_id"),
+            zoom_link=zoom_info.get("zoom_link"),
             community=community["name"],
         )
 
@@ -874,6 +887,11 @@ def reschedule(request, auth):
     except:
         return http500(
             f"Error updating meeting time for meeting {body.get('meeting_id')} to {body.get('meeting_time')}"
+        )
+
+    if not reschedule_meeting(meeting.zoom_id, timestamp=body.get("meeting_time")):
+        return http500(
+            f"Error rescheduling zoom meeting with id {meeting.zoom_id} and biit id {body.get('meeting_id')}"
         )
 
     response = {
