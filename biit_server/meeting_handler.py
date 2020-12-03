@@ -812,7 +812,7 @@ def matchup(request, auth):
 
     try:
         community_stat_db.update(
-            community["id"],
+            community["name"],
             {
                 "total_meetups": community_stats["total_meetups"]
                 + len(matches)
@@ -822,7 +822,7 @@ def matchup(request, auth):
         )
     except:
         send_discord_message(
-            f"Error updating community stats for community [{community['id']}]"
+            f"Error updating community stats for community [{community['name']}]"
         )
         #! No error message is generated because the community still has the meetups generated properly
 

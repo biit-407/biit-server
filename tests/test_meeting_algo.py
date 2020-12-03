@@ -95,7 +95,7 @@ def test_meeting_algo(client):
             ),
             "Purdue Exponent": MockCommunity(
                 {
-                    "id": "Purdue Exponent",
+                    "name": "Purdue Exponent",
                     "Admins": ["ryan@purdue.edu"],
                     "Members": ["ryan@purdue.edu", "alisa@purdue.edu"],
                 }
@@ -175,7 +175,7 @@ def test_meeting_algo_filter_opt_out(client):
             ),
             "Purdue Exponent": MockCommunity(
                 {
-                    "id": "Purdue Exponent",
+                    "name": "Purdue Exponent",
                     "Admins": ["ryan@purdue.edu"],
                     "Members": [
                         "ryan@purdue.edu",
@@ -260,7 +260,7 @@ def test_meeting_algo_different_preferences(client):
             ),
             "Purdue Exponent": MockCommunity(
                 {
-                    "id": "Purdue Exponent",
+                    "name": "Purdue Exponent",
                     "Admins": ["ryan@purdue.edu"],
                     "Members": [
                         "ryan@purdue.edu",
@@ -345,6 +345,7 @@ def test_meeting_algo_not_enough_users(client):
             ),
             "Purdue Exponent": MockCommunity(
                 {
+                    "name": "Purdue Exponent",
                     "Admins": ["ryan@purdue.edu"],
                     "Members": [
                         "ryan@purdue.edu",
