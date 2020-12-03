@@ -63,7 +63,7 @@ class MockMeeting:
         return self.data
 
 
-MOCK_ZOOM = {"zoom_id": "12312", "zoom_url": "https://ryanjchen.com"}
+MOCK_ZOOM = {"zoom_id": "12312", "start_url": "https://ryanjchen.com"}
 
 
 def test_meeting_post(client):
