@@ -223,5 +223,4 @@ def create_app():
         if request.method == "POST":
             return generate_reconnect_meeting(request)
 
-
     return app
