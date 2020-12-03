@@ -756,7 +756,7 @@ def matchup(request, auth):
             location="WALC",
             meeting_type="In-Person",
             duration=30,
-            community=community["id"],
+            community=community["name"],
         )
 
         try:
@@ -771,7 +771,7 @@ def matchup(request, auth):
         rating = Rating(
             meeting_id=random_id,
             rating_dict={user: -1 for user in match},
-            community=community["id"],
+            community=community["name"],
         )
 
         try:
@@ -789,6 +789,7 @@ def matchup(request, auth):
             location="WALC",
             meeting_type="In-Person",
             duration=30,
+            community=community["name"],
         )
 
         try:
@@ -811,7 +812,7 @@ def matchup(request, auth):
 
     try:
         community_stat_db.update(
-            community["id"],
+            community["name"],
             {
                 "total_meetups": community_stats["total_meetups"]
                 + len(matches)
@@ -821,7 +822,7 @@ def matchup(request, auth):
         )
     except:
         send_discord_message(
-            f"Error updating community stats for community [{community['id']}]"
+            f"Error updating community stats for community [{community['name']}]"
         )
         #! No error message is generated because the community still has the meetups generated properly
 
