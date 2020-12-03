@@ -61,7 +61,8 @@ def meeting_post(request, auth):
         random.choice(string.ascii_letters + string.digits) for i in range(64)
     )
 
-    zoom_info = create_meeting(body["timestamp"], body["duration"], body["user_list"])
+    zoom_info = create_meeting(
+        body["timestamp"], body["duration"], body["user_list"])
 
     meeting = Meeting(
         user_list=body["user_list"],
@@ -78,7 +79,8 @@ def meeting_post(request, auth):
     try:
         meeting_db.add(meeting.to_dict(), id=random_id)
     except:
-        send_discord_message(f"Meeting with id [{random_id}] is already in use")
+        send_discord_message(
+            f"Meeting with id [{random_id}] is already in use")
         return http400("Meeting id already taken")
 
     rating_db = Database("ratings")
@@ -313,10 +315,12 @@ def meeting_accept(request, id):
             # one more accepted meetup
             try:
                 community_stat_db = Database("community_stats")
-                community_stats = community_stat_db.get(meeting.community).to_dict()
+                community_stats = community_stat_db.get(
+                    meeting.community).to_dict()
                 community_stat_db.update(
                     community_stats["community"],
-                    {"accepted_meetups": community_stats["accepted_meetups"] - 1},
+                    {"accepted_meetups":
+                        community_stats["accepted_meetups"] - 1},
                 )
             except:
                 send_discord_message(
@@ -376,10 +380,12 @@ def meeting_decline(request, id):
             # one less accepted meetup
             try:
                 community_stat_db = Database("community_stats")
-                community_stats = community_stat_db.get(meeting.community).to_dict()
+                community_stats = community_stat_db.get(
+                    meeting.community).to_dict()
                 community_stat_db.update(
                     community_stats["community"],
-                    {"accepted_meetups": community_stats["accepted_meetups"] - 1},
+                    {"accepted_meetups":
+                        community_stats["accepted_meetups"] - 1},
                 )
             except:
                 send_discord_message(
@@ -573,10 +579,13 @@ def meetings_get_upcoming(request, auth):
 
     # This sorts by the time of the meeting
     meeting_dict = {meeting.id: meeting for meeting in filtered_meetings}
-    meeting_times = {meeting.id: meeting.timestamp for meeting in filtered_meetings}
-    sorted_meeting_times = sorted(meeting_times.items(), key=lambda kv: (kv[1], kv[0]))
+    meeting_times = {
+        meeting.id: meeting.timestamp for meeting in filtered_meetings}
+    sorted_meeting_times = sorted(
+        meeting_times.items(), key=lambda kv: (kv[1], kv[0]))
 
-    return_meetings = [meeting_dict[key[0]].to_dict() for key in sorted_meeting_times]
+    return_meetings = [meeting_dict[key[0]].to_dict()
+                       for key in sorted_meeting_times]
 
     try:
         response = {
@@ -787,7 +796,8 @@ def matchup(request, auth):
         try:
             rating_db.add(rating.to_dict(), id=random_id)
         except:
-            send_discord_message(f"Rating with id [{random_id}] is already in use")
+            send_discord_message(
+                f"Rating with id [{random_id}] is already in use")
             return http400("Rating id already taken")
 
     if len(zero_matches) > 1:
@@ -814,13 +824,15 @@ def matchup(request, auth):
             )
 
         rating = Rating(
-            meeting_id=random_id, rating_dict={user: -1 for user in zero_matches}
+            meeting_id=random_id, rating_dict={
+                user: -1 for user in zero_matches}
         )
 
         try:
             rating_db.add(rating.to_dict(), id=random_id)
         except:
-            send_discord_message(f"Rating with id [{random_id}] is already in use")
+            send_discord_message(
+                f"Rating with id [{random_id}] is already in use")
             return http400("Rating id already taken")
 
     try:
@@ -976,7 +988,8 @@ def meetings_get_past_users(request, auth):
         }
         return jsonHttp200("Past Users retrieved", response)
     except:
-        send_discord_message(f'Unable to find past users for [{args["email"]}]')
+        send_discord_message(
+            f'Unable to find past users for [{args["email"]}]')
         return http400("Past Users not found")
 
 
@@ -1032,7 +1045,7 @@ def generate_reconnect_meeting(request, auth):
 
     try:
         community_stat_db.update(
-            community["id"],
+            community["name"],
             {
                 "total_meetups": community_stats["total_meetups"] + 1,
             },
