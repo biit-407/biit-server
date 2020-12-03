@@ -765,7 +765,7 @@ def matchup(request, auth):
             meeting_type="In-Person",
             duration=30,
             zoom_id=zoom_info.get("zoom_id"),
-            zoom_link=zoom_info.get("zoom_link"),
+            zoom_link=zoom_info.get("start_url"),
             community=community["name"],
         )
 
