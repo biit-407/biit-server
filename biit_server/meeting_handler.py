@@ -756,7 +756,7 @@ def matchup(request, auth):
             location="WALC",
             meeting_type="In-Person",
             duration=30,
-            community=community["id"],
+            community=community["name"],
         )
 
         try:
@@ -771,7 +771,7 @@ def matchup(request, auth):
         rating = Rating(
             meeting_id=random_id,
             rating_dict={user: -1 for user in match},
-            community=community["id"],
+            community=community["name"],
         )
 
         try:
@@ -789,6 +789,7 @@ def matchup(request, auth):
             location="WALC",
             meeting_type="In-Person",
             duration=30,
+            community=community["name"],
         )
 
         try:
