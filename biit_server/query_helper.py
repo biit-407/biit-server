@@ -12,7 +12,7 @@ def validate_body(body, fields):
     """
     for field in fields:
         if field not in body:
-            return http400(f"Missing field {field} in request")
+            return http400(f"Missing field {field} in request with body: {body}")
     return http200()
 
 
