@@ -27,8 +27,8 @@ class Account:
             self.agePref = data.get("agePref")
             self.birthday = data.get("birthday")
             self.covid = data.get("covid")
-            self.meetLength = data.get("covid")
-            self.meetType = data.get("covid")
+            self.meetLength = data.get("meetLength")
+            self.meetType = data.get("meetType")
             self.optIn = data.get("optIn", 0)
             self.schedule = data.get("schedule")
             self.meetGroup = data.get("meetGroup")
@@ -43,7 +43,7 @@ class Account:
         self.covid = covid
         self.meetLength = meetLength
         self.meetType = meetType
-        self.optIn = (optIn,)
+        self.optIn = optIn
         self.schedule = schedule
         self.meetGroup = meetGroup
 
