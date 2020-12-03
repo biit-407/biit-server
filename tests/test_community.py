@@ -198,7 +198,16 @@ def test_community_join_post(client):
         "biit_server.community_handler.Database"
     ) as mock_database:
         instance = mock_database.return_value
-        instance.get.return_value = MockCollection()
+        test_json = {
+            "name": "Cool Community",
+            "codeofconduct": "Eatmyshorts",
+            "Admins": ["Me", "John", "Jeff"],
+            "Members": ["Me", "John", "Adam"],
+            "mpm": "Here",
+            "meettype": "Here",
+            "token": "TestToken",
+        }
+        instance.get.return_value = MockCommunity(test_json)
         instance.update.return_value = True
 
         test_data = {"token": "Toke", "email": "Testemail@gmail.com"}
@@ -211,13 +220,13 @@ def test_community_join_post(client):
             follow_redirects=True,
         )
         assert (
-            b'{"access_token":"RefreshToken","data":{"Members":[],"name":"mock"},"message":"Community Joined","refresh_token":"AccessToken","status_code":200}\n'
+            b'{"access_token":"RefreshToken","data":{"Admins":["Me","John","Jeff"],"Members":["Me","John","Adam"],"codeofconduct":"Eatmyshorts","meettype":"Here","mpm":"Here","name":"Cool Community","token":"TestToken"},"message":"Community Joined","refresh_token":"AccessToken","status_code":200}\n'
             == rv.data
         )
 
         instance.get.assert_called_with(test_id)
         instance.update.assert_called_once_with(
-            test_id, {"Members": [test_data["email"]]}
+            test_id, {"Members": ["Me", "John", "Adam", test_data["email"]]}
         )
 
 
