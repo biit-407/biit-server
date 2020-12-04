@@ -839,7 +839,7 @@ def matchup(request, auth):
             community["name"],
             {
                 "total_meetups": community_stats["total_meetups"]
-                + len(matches)
+                + len(meeting_list)
                 - failed_meetup_count,
                 "total_sessions": community_stats["total_sessions"] + 1,
             },
